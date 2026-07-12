@@ -1,13 +1,121 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>create-set</ion-title>
-  </ion-toolbar>
-</ion-header>
-
 <ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">create-set</ion-title>
-    </ion-toolbar>
-  </ion-header>
+  <main class="create-set-page">
+    <header class="create-set-header">
+      <button
+        class="back-button"
+        type="button"
+        aria-label="Zurück zu den Lernsets"
+        (click)="goBack()"
+      >
+        <ion-icon name="arrow-back-outline"></ion-icon>
+      </button>
+
+      <h1>Create New Set</h1>
+    </header>
+
+    <form
+      class="create-set-form"
+      [formGroup]="createSetForm"
+      (ngSubmit)="createSet()"
+      novalidate
+    >
+      <div class="form-group">
+        <label for="set-title"> Set Title <span>*</span> </label>
+
+        <input
+          id="set-title"
+          type="text"
+          formControlName="title"
+          maxlength="60"
+          placeholder="e.g., French Vocabulary, Math Formulas..."
+          [class.invalid]="titleInvalid"
+        />
+
+        @if (titleInvalid) {
+        <p class="validation-message">
+          Bitte gib einen Titel mit mindestens zwei Zeichen ein.
+        </p>
+        }
+      </div>
+
+      <div class="form-group">
+        <label for="set-description"> Description </label>
+
+        <textarea
+          id="set-description"
+          formControlName="description"
+          maxlength="250"
+          placeholder="Brief description of this set..."
+        ></textarea>
+
+        <span class="character-count">
+          {{ createSetForm.controls.description.value.length }}/250
+        </span>
+      </div>
+
+      <fieldset class="color-section">
+        <legend>Set Color</legend>
+
+        <div class="color-options">
+          @for (option of colorOptions; track option.value) {
+          <button
+            class="color-option"
+            type="button"
+            [class.selected]="selectedColor === option.value"
+            [style.--option-color]="option.hex"
+            [attr.aria-label]="option.label + ' auswählen'"
+            [attr.aria-pressed]="selectedColor === option.value"
+            (click)="selectColor(option.value)"
+          >
+            @if (selectedColor === option.value) {
+            <ion-icon name="checkmark-outline"></ion-icon>
+            }
+          </button>
+          }
+        </div>
+      </fieldset>
+
+      <div class="form-group">
+        <label for="folder"> Folder </label>
+
+        <div class="select-wrapper">
+          <ion-icon name="folder-outline"></ion-icon>
+
+          <select id="folder" formControlName="folder">
+            <option value="">Select folder...</option>
+
+            <option value="languages">Languages</option>
+
+            <option value="science">Science</option>
+
+            <option value="programming">Programming</option>
+          </select>
+
+          <ion-icon class="select-arrow" name="chevron-down-outline"></ion-icon>
+        </div>
+      </div>
+
+      <section class="preview-card" [style.--preview-color]="selectedColorHex">
+        <span class="preview-label"> Preview </span>
+
+        <div class="preview-content">
+          <div class="preview-icon">
+            <ion-icon name="book-outline"></ion-icon>
+          </div>
+
+          <div>
+            <h2>{{ previewTitle }}</h2>
+            <p>0 cards</p>
+          </div>
+        </div>
+      </section>
+
+      <fl-button
+        text="Create Set & Add Cards"
+        [loading]="isSubmitting"
+        [disabled]="createSetForm.invalid"
+        (clicked)="createSet()"
+      ></fl-button>
+    </form>
+  </main>
 </ion-content>
