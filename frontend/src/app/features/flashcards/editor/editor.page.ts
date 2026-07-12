@@ -87,7 +87,12 @@ export class EditorPage {
   }
 
   goBack(): void {
-    this.location.back();
+    if (window.history.length > 1) {
+      this.location.back();
+      return;
+    }
+
+    void this.router.navigateByUrl('/sets');
   }
 
   toggleEdit(cardId: number): void {
