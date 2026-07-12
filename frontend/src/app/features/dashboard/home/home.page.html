@@ -1,13 +1,150 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>home</ion-title>
-  </ion-toolbar>
-</ion-header>
-
 <ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">home</ion-title>
-    </ion-toolbar>
-  </ion-header>
+  <main class="home-page">
+    <header class="home-header">
+      <div class="header-row">
+        <div>
+          <p class="greeting">Good morning ☀️</p>
+          <h1>{{ userName }}</h1>
+        </div>
+
+        <div class="header-actions">
+          <button
+            class="header-icon-button"
+            type="button"
+            aria-label="Benachrichtigungen"
+            (click)="openNotifications()"
+          >
+            <ion-icon name="notifications-outline"></ion-icon>
+            <span class="badge">2</span>
+          </button>
+
+          <button
+            class="header-icon-button"
+            type="button"
+            aria-label="Einstellungen"
+            (click)="openSettings()"
+          >
+            <ion-icon name="settings-outline"></ion-icon>
+          </button>
+        </div>
+      </div>
+
+      <section class="goal-card">
+        <div class="goal-content">
+          <span class="goal-label">TODAY'S GOAL</span>
+          <h2>Study 30 cards</h2>
+
+          <div class="goal-meta">
+            <span>
+              <ion-icon name="flame-outline"></ion-icon>
+              14-day streak
+            </span>
+
+            <span> ⚡ 22 / 30 done </span>
+          </div>
+        </div>
+
+        <div class="goal-ring">
+          <div class="goal-ring-inner">73%</div>
+        </div>
+      </section>
+    </header>
+
+    <section class="dashboard-content">
+      <section class="stats-grid">
+        <article class="stat-card">
+          <div class="stat-icon blue">
+            <ion-icon name="trophy-outline"></ion-icon>
+          </div>
+
+          <strong>1,248</strong>
+          <span>Cards Learned</span>
+        </article>
+
+        <article class="stat-card">
+          <div class="stat-icon purple">
+            <ion-icon name="time-outline"></ion-icon>
+          </div>
+
+          <strong>48h</strong>
+          <span>Study Hours</span>
+        </article>
+
+        <article class="stat-card">
+          <div class="stat-icon green">
+            <ion-icon name="bar-chart-outline"></ion-icon>
+          </div>
+
+          <strong>87%</strong>
+          <span>Accuracy</span>
+        </article>
+      </section>
+
+      <section class="continue-section">
+        <div class="section-title-row">
+          <h2>Continue Studying</h2>
+          <a routerLink="/sets">See All</a>
+        </div>
+
+        <div class="study-scroll">
+          @for (set of studySets; track set.id) {
+          <button
+            class="study-card"
+            [class.blue]="set.theme === 'blue'"
+            [class.purple]="set.theme === 'purple'"
+            [class.green]="set.theme === 'green'"
+            type="button"
+            (click)="openSet(set.id)"
+          >
+            <div class="study-icon">
+              <ion-icon name="book-outline"></ion-icon>
+            </div>
+
+            <div class="study-card-main">
+              <h3>{{ set.title }}</h3>
+              <p>{{ set.cards }} cards · {{ set.subtitle }}</p>
+            </div>
+
+            <div class="progress-label">
+              <span>Progress</span>
+              <strong>{{ set.progress }}%</strong>
+            </div>
+
+            <div class="progress-track">
+              <div class="progress-value" [style.width.%]="set.progress"></div>
+            </div>
+          </button>
+          }
+        </div>
+      </section>
+
+      <section class="activity-section">
+        <h2>Recent Activity</h2>
+
+        <div class="activity-list">
+          @for (activity of activities; track activity.id) {
+          <article class="activity-card">
+            <div
+              class="activity-icon"
+              [class.blue]="activity.theme === 'blue'"
+              [class.purple]="activity.theme === 'purple'"
+              [class.green]="activity.theme === 'green'"
+            >
+              <ion-icon name="book-outline"></ion-icon>
+            </div>
+
+            <div class="activity-content">
+              <h3>{{ activity.title }}</h3>
+              <p>{{ activity.description }}</p>
+            </div>
+
+            <strong>{{ activity.result }}</strong>
+          </article>
+          }
+        </div>
+      </section>
+    </section>
+  </main>
 </ion-content>
+
+<fl-bottom-nav activePage="home"></fl-bottom-nav>

@@ -1,0 +1,74 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+.bottom-nav {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+
+  width: 100%;
+  min-height: 74px;
+
+  padding: 8px 12px calc(8px + env(safe-area-inset-bottom));
+
+  border-top: 1px solid var(--fl-border);
+
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 -8px 24px rgba(35, 67, 130, 0.08);
+
+  backdrop-filter: blur(18px);
+}
+
+.nav-item {
+  position: relative;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+
+  min-width: 0;
+  padding: 6px 4px;
+
+  border-radius: 14px;
+
+  color: var(--fl-text-muted);
+
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-decoration: none;
+
+  transition:
+    color var(--fl-transition-fast),
+    background var(--fl-transition-fast),
+    transform var(--fl-transition-fast);
+}
+
+.nav-item ion-icon {
+  font-size: 1.35rem;
+}
+
+.nav-item.active {
+  color: var(--fl-primary);
+  background: rgba(47, 107, 255, 0.08);
+}
+
+.nav-item.active::before {
+  position: absolute;
+  top: 2px;
+
+  width: 22px;
+  height: 3px;
+
+  border-radius: var(--fl-radius-pill);
+
+  background: var(--fl-primary);
+
+  content: "";
+}
+
+.nav-item:active {
+  transform: scale(0.96);
+}

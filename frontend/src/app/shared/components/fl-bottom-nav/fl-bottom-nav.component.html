@@ -1,0 +1,41 @@
+<nav class="bottom-nav" aria-label="Hauptnavigation">
+  <a
+    class="nav-item"
+    routerLink="/home"
+    [class.active]="activePage === 'home'"
+    aria-label="Startseite"
+  >
+    <ion-icon name="home-outline"></ion-icon>
+    <span>Home</span>
+  </a>
+
+  <a
+    class="nav-item"
+    routerLink="/sets"
+    [class.active]="activePage === 'sets'"
+    aria-label="Meine Lernsets"
+  >
+    <ion-icon name="layers-outline"></ion-icon>
+    <span>My Sets</span>
+  </a>
+
+  <a
+    class="nav-item"
+    routerLink="/statistics"
+    [class.active]="activePage === 'statistics'"
+    aria-label="Statistiken"
+  >
+    <ion-icon name="bar-chart-outline"></ion-icon>
+    <span>Statistics</span>
+  </a>
+
+  <a
+    class="nav-item"
+    routerLink="/profile"
+    [class.active]="activePage === 'profile'"
+    aria-label="Profil"
+  >
+    <ion-icon name="person-outline"></ion-icon>
+    <span>Profile</span>
+  </a>
+</nav>
