@@ -1,13 +1,119 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>settings</ion-title>
-  </ion-toolbar>
-</ion-header>
-
 <ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">settings</ion-title>
-    </ion-toolbar>
-  </ion-header>
+  <main class="settings-page">
+    <header class="settings-header">
+      <button
+        class="back-button"
+        type="button"
+        aria-label="Zurück"
+        (click)="goBack()"
+      >
+        <ion-icon name="arrow-back-outline"></ion-icon>
+      </button>
+
+      <h1>Settings</h1>
+    </header>
+
+    <section class="settings-content">
+      <button class="profile-card" type="button" (click)="editProfile()">
+        <div class="profile-avatar">{{ user.initials }}</div>
+
+        <div class="profile-information">
+          <strong>{{ user.name }}</strong>
+          <span>{{ user.email }}</span>
+          <small>Edit Profile</small>
+        </div>
+
+        <ion-icon class="row-chevron" name="chevron-forward-outline"></ion-icon>
+      </button>
+
+      <section class="settings-group appearance-group">
+        <h2>Appearance</h2>
+
+        <div class="appearance-placeholder">
+          <span>Theme options will be added later</span>
+        </div>
+      </section>
+
+      <section class="settings-group">
+        <h2>Study Preferences</h2>
+
+        <div class="settings-list">
+          @for ( setting of studyPreferences; track setting.action ) {
+          <button
+            class="settings-row"
+            type="button"
+            (click)="openSetting(setting.action)"
+          >
+            <ion-icon class="row-icon" [name]="setting.icon"></ion-icon>
+
+            <span class="row-label"> {{ setting.label }} </span>
+
+            <span class="row-value"> {{ setting.value }} </span>
+
+            <ion-icon
+              class="row-chevron"
+              name="chevron-forward-outline"
+            ></ion-icon>
+          </button>
+          }
+        </div>
+      </section>
+
+      <section class="settings-group">
+        <h2>Notifications</h2>
+
+        <div class="settings-list">
+          <div class="settings-row toggle-row">
+            <span class="row-label"> Study Reminders </span>
+
+            <ion-toggle
+              aria-label="Lernerinnerungen"
+              [(ngModel)]="studyRemindersEnabled"
+            ></ion-toggle>
+          </div>
+
+          <div class="settings-row toggle-row">
+            <span class="row-label"> Streak Alerts </span>
+
+            <ion-toggle
+              aria-label="Lernserien-Benachrichtigungen"
+              [(ngModel)]="streakAlertsEnabled"
+            ></ion-toggle>
+          </div>
+        </div>
+      </section>
+
+      <section class="settings-group">
+        <h2>Account</h2>
+
+        <div class="settings-list">
+          @for ( setting of accountRows; track setting.action ) {
+          <button
+            class="settings-row"
+            type="button"
+            (click)="openSetting(setting.action)"
+          >
+            <ion-icon class="row-icon" [name]="setting.icon"></ion-icon>
+
+            <span class="row-label"> {{ setting.label }} </span>
+
+            <ion-icon
+              class="row-chevron"
+              name="chevron-forward-outline"
+            ></ion-icon>
+          </button>
+          }
+        </div>
+      </section>
+
+      <button class="logout-button" type="button" (click)="logout()">
+        <ion-icon name="log-out-outline"></ion-icon>
+        Log Out
+      </button>
+
+      <footer class="settings-footer">
+        FlipLearn v2.4.1 · Privacy · Terms
+      </footer>
+    </section>
+  </main>
 </ion-content>
