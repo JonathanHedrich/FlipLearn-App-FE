@@ -1,13 +1,70 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>notifications</ion-title>
-  </ion-toolbar>
-</ion-header>
+<ion-content>
+  <main class="notifications-page">
+    <header class="notifications-header">
+      <button class="back-button" (click)="back()">
+        <ion-icon name="arrow-back-outline"> </ion-icon>
+      </button>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">notifications</ion-title>
-    </ion-toolbar>
-  </ion-header>
+      <div>
+        <h1>Notifications</h1>
+
+        <p>{{unreadCount}} unread</p>
+      </div>
+
+      <button
+        class="read-button"
+        type="button"
+        [disabled]="unreadCount === 0"
+        (click)="markAllRead()"
+      >
+        Mark all read
+      </button>
+    </header>
+
+    <section class="notifications-list">
+      @for(item of notifications;track item.id){
+
+      <article class="notification-card" [class.unread]="item.unread">
+        <div
+          class="notification-icon"
+          [class.streak]="item.type==='streak'"
+          [class.achievement]="item.type==='achievement'"
+          [class.goal]="item.type==='goal'"
+          [class.new]="item.type==='new'"
+          [class.reminder]="item.type==='reminder'"
+        >
+          <ion-icon
+            [name]="
+item.type==='streak'
+?'flame-outline'
+:item.type==='achievement'
+?'trophy-outline'
+:item.type==='goal'
+?'checkmark-done-outline'
+:item.type==='new'
+?'star-outline'
+:'flash-outline'
+"
+          >
+          </ion-icon>
+        </div>
+
+        <div class="notification-content">
+          <h2>
+            {{item.title}} @if(item.unread){
+
+            <span class="dot"></span>
+
+            }
+          </h2>
+
+          <p>{{item.message}}</p>
+
+          <small> {{item.time}} </small>
+        </div>
+      </article>
+
+      }
+    </section>
+  </main>
 </ion-content>
