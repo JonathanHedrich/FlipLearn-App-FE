@@ -1,13 +1,217 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>study-session</ion-title>
-  </ion-toolbar>
-</ion-header>
-
 <ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">study-session</ion-title>
-    </ion-toolbar>
-  </ion-header>
+  <main class="study-page">
+    @if (!sessionComplete) {
+    <header class="study-header">
+      <div class="header-top">
+        <button
+          class="header-button"
+          type="button"
+          aria-label="Lernsitzung beenden"
+          (click)="goBack()"
+        >
+          <ion-icon name="arrow-back-outline"></ion-icon>
+        </button>
+
+        <div class="header-title">
+          <h1>{{ setTitle }}</h1>
+          <p>Card {{ currentCardNumber }} of {{ cards.length }}</p>
+        </div>
+
+        <span class="progress-percentage"> {{ progress }}% </span>
+      </div>
+
+      <div class="header-progress">
+        <div class="header-progress-value" [style.width.%]="progress"></div>
+      </div>
+    </header>
+
+    <section class="study-content">
+      <p class="instruction">Tap the card to reveal the answer</p>
+
+      <div
+        class="flip-card"
+        [class.flipped]="isFlipped"
+        role="button"
+        tabindex="0"
+        (click)="flipCard()"
+        (keydown.enter)="flipCard()"
+        (keydown.space)="flipCard()"
+      >
+        <div class="flip-card-inner">
+          <article class="card-face card-front">
+            <button
+              class="favorite-button"
+              type="button"
+              aria-label="Karte als Favorit markieren"
+              (click)="toggleFavorite($event)"
+            >
+              <ion-icon
+                [name]="
+                    currentCard.favorite
+                      ? 'star-sharp'
+                      : 'star-outline'
+                  "
+              ></ion-icon>
+            </button>
+
+            <span class="card-side-label"> Front </span>
+
+            <h2>{{ currentCard.front }}</h2>
+
+            <p>Tap to flip</p>
+          </article>
+
+          <article class="card-face card-back">
+            <button
+              class="favorite-button"
+              type="button"
+              aria-label="Karte als Favorit markieren"
+              (click)="toggleFavorite($event)"
+            >
+              <ion-icon
+                [name]="
+                    currentCard.favorite
+                      ? 'star-sharp'
+                      : 'star-outline'
+                  "
+              ></ion-icon>
+            </button>
+
+            <span class="card-side-label"> Back </span>
+
+            <h2>{{ currentCard.back }}</h2>
+
+            <p>How well did you know it?</p>
+          </article>
+        </div>
+      </div>
+
+      @if (!isFlipped) {
+      <section class="answer-placeholder">
+        <span> Flip the card before choosing an answer </span>
+      </section>
+      } @else {
+      <section class="rating-section">
+        <p>Rate your answer</p>
+
+        <div class="rating-grid">
+          <button
+            class="rating-button again"
+            type="button"
+            (click)="rateCard('again')"
+          >
+            <ion-icon name="refresh-outline"></ion-icon>
+            <strong>Again</strong>
+            <span>1 min</span>
+          </button>
+
+          <button
+            class="rating-button hard"
+            type="button"
+            (click)="rateCard('hard')"
+          >
+            <ion-icon name="close-outline"></ion-icon>
+            <strong>Hard</strong>
+            <span>6 min</span>
+          </button>
+
+          <button
+            class="rating-button good"
+            type="button"
+            (click)="rateCard('good')"
+          >
+            <ion-icon name="checkmark-outline"></ion-icon>
+            <strong>Good</strong>
+            <span>10 min</span>
+          </button>
+
+          <button
+            class="rating-button easy"
+            type="button"
+            (click)="rateCard('easy')"
+          >
+            <span class="easy-symbol">⚡</span>
+            <strong>Easy</strong>
+            <span>4 days</span>
+          </button>
+        </div>
+      </section>
+      }
+
+      <section class="session-status">
+        <div>
+          <span class="status-dot incorrect"></span>
+          {{ incorrectAnswers }} difficult
+        </div>
+
+        <div>
+          <span class="status-dot correct"></span>
+          {{ correctAnswers }} correct
+        </div>
+      </section>
+    </section>
+    } @else {
+    <section class="result-page">
+      <div class="result-icon">
+        <ion-icon name="trophy-outline"></ion-icon>
+      </div>
+
+      <span class="result-eyebrow"> Session complete </span>
+
+      <h1>Great job!</h1>
+
+      <p>
+        You finished all cards in
+        <strong>{{ setTitle }}</strong>.
+      </p>
+
+      <div class="accuracy-ring" [style.--accuracy]="accuracy">
+        <div class="accuracy-ring-inner">
+          <strong>{{ accuracy }}%</strong>
+          <span>Accuracy</span>
+        </div>
+      </div>
+
+      <section class="result-stats">
+        <article>
+          <div class="result-stat-icon correct">
+            <ion-icon name="checkmark-outline"></ion-icon>
+          </div>
+
+          <strong>{{ correctAnswers }}</strong>
+          <span>Correct</span>
+        </article>
+
+        <article>
+          <div class="result-stat-icon incorrect">
+            <ion-icon name="close-outline"></ion-icon>
+          </div>
+
+          <strong>{{ incorrectAnswers }}</strong>
+          <span>Difficult</span>
+        </article>
+
+        <article>
+          <div class="result-stat-icon total">
+            <span>🃏</span>
+          </div>
+
+          <strong>{{ cards.length }}</strong>
+          <span>Total Cards</span>
+        </article>
+      </section>
+
+      <div class="result-actions">
+        <button class="primary-action" type="button" (click)="restartSession()">
+          <ion-icon name="refresh-outline"></ion-icon>
+          Study Again
+        </button>
+
+        <button class="secondary-action" type="button" (click)="goHome()">
+          Back to Home
+        </button>
+      </div>
+    </section>
+    }
+  </main>
 </ion-content>
