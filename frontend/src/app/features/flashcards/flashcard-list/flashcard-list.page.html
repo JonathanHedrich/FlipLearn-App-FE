@@ -2,7 +2,14 @@
   <main class="sets-page">
     <header class="sets-header">
       <div class="title-row">
-        <h1>My Sets</h1>
+        <div>
+          <h1>My Sets</h1>
+
+          <p>
+            {{ flashcardStore.totalSets() }} Lernsets · {{
+            flashcardStore.totalCards() }} Karten
+          </p>
+        </div>
 
         <button
           class="add-button"
@@ -30,7 +37,7 @@
       <div class="main-filters">
         <button
           type="button"
-          [class.active]="activeFilter === 'all'"
+          [class.active]="activeFilter() === 'all'"
           (click)="setMainFilter('all')"
         >
           All Sets
@@ -38,7 +45,7 @@
 
         <button
           type="button"
-          [class.active]="activeFilter === 'favorites'"
+          [class.active]="activeFilter() === 'favorites'"
           (click)="setMainFilter('favorites')"
         >
           <span>⭐</span>
@@ -47,7 +54,7 @@
 
         <button
           type="button"
-          [class.active]="activeFilter === 'recent'"
+          [class.active]="activeFilter() === 'recent'"
           (click)="setMainFilter('recent')"
         >
           <ion-icon name="time-outline"></ion-icon>
@@ -58,7 +65,7 @@
       <div class="category-scroll">
         <button
           type="button"
-          [class.active]="activeCategory === 'all'"
+          [class.active]="activeCategory() === 'all'"
           (click)="setCategory('all')"
         >
           <ion-icon name="folder-outline"></ion-icon>
@@ -67,7 +74,7 @@
 
         <button
           type="button"
-          [class.active]="activeCategory === 'languages'"
+          [class.active]="activeCategory() === 'languages'"
           (click)="setCategory('languages')"
         >
           <ion-icon name="folder-outline"></ion-icon>
@@ -76,7 +83,7 @@
 
         <button
           type="button"
-          [class.active]="activeCategory === 'science'"
+          [class.active]="activeCategory() === 'science'"
           (click)="setCategory('science')"
         >
           <ion-icon name="folder-outline"></ion-icon>
@@ -85,7 +92,7 @@
 
         <button
           type="button"
-          [class.active]="activeCategory === 'programming'"
+          [class.active]="activeCategory() === 'programming'"
           (click)="setCategory('programming')"
         >
           <ion-icon name="folder-outline"></ion-icon>
@@ -93,35 +100,42 @@
         </button>
       </div>
 
+      @if (filteredSets().length > 0) {
       <section class="sets-grid">
-        @for (set of filteredSets; track set.id) {
+        @for (set of filteredSets(); track set.id) {
         <article
           class="set-card"
-          [class.theme-blue]="set.theme === 'blue'"
-          [class.theme-purple]="set.theme === 'purple'"
-          [class.theme-green]="set.theme === 'green'"
-          [class.theme-orange]="set.theme === 'orange'"
+          [ngClass]="getThemeClass(set.color)"
+          (click)="openEditor(set.id)"
         >
           <div class="set-card-accent"></div>
 
           <div class="set-card-header">
             <div class="set-title-group">
               <h2>{{ set.title }}</h2>
-              <p>{{ set.cards }} cards</p>
+
+              <p>
+                {{ set.cards.length }} {{ set.cards.length === 1 ? 'card' :
+                'cards' }}
+              </p>
             </div>
 
             <button
               class="favorite-button"
               type="button"
               [attr.aria-label]="
-                  set.favorite
-                    ? 'Aus Favoriten entfernen'
-                    : 'Zu Favoriten hinzufügen'
-                "
+                    set.favorite
+                      ? 'Aus Favoriten entfernen'
+                      : 'Zu Favoriten hinzufügen'
+                  "
               (click)="toggleFavorite(set, $event)"
             >
               <ion-icon
-                [name]="set.favorite ? 'heart-sharp' : 'heart-outline'"
+                [name]="
+                      set.favorite
+                        ? 'heart-sharp'
+                        : 'heart-outline'
+                    "
               ></ion-icon>
             </button>
           </div>
@@ -164,15 +178,15 @@
           <strong>New Set</strong>
         </button>
       </section>
-
-      @if (filteredSets.length === 0) {
+      } @else {
       <section class="empty-state">
         <div class="empty-icon">
           <ion-icon name="folder-outline"></ion-icon>
         </div>
 
         <h2>No sets found</h2>
-        <p>Try another search or create a new flashcard set.</p>
+
+        <p>Ändere deine Suche oder erstelle ein neues Lernset.</p>
 
         <button type="button" (click)="openCreateSet()">Create Set</button>
       </section>

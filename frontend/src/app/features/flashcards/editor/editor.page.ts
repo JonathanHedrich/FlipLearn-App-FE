@@ -1,8 +1,8 @@
+import { Location } from '@angular/common';
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { IonContent, IonIcon } from '@ionic/angular/standalone';
-import { Location } from '@angular/common';
 import { addIcons } from 'ionicons';
 import {
   addOutline,
@@ -13,11 +13,8 @@ import {
   trashOutline,
 } from 'ionicons/icons';
 
-interface Flashcard {
-  id: number;
-  front: string;
-  back: string;
-}
+import { Flashcard } from '../../../core/models/flashcard.model';
+import { FlashcardStore } from '../../../core/services/flashcard-store';
 
 @Component({
   selector: 'app-editor',
@@ -28,44 +25,16 @@ interface Flashcard {
 })
 export class EditorPage {
   readonly setId: number;
-  readonly setTitle = 'Spanish Vocabulary';
 
   editingCardId: number | null = null;
-
-  cards: Flashcard[] = [
-    {
-      id: 1,
-      front: 'Hello',
-      back: 'Hola',
-    },
-    {
-      id: 2,
-      front: 'Goodbye',
-      back: 'Adiós',
-    },
-    {
-      id: 3,
-      front: 'Thank you',
-      back: 'Gracias',
-    },
-    {
-      id: 4,
-      front: 'Please',
-      back: 'Por favor',
-    },
-    {
-      id: 5,
-      front: 'Good morning',
-      back: 'Buenos días',
-    },
-  ];
 
   constructor(
     private readonly route: ActivatedRoute,
     private readonly router: Router,
     private readonly location: Location,
+    private readonly flashcardStore: FlashcardStore,
   ) {
-    this.setId = Number(this.route.snapshot.paramMap.get('setId')) || 1;
+    this.setId = Number(this.route.snapshot.paramMap.get('setId')) || 0;
 
     addIcons({
       addOutline,
@@ -75,6 +44,18 @@ export class EditorPage {
       ellipsisVerticalOutline,
       trashOutline,
     });
+  }
+
+  get currentSet() {
+    return this.flashcardStore.getSetById(this.setId);
+  }
+
+  get setTitle(): string {
+    return this.currentSet?.title ?? 'Unbekanntes Lernset';
+  }
+
+  get cards(): Flashcard[] {
+    return this.currentSet?.cards ?? [];
   }
 
   get cardsComplete(): boolean {
@@ -100,13 +81,12 @@ export class EditorPage {
   }
 
   addCard(): void {
-    const newCard: Flashcard = {
-      id: Date.now(),
-      front: '',
-      back: '',
-    };
+    const newCard = this.flashcardStore.addCard(this.setId);
 
-    this.cards.push(newCard);
+    if (!newCard) {
+      return;
+    }
+
     this.editingCardId = newCard.id;
 
     window.setTimeout(() => {
@@ -114,6 +94,12 @@ export class EditorPage {
         behavior: 'smooth',
         block: 'center',
       });
+    });
+  }
+
+  updateCard(cardId: number, field: 'front' | 'back', value: string): void {
+    this.flashcardStore.updateCard(this.setId, cardId, {
+      [field]: value,
     });
   }
 
@@ -126,7 +112,7 @@ export class EditorPage {
       return;
     }
 
-    this.cards = this.cards.filter((card) => card.id !== cardId);
+    this.flashcardStore.deleteCard(this.setId, cardId);
 
     if (this.editingCardId === cardId) {
       this.editingCardId = null;

@@ -33,6 +33,12 @@ ion-content {
   margin: 0;
   font-size: 1.55rem;
   font-weight: 800;
+
+  .title-row > div > p {
+    margin: 4px 0 0;
+    color: rgba(255, 255, 255, 0.78);
+    font-size: 0.7rem;
+  }
 }
 
 .add-button {
@@ -471,5 +477,15 @@ fl-bottom-nav {
 
     border-radius: 34px;
     box-shadow: var(--fl-shadow-lg);
+  }
+
+  .theme-red {
+    --card-color: var(--fl-set-red);
+    --card-soft-color: #ffe8e8;
+  }
+
+  .theme-cyan {
+    --card-color: var(--fl-set-cyan);
+    --card-soft-color: #e4f6fa;
   }
 }

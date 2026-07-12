@@ -3,6 +3,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { IonContent, IonIcon } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
+import { FlashcardStore } from '../../../core/services/flashcard-store';
 import {
   arrowBackOutline,
   bookOutline,
@@ -78,6 +79,7 @@ export class CreateSetPage {
   constructor(
     private readonly formBuilder: FormBuilder,
     private readonly router: Router,
+    private readonly flashcardStore: FlashcardStore,
   ) {
     addIcons({
       arrowBackOutline,
@@ -126,23 +128,16 @@ export class CreateSetPage {
     this.isSubmitting = true;
 
     try {
-      const newSet = {
-        ...this.createSetForm.getRawValue(),
+      const formValue = this.createSetForm.getRawValue();
+
+      const newSet = this.flashcardStore.createSet({
+        title: formValue.title,
+        description: formValue.description,
+        folder: formValue.folder,
         color: this.selectedColor,
-      };
-
-      console.log('Neues Lernset:', newSet);
-
-      /*
-       * Später:
-       * POST /api/sets
-       */
-
-      await new Promise<void>((resolve) => {
-        window.setTimeout(resolve, 700);
       });
 
-      await this.router.navigate(['/sets', 1, 'edit'], {
+      await this.router.navigate(['/sets', newSet.id, 'edit'], {
         replaceUrl: true,
       });
     } finally {

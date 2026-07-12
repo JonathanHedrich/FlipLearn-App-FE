@@ -47,7 +47,10 @@
               <span>Front</span>
 
               <textarea
-                [(ngModel)]="card.front"
+                [ngModel]="card.front"
+                (ngModelChange)="
+    updateCard(card.id, 'front', $event)
+  "
                 placeholder="Enter term or question..."
                 rows="3"
               ></textarea>
@@ -57,7 +60,10 @@
               <span>Back</span>
 
               <textarea
-                [(ngModel)]="card.back"
+                [ngModel]="card.back"
+                (ngModelChange)="
+    updateCard(card.id, 'back', $event)
+  "
                 placeholder="Enter definition or answer..."
                 rows="3"
               ></textarea>

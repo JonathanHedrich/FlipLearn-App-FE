@@ -1,6 +1,36 @@
 <ion-content [fullscreen]="true">
   <main class="study-page">
-    @if (!sessionComplete) {
+    @if (!currentSet) {
+    <section class="empty-study-state">
+      <div class="empty-study-icon">🗂️</div>
+
+      <h1>Set nicht gefunden</h1>
+
+      <p>
+        Dieses Lernset existiert nicht mehr oder konnte nicht geladen werden.
+      </p>
+
+      <button class="primary-action" type="button" (click)="goBack()">
+        Zurück zu My Sets
+      </button>
+    </section>
+    } @else if (cards.length === 0) {
+    <section class="empty-study-state">
+      <div class="empty-study-icon">🃏</div>
+
+      <h1>Noch keine Karten</h1>
+
+      <p>Füge dem Lernset zuerst mindestens eine Lernkarte hinzu.</p>
+
+      <button class="primary-action" type="button" (click)="goToEditor()">
+        Karten hinzufügen
+      </button>
+
+      <button class="secondary-action" type="button" (click)="goBack()">
+        Zurück
+      </button>
+    </section>
+    } @else if (!sessionComplete && currentCard) {
     <header class="study-header">
       <div class="header-top">
         <button

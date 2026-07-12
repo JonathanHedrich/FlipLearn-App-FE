@@ -1,5 +1,6 @@
+import { Location } from '@angular/common';
 import { Component } from '@angular/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { IonContent, IonIcon } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
@@ -12,12 +13,8 @@ import {
   trophyOutline,
 } from 'ionicons/icons';
 
-interface StudyCard {
-  id: number;
-  front: string;
-  back: string;
-  favorite: boolean;
-}
+import { Flashcard } from '../../../core/models/flashcard.model';
+import { FlashcardStore } from '../../../core/services/flashcard-store';
 
 type StudyRating = 'again' | 'hard' | 'good' | 'easy';
 
@@ -29,40 +26,7 @@ type StudyRating = 'again' | 'hard' | 'good' | 'easy';
   styleUrls: ['./study-session.page.scss'],
 })
 export class StudySessionPage {
-  readonly setTitle = 'Spanish Vocabulary';
-
-  readonly cards: StudyCard[] = [
-    {
-      id: 1,
-      front: 'Hello',
-      back: 'Hola',
-      favorite: false,
-    },
-    {
-      id: 2,
-      front: 'Goodbye',
-      back: 'Adiós',
-      favorite: true,
-    },
-    {
-      id: 3,
-      front: 'Thank you',
-      back: 'Gracias',
-      favorite: false,
-    },
-    {
-      id: 4,
-      front: 'Please',
-      back: 'Por favor',
-      favorite: false,
-    },
-    {
-      id: 5,
-      front: 'Good morning',
-      back: 'Buenos días',
-      favorite: false,
-    },
-  ];
+  readonly setId: number;
 
   currentIndex = 0;
   isFlipped = false;
@@ -71,7 +35,14 @@ export class StudySessionPage {
   correctAnswers = 0;
   incorrectAnswers = 0;
 
-  constructor(private readonly router: Router) {
+  constructor(
+    private readonly route: ActivatedRoute,
+    private readonly router: Router,
+    private readonly location: Location,
+    private readonly flashcardStore: FlashcardStore,
+  ) {
+    this.setId = Number(this.route.snapshot.paramMap.get('setId')) || 0;
+
     addIcons({
       arrowBackOutline,
       checkmarkOutline,
@@ -83,15 +54,31 @@ export class StudySessionPage {
     });
   }
 
-  get currentCard(): StudyCard {
+  get currentSet() {
+    return this.flashcardStore.getSetById(this.setId);
+  }
+
+  get setTitle(): string {
+    return this.currentSet?.title ?? 'Unbekanntes Lernset';
+  }
+
+  get cards(): Flashcard[] {
+    return this.currentSet?.cards ?? [];
+  }
+
+  get currentCard(): Flashcard | undefined {
     return this.cards[this.currentIndex];
   }
 
   get currentCardNumber(): number {
-    return this.currentIndex + 1;
+    return this.cards.length === 0 ? 0 : this.currentIndex + 1;
   }
 
   get progress(): number {
+    if (this.cards.length === 0) {
+      return 0;
+    }
+
     return Math.round((this.currentCardNumber / this.cards.length) * 100);
   }
 
@@ -106,20 +93,36 @@ export class StudySessionPage {
   }
 
   goBack(): void {
+    if (window.history.length > 1) {
+      this.location.back();
+      return;
+    }
+
     void this.router.navigateByUrl('/sets');
   }
 
   flipCard(): void {
+    if (!this.currentCard) {
+      return;
+    }
+
     this.isFlipped = !this.isFlipped;
   }
 
   toggleFavorite(event: Event): void {
     event.stopPropagation();
-    this.currentCard.favorite = !this.currentCard.favorite;
+
+    if (!this.currentCard) {
+      return;
+    }
+
+    this.flashcardStore.updateCard(this.setId, this.currentCard.id, {
+      favorite: !this.currentCard.favorite,
+    });
   }
 
   rateCard(rating: StudyRating): void {
-    if (!this.isFlipped) {
+    if (!this.isFlipped || !this.currentCard) {
       return;
     }
 
@@ -146,13 +149,24 @@ export class StudySessionPage {
     });
   }
 
+  goToEditor(): void {
+    void this.router.navigate(['/sets', this.setId, 'edit']);
+  }
+
   private nextCard(): void {
     if (this.currentIndex >= this.cards.length - 1) {
       this.sessionComplete = true;
+      this.updateSetProgress();
       return;
     }
 
     this.currentIndex += 1;
     this.isFlipped = false;
+  }
+
+  private updateSetProgress(): void {
+    this.flashcardStore.updateSet(this.setId, {
+      progress: this.accuracy,
+    });
   }
 }
