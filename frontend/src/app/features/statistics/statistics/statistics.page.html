@@ -1,13 +1,153 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>statistics</ion-title>
-  </ion-toolbar>
-</ion-header>
-
 <ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">statistics</ion-title>
-    </ion-toolbar>
-  </ion-header>
+  <main class="statistics-page">
+    <header class="statistics-header">
+      <div class="header-content">
+        <div>
+          <h1>Statistics</h1>
+          <p>Your learning progress</p>
+        </div>
+
+        <div class="streak-badge">
+          <ion-icon name="flame-outline"></ion-icon>
+          <span>{{ streakDays }} day streak</span>
+        </div>
+      </div>
+    </header>
+
+    <section class="statistics-content">
+      <section class="summary-card">
+        <span class="section-label">This week</span>
+
+        <div class="summary-grid">
+          <article class="summary-item">
+            <div class="summary-icon blue">
+              <ion-icon name="book-outline"></ion-icon>
+            </div>
+
+            <strong>{{ weeklyCards }}</strong>
+            <span>Cards Studied</span>
+          </article>
+
+          <article class="summary-item">
+            <div class="summary-icon purple">
+              <ion-icon name="time-outline"></ion-icon>
+            </div>
+
+            <strong>{{ weeklyStudyTime }}</strong>
+            <span>Study Time</span>
+          </article>
+
+          <article class="summary-item">
+            <div class="summary-icon green">
+              <ion-icon name="trophy-outline"></ion-icon>
+            </div>
+
+            <strong>{{ weeklyAccuracy }}%</strong>
+            <span>Avg. Accuracy</span>
+          </article>
+        </div>
+      </section>
+
+      <section class="chart-card">
+        <div class="card-heading">
+          <h2>Cards per Day</h2>
+          <p>This week</p>
+        </div>
+
+        <div class="chart-wrapper">
+          <div class="y-axis">
+            <span>80</span>
+            <span>40</span>
+            <span>20</span>
+            <span>0</span>
+          </div>
+
+          <div class="chart-main">
+            <svg
+              class="line-chart"
+              viewBox="0 0 276 96"
+              preserveAspectRatio="none"
+              role="img"
+              aria-label="Gelernte Karten pro Wochentag"
+            >
+              <defs>
+                <linearGradient
+                  id="chartAreaGradient"
+                  x1="0"
+                  y1="0"
+                  x2="0"
+                  y2="1"
+                >
+                  <stop offset="0%" stop-color="#2f6bff" stop-opacity="0.22" />
+
+                  <stop offset="100%" stop-color="#2f6bff" stop-opacity="0" />
+                </linearGradient>
+              </defs>
+
+              <line x1="0" y1="24" x2="276" y2="24" class="grid-line"></line>
+
+              <line x1="0" y1="48" x2="276" y2="48" class="grid-line"></line>
+
+              <line x1="0" y1="72" x2="276" y2="72" class="grid-line"></line>
+
+              <polygon
+                [attr.points]="chartAreaPoints"
+                fill="url(#chartAreaGradient)"
+              ></polygon>
+
+              <polyline
+                [attr.points]="chartPolylinePoints"
+                class="chart-line"
+              ></polyline>
+
+              @for (point of chartPoints; track point.day) {
+              <circle
+                [attr.cx]="point.x"
+                [attr.cy]="point.y"
+                r="3"
+                class="chart-point"
+              ></circle>
+              }
+            </svg>
+
+            <div class="x-axis">
+              @for (point of chartPoints; track point.day) {
+              <span>{{ point.day }}</span>
+              }
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="accuracy-card">
+        <div class="card-heading">
+          <h2>Accuracy by Set</h2>
+          <p>Last session results</p>
+        </div>
+
+        <div class="accuracy-list">
+          @for (set of setAccuracies; track set.id) {
+          <article
+            class="accuracy-item"
+            [class.theme-blue]="set.theme === 'blue'"
+            [class.theme-purple]="set.theme === 'purple'"
+            [class.theme-green]="set.theme === 'green'"
+            [class.theme-orange]="set.theme === 'orange'"
+          >
+            <div class="accuracy-heading">
+              <span>{{ set.title }}</span>
+              <strong>{{ set.accuracy }}%</strong>
+            </div>
+
+            <div class="accuracy-track">
+              <div class="accuracy-value" [style.width.%]="set.accuracy"></div>
+            </div>
+          </article>
+          }
+        </div>
+      </section>
+    </section>
+  </main>
 </ion-content>
+
+<fl-bottom-nav activePage="statistics"></fl-bottom-nav>
