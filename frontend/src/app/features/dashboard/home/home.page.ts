@@ -1,97 +1,112 @@
-import { Component } from '@angular/core';
+import { Component, computed } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { IonContent, IonIcon } from '@ionic/angular/standalone';
+import { DecimalPipe } from '@angular/common';
 import { addIcons } from 'ionicons';
 import {
   barChartOutline,
   bookOutline,
   flameOutline,
-  layersOutline,
   notificationsOutline,
   settingsOutline,
   timeOutline,
   trophyOutline,
 } from 'ionicons/icons';
 
+import {
+  FlashcardSet,
+  FlashcardSetColor,
+} from '../../../core/models/flashcard.model';
+import { FlashcardStore } from '../../../core/services/flashcard-store';
 import { FlBottomNavComponent } from '../../../shared/components/fl-bottom-nav/fl-bottom-nav.component';
 
-interface StudySet {
-  id: number;
-  title: string;
-  subtitle: string;
-  cards: number;
-  progress: number;
-  theme: 'blue' | 'purple' | 'green';
-}
-
-interface Activity {
+interface RecentActivity {
   id: number;
   title: string;
   description: string;
   result: string;
-  theme: 'blue' | 'purple' | 'green';
+  color: FlashcardSetColor;
 }
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [RouterLink, IonContent, IonIcon, FlBottomNavComponent],
+  imports: [RouterLink, IonContent, IonIcon, FlBottomNavComponent, DecimalPipe],
   templateUrl: './home.page.html',
   styleUrls: ['./home.page.scss'],
 })
 export class HomePage {
   readonly userName = 'Alex Johnson';
 
-  readonly studySets: StudySet[] = [
-    {
-      id: 1,
-      title: 'Spanish Vocabulary',
-      subtitle: '2h ago',
-      cards: 5,
-      progress: 72,
-      theme: 'blue',
-    },
-    {
-      id: 2,
-      title: 'Chemistry Basics',
-      subtitle: '1d ago',
-      cards: 4,
-      progress: 45,
-      theme: 'purple',
-    },
-    {
-      id: 3,
-      title: 'World Capitals',
-      subtitle: '3h ago',
-      cards: 15,
-      progress: 93,
-      theme: 'green',
-    },
-  ];
+  readonly recentSets = computed(() =>
+    [...this.flashcardStore.sets()]
+      .sort(
+        (firstSet, secondSet) =>
+          new Date(secondSet.updatedAt).getTime() -
+          new Date(firstSet.updatedAt).getTime(),
+      )
+      .slice(0, 3),
+  );
 
-  readonly activities: Activity[] = [
-    {
-      id: 1,
-      title: 'World Capitals',
-      description: 'Studied 15 cards · 3h ago',
-      result: '93%',
-      theme: 'green',
-    },
-    {
-      id: 2,
-      title: 'Spanish Vocabulary',
-      description: 'Studied 5 cards · 2h ago',
-      result: '72%',
-      theme: 'blue',
-    },
-  ];
+  readonly learnedCards = computed(() =>
+    this.flashcardStore
+      .sets()
+      .reduce(
+        (total, set) =>
+          total + Math.round(set.cards.length * (set.progress / 100)),
+        0,
+      ),
+  );
 
-  constructor(private readonly router: Router) {
+  readonly averageAccuracy = computed(() => {
+    const sets = this.flashcardStore.sets();
+
+    if (sets.length === 0) {
+      return 0;
+    }
+
+    const totalProgress = sets.reduce((total, set) => total + set.progress, 0);
+
+    return Math.round(totalProgress / sets.length);
+  });
+
+  readonly dueCards = computed(() =>
+    this.flashcardStore
+      .sets()
+      .reduce(
+        (total, set) =>
+          total +
+          Math.max(
+            0,
+            set.cards.length -
+              Math.round(set.cards.length * (set.progress / 100)),
+          ),
+        0,
+      ),
+  );
+
+  readonly recentActivities = computed<RecentActivity[]>(() =>
+    this.recentSets()
+      .filter((set) => set.cards.length > 0)
+      .slice(0, 2)
+      .map((set) => ({
+        id: set.id,
+        title: set.title,
+        description:
+          `${set.cards.length} cards · ` + this.formatUpdatedAt(set.updatedAt),
+        result: `${set.progress}%`,
+        color: set.color,
+      })),
+  );
+
+  constructor(
+    readonly flashcardStore: FlashcardStore,
+    private readonly router: Router,
+  ) {
     addIcons({
       barChartOutline,
       bookOutline,
       flameOutline,
-      layersOutline,
       notificationsOutline,
       settingsOutline,
       timeOutline,
@@ -107,7 +122,52 @@ export class HomePage {
     void this.router.navigateByUrl('/settings');
   }
 
-  openSet(id: number): void {
-    void this.router.navigate(['/study', id]);
+  openSet(setId: number): void {
+    const set = this.flashcardStore.getSetById(setId);
+
+    if (!set) {
+      return;
+    }
+
+    if (set.cards.length === 0) {
+      void this.router.navigate(['/sets', setId, 'edit']);
+
+      return;
+    }
+
+    void this.router.navigate(['/study', setId]);
+  }
+
+  getThemeClass(color: FlashcardSetColor): string {
+    return `theme-${color}`;
+  }
+
+  getCardLabel(set: FlashcardSet): string {
+    return set.cards.length === 1 ? '1 card' : `${set.cards.length} cards`;
+  }
+
+  private formatUpdatedAt(value: string): string {
+    const updatedAt = new Date(value);
+    const difference = Date.now() - updatedAt.getTime();
+
+    const minutes = Math.floor(difference / 60_000);
+
+    if (minutes < 1) {
+      return 'just now';
+    }
+
+    if (minutes < 60) {
+      return `${minutes}m ago`;
+    }
+
+    const hours = Math.floor(minutes / 60);
+
+    if (hours < 24) {
+      return `${hours}h ago`;
+    }
+
+    const days = Math.floor(hours / 24);
+
+    return `${days}d ago`;
   }
 }

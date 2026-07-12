@@ -160,8 +160,8 @@ ion-content {
   border-radius: 50%;
 
   background: conic-gradient(
-    #ffffff 0deg 263deg,
-    rgba(255, 255, 255, 0.22) 263deg 360deg
+    #ffffff 0deg calc(var(--goal-progress, 0) * 12deg),
+    rgba(255, 255, 255, 0.22) calc(var(--goal-progress, 0) * 12deg) 360deg
   );
 }
 
@@ -521,5 +521,115 @@ fl-bottom-nav {
 
     border-radius: 34px;
     box-shadow: var(--fl-shadow-lg);
+  }
+
+  .study-card.theme-blue {
+    background: linear-gradient(145deg, #2c72ff, #2661e9);
+  }
+
+  .study-card.theme-purple {
+    background: linear-gradient(145deg, #9842ef, #7a2de8);
+  }
+
+  .study-card.theme-green {
+    background: linear-gradient(145deg, #11af86, #008f70);
+  }
+
+  .study-card.theme-orange {
+    background: linear-gradient(145deg, #f09a22, #dd7300);
+  }
+
+  .study-card.theme-red {
+    background: linear-gradient(145deg, #f34e55, #d92d36);
+  }
+
+  .study-card.theme-cyan {
+    background: linear-gradient(145deg, #22a8c9, #087d9c);
+  }
+
+  .activity-icon.theme-blue {
+    color: var(--fl-set-blue);
+    background: #e8efff;
+  }
+
+  .activity-icon.theme-purple {
+    color: var(--fl-set-purple);
+    background: #f1e9ff;
+  }
+
+  .activity-icon.theme-green {
+    color: var(--fl-set-green);
+    background: #e2f6ef;
+  }
+
+  .activity-icon.theme-orange {
+    color: var(--fl-set-orange);
+    background: #fff0dc;
+  }
+
+  .activity-icon.theme-red {
+    color: var(--fl-set-red);
+    background: #ffe8e8;
+  }
+
+  .activity-icon.theme-cyan {
+    color: var(--fl-set-cyan);
+    background: #e4f6fa;
+  }
+  .empty-home-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    margin-top: 14px;
+    padding: 26px 18px;
+
+    border: 2px dashed var(--fl-border-strong);
+    border-radius: 18px;
+
+    color: var(--fl-primary);
+    background: rgba(255, 255, 255, 0.7);
+
+    text-align: center;
+  }
+
+  .empty-home-card div {
+    display: grid;
+    place-items: center;
+
+    width: 44px;
+    height: 44px;
+
+    border-radius: 14px;
+    background: var(--fl-primary-light);
+
+    font-size: 1.5rem;
+  }
+
+  .empty-home-card strong {
+    margin-top: 12px;
+    font-size: 0.86rem;
+  }
+
+  .empty-home-card span {
+    margin-top: 5px;
+
+    color: var(--fl-text-secondary);
+
+    font-size: 0.72rem;
+  }
+
+  .empty-activity {
+    margin: 12px 0 0;
+    padding: 18px;
+
+    border: 1px solid var(--fl-border);
+    border-radius: 16px;
+
+    color: var(--fl-text-secondary);
+    background: #ffffff;
+
+    font-size: 0.76rem;
+    text-align: center;
   }
 }

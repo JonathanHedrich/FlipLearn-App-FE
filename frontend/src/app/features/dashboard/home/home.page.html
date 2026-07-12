@@ -32,6 +32,7 @@
       <section class="goal-card">
         <div class="goal-content">
           <span class="goal-label">TODAY'S GOAL</span>
+
           <h2>Study 30 cards</h2>
 
           <div class="goal-meta">
@@ -40,12 +41,22 @@
               14-day streak
             </span>
 
-            <span> ⚡ 22 / 30 done </span>
+            <span> ⚡ {{ learnedCards() }} / 30 done </span>
           </div>
         </div>
 
-        <div class="goal-ring">
-          <div class="goal-ring-inner">73%</div>
+        <div
+          class="goal-ring"
+          [style.--goal-progress]="
+            learnedCards() > 30
+              ? 30
+              : learnedCards()
+          "
+        >
+          <div class="goal-ring-inner">
+            {{ learnedCards() >= 30 ? 100 : (learnedCards() / 30) * 100 |
+            number: '1.0-0' }}%
+          </div>
         </div>
       </section>
     </header>
@@ -57,17 +68,17 @@
             <ion-icon name="trophy-outline"></ion-icon>
           </div>
 
-          <strong>1,248</strong>
+          <strong>{{ learnedCards() }}</strong>
           <span>Cards Learned</span>
         </article>
 
         <article class="stat-card">
           <div class="stat-icon purple">
-            <ion-icon name="time-outline"></ion-icon>
+            <ion-icon name="book-outline"></ion-icon>
           </div>
 
-          <strong>48h</strong>
-          <span>Study Hours</span>
+          <strong>{{ flashcardStore.totalCards() }}</strong>
+          <span>Total Cards</span>
         </article>
 
         <article class="stat-card">
@@ -75,7 +86,7 @@
             <ion-icon name="bar-chart-outline"></ion-icon>
           </div>
 
-          <strong>87%</strong>
+          <strong>{{ averageAccuracy() }}%</strong>
           <span>Accuracy</span>
         </article>
       </section>
@@ -83,16 +94,16 @@
       <section class="continue-section">
         <div class="section-title-row">
           <h2>Continue Studying</h2>
-          <a routerLink="/sets">See All</a>
+
+          <a routerLink="/sets"> See All </a>
         </div>
 
+        @if (recentSets().length > 0) {
         <div class="study-scroll">
-          @for (set of studySets; track set.id) {
+          @for (set of recentSets(); track set.id) {
           <button
             class="study-card"
-            [class.blue]="set.theme === 'blue'"
-            [class.purple]="set.theme === 'purple'"
-            [class.green]="set.theme === 'green'"
+            [class]="getThemeClass(set.color)"
             type="button"
             (click)="openSet(set.id)"
           >
@@ -102,7 +113,8 @@
 
             <div class="study-card-main">
               <h3>{{ set.title }}</h3>
-              <p>{{ set.cards }} cards · {{ set.subtitle }}</p>
+
+              <p>{{ getCardLabel(set) }} · {{ set.progress }}% complete</p>
             </div>
 
             <div class="progress-label">
@@ -116,20 +128,23 @@
           </button>
           }
         </div>
+        } @else {
+        <a class="empty-home-card" routerLink="/sets/create">
+          <div>＋</div>
+          <strong>Create your first set</strong>
+          <span> Add flashcards and start learning. </span>
+        </a>
+        }
       </section>
 
       <section class="activity-section">
         <h2>Recent Activity</h2>
 
+        @if (recentActivities().length > 0) {
         <div class="activity-list">
-          @for (activity of activities; track activity.id) {
+          @for ( activity of recentActivities(); track activity.id ) {
           <article class="activity-card">
-            <div
-              class="activity-icon"
-              [class.blue]="activity.theme === 'blue'"
-              [class.purple]="activity.theme === 'purple'"
-              [class.green]="activity.theme === 'green'"
-            >
+            <div class="activity-icon" [class]="getThemeClass(activity.color)">
               <ion-icon name="book-outline"></ion-icon>
             </div>
 
@@ -142,6 +157,9 @@
           </article>
           }
         </div>
+        } @else {
+        <p class="empty-activity">Noch keine Lernaktivitäten vorhanden.</p>
+        }
       </section>
     </section>
   </main>
