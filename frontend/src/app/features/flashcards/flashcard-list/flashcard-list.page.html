@@ -1,13 +1,184 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>flashcard-list</ion-title>
-  </ion-toolbar>
-</ion-header>
-
 <ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">flashcard-list</ion-title>
-    </ion-toolbar>
-  </ion-header>
+  <main class="sets-page">
+    <header class="sets-header">
+      <div class="title-row">
+        <h1>My Sets</h1>
+
+        <button
+          class="add-button"
+          type="button"
+          aria-label="Neues Lernset erstellen"
+          (click)="openCreateSet()"
+        >
+          <ion-icon name="add-outline"></ion-icon>
+        </button>
+      </div>
+
+      <label class="search-field">
+        <ion-icon name="search-outline"></ion-icon>
+
+        <input
+          type="search"
+          placeholder="Search sets..."
+          aria-label="Lernsets durchsuchen"
+          [(ngModel)]="searchTerm"
+        />
+      </label>
+    </header>
+
+    <section class="sets-content">
+      <div class="main-filters">
+        <button
+          type="button"
+          [class.active]="activeFilter === 'all'"
+          (click)="setMainFilter('all')"
+        >
+          All Sets
+        </button>
+
+        <button
+          type="button"
+          [class.active]="activeFilter === 'favorites'"
+          (click)="setMainFilter('favorites')"
+        >
+          <span>⭐</span>
+          Favorites
+        </button>
+
+        <button
+          type="button"
+          [class.active]="activeFilter === 'recent'"
+          (click)="setMainFilter('recent')"
+        >
+          <ion-icon name="time-outline"></ion-icon>
+          Recent
+        </button>
+      </div>
+
+      <div class="category-scroll">
+        <button
+          type="button"
+          [class.active]="activeCategory === 'all'"
+          (click)="setCategory('all')"
+        >
+          <ion-icon name="folder-outline"></ion-icon>
+          All
+        </button>
+
+        <button
+          type="button"
+          [class.active]="activeCategory === 'languages'"
+          (click)="setCategory('languages')"
+        >
+          <ion-icon name="folder-outline"></ion-icon>
+          Languages
+        </button>
+
+        <button
+          type="button"
+          [class.active]="activeCategory === 'science'"
+          (click)="setCategory('science')"
+        >
+          <ion-icon name="folder-outline"></ion-icon>
+          Science
+        </button>
+
+        <button
+          type="button"
+          [class.active]="activeCategory === 'programming'"
+          (click)="setCategory('programming')"
+        >
+          <ion-icon name="folder-outline"></ion-icon>
+          Coding
+        </button>
+      </div>
+
+      <section class="sets-grid">
+        @for (set of filteredSets; track set.id) {
+        <article
+          class="set-card"
+          [class.theme-blue]="set.theme === 'blue'"
+          [class.theme-purple]="set.theme === 'purple'"
+          [class.theme-green]="set.theme === 'green'"
+          [class.theme-orange]="set.theme === 'orange'"
+        >
+          <div class="set-card-accent"></div>
+
+          <div class="set-card-header">
+            <div class="set-title-group">
+              <h2>{{ set.title }}</h2>
+              <p>{{ set.cards }} cards</p>
+            </div>
+
+            <button
+              class="favorite-button"
+              type="button"
+              [attr.aria-label]="
+                  set.favorite
+                    ? 'Aus Favoriten entfernen'
+                    : 'Zu Favoriten hinzufügen'
+                "
+              (click)="toggleFavorite(set, $event)"
+            >
+              <ion-icon
+                [name]="set.favorite ? 'heart-sharp' : 'heart-outline'"
+              ></ion-icon>
+            </button>
+          </div>
+
+          <div class="progress-heading">
+            <span>Progress</span>
+            <strong>{{ set.progress }}%</strong>
+          </div>
+
+          <div class="progress-track">
+            <div class="progress-value" [style.width.%]="set.progress"></div>
+          </div>
+
+          <div class="set-actions">
+            <button
+              class="study-button"
+              type="button"
+              (click)="startStudy(set.id, $event)"
+            >
+              Study
+            </button>
+
+            <button
+              class="edit-button"
+              type="button"
+              aria-label="Lernset bearbeiten"
+              (click)="openEditor(set.id, $event)"
+            >
+              <ion-icon name="create-outline"></ion-icon>
+            </button>
+          </div>
+        </article>
+        }
+
+        <button class="new-set-card" type="button" (click)="openCreateSet()">
+          <span class="new-set-icon">
+            <ion-icon name="add-outline"></ion-icon>
+          </span>
+
+          <strong>New Set</strong>
+        </button>
+      </section>
+
+      @if (filteredSets.length === 0) {
+      <section class="empty-state">
+        <div class="empty-icon">
+          <ion-icon name="folder-outline"></ion-icon>
+        </div>
+
+        <h2>No sets found</h2>
+        <p>Try another search or create a new flashcard set.</p>
+
+        <button type="button" (click)="openCreateSet()">Create Set</button>
+      </section>
+      }
+    </section>
+  </main>
 </ion-content>
+
+<fl-bottom-nav activePage="sets"></fl-bottom-nav>
