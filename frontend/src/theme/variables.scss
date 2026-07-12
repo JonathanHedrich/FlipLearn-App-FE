@@ -1,0 +1,254 @@
+/*
+ * FlipLearn – globales Design-System
+ * Datei: src/theme/variables.scss
+ */
+
+:root {
+  /*
+   * Ionic-Hauptfarben
+   */
+
+  --ion-color-primary: #2f6bff;
+  --ion-color-primary-rgb: 47, 107, 255;
+  --ion-color-primary-contrast: #ffffff;
+  --ion-color-primary-contrast-rgb: 255, 255, 255;
+  --ion-color-primary-shade: #295ee0;
+  --ion-color-primary-tint: #447aff;
+
+  --ion-color-secondary: #5438f5;
+  --ion-color-secondary-rgb: 84, 56, 245;
+  --ion-color-secondary-contrast: #ffffff;
+  --ion-color-secondary-contrast-rgb: 255, 255, 255;
+  --ion-color-secondary-shade: #4a31d8;
+  --ion-color-secondary-tint: #654cf6;
+
+  --ion-color-tertiary: #8a3ffc;
+  --ion-color-tertiary-rgb: 138, 63, 252;
+  --ion-color-tertiary-contrast: #ffffff;
+  --ion-color-tertiary-contrast-rgb: 255, 255, 255;
+  --ion-color-tertiary-shade: #7937de;
+  --ion-color-tertiary-tint: #9652fc;
+
+  --ion-color-success: #08a77a;
+  --ion-color-success-rgb: 8, 167, 122;
+  --ion-color-success-contrast: #ffffff;
+  --ion-color-success-contrast-rgb: 255, 255, 255;
+  --ion-color-success-shade: #07936b;
+  --ion-color-success-tint: #21b187;
+
+  --ion-color-warning: #f59e0b;
+  --ion-color-warning-rgb: 245, 158, 11;
+  --ion-color-warning-contrast: #ffffff;
+  --ion-color-warning-contrast-rgb: 255, 255, 255;
+  --ion-color-warning-shade: #d88b0a;
+  --ion-color-warning-tint: #f6a824;
+
+  --ion-color-danger: #ef4444;
+  --ion-color-danger-rgb: 239, 68, 68;
+  --ion-color-danger-contrast: #ffffff;
+  --ion-color-danger-contrast-rgb: 255, 255, 255;
+  --ion-color-danger-shade: #d23c3c;
+  --ion-color-danger-tint: #f15757;
+
+  --ion-color-light: #f4f7ff;
+  --ion-color-light-rgb: 244, 247, 255;
+  --ion-color-light-contrast: #102047;
+  --ion-color-light-contrast-rgb: 16, 32, 71;
+  --ion-color-light-shade: #d7d9e0;
+  --ion-color-light-tint: #f5f8ff;
+
+  --ion-color-medium: #7181aa;
+  --ion-color-medium-rgb: 113, 129, 170;
+  --ion-color-medium-contrast: #ffffff;
+  --ion-color-medium-contrast-rgb: 255, 255, 255;
+  --ion-color-medium-shade: #637196;
+  --ion-color-medium-tint: #7f8eb3;
+
+  --ion-color-dark: #102047;
+  --ion-color-dark-rgb: 16, 32, 71;
+  --ion-color-dark-contrast: #ffffff;
+  --ion-color-dark-contrast-rgb: 255, 255, 255;
+  --ion-color-dark-shade: #0e1c3e;
+  --ion-color-dark-tint: #28365a;
+
+  /*
+   * Allgemeine Ionic-Einstellungen
+   */
+
+  --ion-background-color: #eef4ff;
+  --ion-background-color-rgb: 238, 244, 255;
+
+  --ion-text-color: #102047;
+  --ion-text-color-rgb: 16, 32, 71;
+
+  --ion-font-family:
+    "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
+    Arial, sans-serif;
+
+  --ion-toolbar-background: transparent;
+  --ion-toolbar-color: #ffffff;
+
+  --ion-item-background: transparent;
+  --ion-card-background: #ffffff;
+
+  /*
+   * FlipLearn-Farbpalette
+   */
+
+  --fl-primary: #2f6bff;
+  --fl-primary-dark: #2358e8;
+  --fl-primary-light: #e2ecff;
+
+  --fl-secondary: #5438f5;
+  --fl-secondary-dark: #4329df;
+  --fl-secondary-light: #eee9ff;
+
+  --fl-gradient-start: #2575fc;
+  --fl-gradient-middle: #3560f8;
+  --fl-gradient-end: #5133df;
+
+  --fl-background: #eef4ff;
+  --fl-surface: #ffffff;
+  --fl-surface-soft: #f7f9ff;
+  --fl-input-background: #e3edff;
+
+  --fl-text-primary: #102047;
+  --fl-text-secondary: #6476a3;
+  --fl-text-muted: #8a99bd;
+  --fl-text-on-primary: #ffffff;
+
+  --fl-border: #d9e4f8;
+  --fl-border-strong: #bdd2fa;
+
+  --fl-success: #08a77a;
+  --fl-warning: #f59e0b;
+  --fl-danger: #ef4444;
+  --fl-info: #2f6bff;
+
+  /*
+   * Alternative Lernset-Farben aus dem Mockup
+   */
+
+  --fl-set-blue: #2868f7;
+  --fl-set-purple: #8735ef;
+  --fl-set-green: #069f78;
+  --fl-set-orange: #e88100;
+  --fl-set-red: #e92929;
+  --fl-set-cyan: #1495b5;
+
+  /*
+   * Typografie
+   */
+
+  --fl-font-size-xs: 0.75rem;
+  --fl-font-size-sm: 0.875rem;
+  --fl-font-size-md: 1rem;
+  --fl-font-size-lg: 1.125rem;
+  --fl-font-size-xl: 1.5rem;
+  --fl-font-size-2xl: 2rem;
+  --fl-font-size-3xl: 2.75rem;
+
+  --fl-font-weight-regular: 400;
+  --fl-font-weight-medium: 500;
+  --fl-font-weight-semibold: 600;
+  --fl-font-weight-bold: 700;
+  --fl-font-weight-extrabold: 800;
+
+  /*
+   * Abstände
+   */
+
+  --fl-space-1: 0.25rem;
+  --fl-space-2: 0.5rem;
+  --fl-space-3: 0.75rem;
+  --fl-space-4: 1rem;
+  --fl-space-5: 1.25rem;
+  --fl-space-6: 1.5rem;
+  --fl-space-8: 2rem;
+  --fl-space-10: 2.5rem;
+  --fl-space-12: 3rem;
+
+  /*
+   * Rundungen
+   */
+
+  --fl-radius-sm: 0.75rem;
+  --fl-radius-md: 1rem;
+  --fl-radius-lg: 1.25rem;
+  --fl-radius-xl: 1.75rem;
+  --fl-radius-pill: 999px;
+
+  /*
+   * Schatten
+   */
+
+  --fl-shadow-sm: 0 2px 6px rgba(35, 67, 130, 0.08);
+
+  --fl-shadow-md: 0 6px 18px rgba(35, 67, 130, 0.12);
+
+  --fl-shadow-lg: 0 14px 36px rgba(35, 67, 130, 0.16);
+
+  --fl-shadow-primary: 0 10px 24px rgba(47, 107, 255, 0.28);
+
+  /*
+   * Layout
+   */
+
+  --fl-content-padding: 1.25rem;
+  --fl-header-height: 7rem;
+  --fl-bottom-nav-height: 4.75rem;
+  --fl-max-mobile-width: 430px;
+
+  /*
+   * Animationen
+   */
+
+  --fl-transition-fast: 150ms ease;
+  --fl-transition-normal: 250ms ease;
+  --fl-transition-slow: 400ms ease;
+
+  /*
+   * Wiederverwendbare Verläufe
+   */
+
+  --fl-gradient-primary: linear-gradient(
+    135deg,
+    var(--fl-gradient-start) 0%,
+    var(--fl-gradient-middle) 48%,
+    var(--fl-gradient-end) 100%
+  );
+
+  --fl-gradient-button: linear-gradient(90deg, #2168ff 0%, #5438f5 100%);
+}
+
+/*
+ * Optionale eigene Ionic-Farbklasse:
+ * <ion-button color="fl-purple">
+ */
+
+.ion-color-fl-purple {
+  --ion-color-base: #8735ef;
+  --ion-color-base-rgb: 135, 53, 239;
+  --ion-color-contrast: #ffffff;
+  --ion-color-contrast-rgb: 255, 255, 255;
+  --ion-color-shade: #772fd2;
+  --ion-color-tint: #9349f1;
+}
+
+.ion-color-fl-green {
+  --ion-color-base: #069f78;
+  --ion-color-base-rgb: 6, 159, 120;
+  --ion-color-contrast: #ffffff;
+  --ion-color-contrast-rgb: 255, 255, 255;
+  --ion-color-shade: #058c6a;
+  --ion-color-tint: #1fa986;
+}
+
+.ion-color-fl-orange {
+  --ion-color-base: #e88100;
+  --ion-color-base-rgb: 232, 129, 0;
+  --ion-color-contrast: #ffffff;
+  --ion-color-contrast-rgb: 255, 255, 255;
+  --ion-color-shade: #cc7200;
+  --ion-color-tint: #ea8e1a;
+}

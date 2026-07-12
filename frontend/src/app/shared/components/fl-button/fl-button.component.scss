@@ -1,0 +1,41 @@
+:host {
+  display: block;
+
+  width: 100%;
+}
+
+.fl-button {
+  width: 100%;
+
+  height: 56px;
+
+  border: none;
+
+  border-radius: 18px;
+
+  background: linear-gradient(90deg, #2868f7, #5a3fff);
+
+  color: white;
+
+  font-size: 18px;
+
+  font-weight: 700;
+
+  cursor: pointer;
+
+  box-shadow: 0 12px 30px rgba(47, 107, 255, 0.22);
+
+  transition: 0.2s;
+}
+
+.fl-button:hover {
+  transform: translateY(-1px);
+}
+
+.fl-button:active {
+  transform: scale(0.98);
+}
+
+.fl-button:disabled {
+  opacity: 0.6;
+}

@@ -1,0 +1,13 @@
+<button
+  class="fl-button"
+  type="button"
+  (click)="onClick()"
+  [disabled]="loading || disabled"
+>
+  @if (loading) {
+    <ion-spinner name="crescent"> </ion-spinner>
+
+  } @else {
+    {{ text }}
+  }
+</button>

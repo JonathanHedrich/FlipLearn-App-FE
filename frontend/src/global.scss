@@ -1,0 +1,591 @@
+/*
+ * FlipLearn – globale Styles
+ * Datei: src/global.scss
+ */
+
+/* Ionic Core */
+@import "@ionic/angular/css/core.css";
+
+/* Grundlegende Ionic-Styles */
+@import "@ionic/angular/css/normalize.css";
+@import "@ionic/angular/css/structure.css";
+@import "@ionic/angular/css/typography.css";
+@import "@ionic/angular/css/display.css";
+
+/* Optionale Hilfsklassen */
+@import "@ionic/angular/css/padding.css";
+@import "@ionic/angular/css/float-elements.css";
+@import "@ionic/angular/css/text-alignment.css";
+@import "@ionic/angular/css/text-transformation.css";
+@import "@ionic/angular/css/flex-utils.css";
+
+/*
+ * Dark Mode wird später gezielt umgesetzt.
+ * Deshalb vorerst NICHT importieren:
+ *
+ * @import '@ionic/angular/css/palettes/dark.system.css';
+ */
+
+/* --------------------------------------------------
+ * Grundlayout
+ * -------------------------------------------------- */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  width: 100%;
+  min-height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+}
+
+body {
+  font-family: var(--ion-font-family);
+  color: var(--fl-text-primary);
+  background: var(--fl-background);
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+a {
+  color: var(--fl-primary);
+  text-decoration: none;
+}
+
+img,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+/* --------------------------------------------------
+ * Ionic-Grundelemente
+ * -------------------------------------------------- */
+
+ion-app {
+  background: var(--fl-background);
+}
+
+ion-content {
+  --background: var(--fl-background);
+  --color: var(--fl-text-primary);
+}
+
+ion-header {
+  box-shadow: none;
+}
+
+ion-toolbar {
+  --background: transparent;
+  --border-width: 0;
+  --color: var(--fl-text-on-primary);
+}
+
+ion-title {
+  font-size: var(--fl-font-size-xl);
+  font-weight: var(--fl-font-weight-bold);
+}
+
+ion-card {
+  margin: 0;
+  border-radius: var(--fl-radius-lg);
+  background: var(--fl-surface);
+  box-shadow: var(--fl-shadow-sm);
+}
+
+ion-item {
+  --background: transparent;
+  --border-color: transparent;
+  --inner-border-width: 0;
+  --padding-start: 0;
+  --inner-padding-end: 0;
+}
+
+ion-list {
+  margin: 0;
+  padding: 0;
+  background: transparent;
+}
+
+ion-label {
+  color: var(--fl-text-primary);
+}
+
+/* --------------------------------------------------
+ * Mobile Seitenbreite
+ * -------------------------------------------------- */
+
+.fl-page {
+  width: 100%;
+  min-height: 100%;
+  margin: 0 auto;
+  background: var(--fl-background);
+}
+
+.fl-page-content {
+  width: 100%;
+  max-width: var(--fl-max-mobile-width);
+  margin: 0 auto;
+  padding: var(--fl-content-padding);
+}
+
+@media (min-width: 600px) {
+  .fl-page {
+    max-width: var(--fl-max-mobile-width);
+    box-shadow: var(--fl-shadow-lg);
+  }
+}
+
+/* --------------------------------------------------
+ * Typografie
+ * -------------------------------------------------- */
+
+.fl-title {
+  margin: 0;
+  color: var(--fl-text-primary);
+  font-size: var(--fl-font-size-2xl);
+  font-weight: var(--fl-font-weight-bold);
+  line-height: 1.15;
+}
+
+.fl-subtitle {
+  margin: var(--fl-space-2) 0 0;
+  color: var(--fl-text-secondary);
+  font-size: var(--fl-font-size-md);
+  font-weight: var(--fl-font-weight-regular);
+  line-height: 1.5;
+}
+
+.fl-section-title {
+  margin: 0;
+  color: var(--fl-text-primary);
+  font-size: var(--fl-font-size-lg);
+  font-weight: var(--fl-font-weight-bold);
+}
+
+.fl-label {
+  display: block;
+  margin-bottom: var(--fl-space-2);
+  color: var(--fl-text-secondary);
+  font-size: var(--fl-font-size-xs);
+  font-weight: var(--fl-font-weight-bold);
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.fl-muted {
+  color: var(--fl-text-muted);
+}
+
+/* --------------------------------------------------
+ * Header mit Farbverlauf
+ * -------------------------------------------------- */
+
+.fl-gradient-header {
+  color: var(--fl-text-on-primary);
+  background: var(--fl-gradient-primary);
+}
+
+.fl-gradient-background {
+  background: var(--fl-gradient-primary);
+}
+
+/* --------------------------------------------------
+ * Buttons
+ * -------------------------------------------------- */
+
+.fl-button {
+  width: 100%;
+  min-height: 56px;
+  margin: 0;
+  padding: 0 var(--fl-space-5);
+  border: 0;
+  border-radius: var(--fl-radius-md);
+  color: var(--fl-text-on-primary);
+  background: var(--fl-gradient-button);
+  box-shadow: var(--fl-shadow-primary);
+  font-size: var(--fl-font-size-md);
+  font-weight: var(--fl-font-weight-bold);
+  cursor: pointer;
+  transition:
+    transform var(--fl-transition-fast),
+    opacity var(--fl-transition-fast),
+    box-shadow var(--fl-transition-fast);
+}
+
+.fl-button:active {
+  transform: scale(0.98);
+}
+
+.fl-button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.fl-button-secondary {
+  color: var(--fl-text-primary);
+  background: var(--fl-surface);
+  border: 1px solid var(--fl-border);
+  box-shadow: var(--fl-shadow-sm);
+}
+
+.fl-button-danger {
+  color: var(--fl-danger);
+  background: #fff2f2;
+  border: 1px solid #ffcaca;
+  box-shadow: none;
+}
+
+/*
+ * Ionic Buttons mit der CSS-Klasse:
+ * <ion-button class="fl-ion-button">
+ */
+
+ion-button.fl-ion-button {
+  width: 100%;
+  min-height: 56px;
+  margin: 0;
+  font-size: var(--fl-font-size-md);
+  font-weight: var(--fl-font-weight-bold);
+
+  --background: var(--fl-gradient-button);
+  --background-activated: var(--fl-gradient-button);
+  --background-focused: var(--fl-gradient-button);
+  --background-hover: var(--fl-gradient-button);
+  --border-radius: var(--fl-radius-md);
+  --box-shadow: var(--fl-shadow-primary);
+  --color: var(--fl-text-on-primary);
+}
+
+/* --------------------------------------------------
+ * Formulare und Eingabefelder
+ * -------------------------------------------------- */
+
+.fl-form-group {
+  margin-bottom: var(--fl-space-5);
+}
+
+.fl-input-wrapper {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-height: 52px;
+  padding: 0 var(--fl-space-4);
+  border: 1px solid transparent;
+  border-radius: var(--fl-radius-md);
+  background: var(--fl-input-background);
+  transition:
+    border-color var(--fl-transition-fast),
+    box-shadow var(--fl-transition-fast);
+}
+
+.fl-input-wrapper:focus-within {
+  border-color: var(--fl-primary);
+  box-shadow: 0 0 0 3px rgba(47, 107, 255, 0.12);
+}
+
+.fl-input-wrapper ion-icon {
+  flex-shrink: 0;
+  margin-right: var(--fl-space-3);
+  color: var(--fl-text-secondary);
+  font-size: 1.2rem;
+}
+
+.fl-input {
+  width: 100%;
+  min-width: 0;
+  border: 0;
+  outline: none;
+  color: var(--fl-text-primary);
+  background: transparent;
+  font-size: var(--fl-font-size-md);
+}
+
+.fl-input::placeholder {
+  color: var(--fl-text-muted);
+}
+
+textarea.fl-input {
+  min-height: 110px;
+  padding: var(--fl-space-4) 0;
+  resize: vertical;
+}
+
+/* Ionic Input */
+
+ion-input.fl-ion-input,
+ion-textarea.fl-ion-input {
+  width: 100%;
+
+  --background: var(--fl-input-background);
+  --border-color: transparent;
+  --border-radius: var(--fl-radius-md);
+  --color: var(--fl-text-primary);
+  --highlight-color-focused: var(--fl-primary);
+  --padding-start: var(--fl-space-4);
+  --padding-end: var(--fl-space-4);
+  --placeholder-color: var(--fl-text-muted);
+  --placeholder-opacity: 1;
+}
+
+/* --------------------------------------------------
+ * Karten
+ * -------------------------------------------------- */
+
+.fl-card {
+  padding: var(--fl-space-4);
+  border: 1px solid var(--fl-border);
+  border-radius: var(--fl-radius-lg);
+  background: var(--fl-surface);
+  box-shadow: var(--fl-shadow-sm);
+}
+
+.fl-card-soft {
+  padding: var(--fl-space-4);
+  border-radius: var(--fl-radius-lg);
+  background: var(--fl-surface-soft);
+}
+
+.fl-auth-panel {
+  width: 100%;
+  min-height: 65vh;
+  padding: var(--fl-space-8) var(--fl-space-6) var(--fl-space-10);
+  border-radius: var(--fl-radius-xl) var(--fl-radius-xl) 0 0;
+  background: var(--fl-background);
+}
+
+/* --------------------------------------------------
+ * Icons
+ * -------------------------------------------------- */
+
+.fl-icon-box {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: var(--fl-radius-md);
+  color: var(--fl-primary);
+  background: var(--fl-primary-light);
+}
+
+.fl-icon-box ion-icon {
+  font-size: 1.5rem;
+}
+
+.fl-icon-box-large {
+  width: 80px;
+  height: 80px;
+  border-radius: var(--fl-radius-lg);
+}
+
+.fl-icon-box-large ion-icon {
+  font-size: 2.5rem;
+}
+
+/* --------------------------------------------------
+ * Fortschrittsanzeigen
+ * -------------------------------------------------- */
+
+.fl-progress-track {
+  width: 100%;
+  height: 6px;
+  overflow: hidden;
+  border-radius: var(--fl-radius-pill);
+  background: #dfe9fb;
+}
+
+.fl-progress-value {
+  height: 100%;
+  border-radius: inherit;
+  background: var(--fl-primary);
+  transition: width var(--fl-transition-normal);
+}
+
+/* --------------------------------------------------
+ * Trennlinie mit Text
+ * -------------------------------------------------- */
+
+.fl-divider {
+  display: flex;
+  align-items: center;
+  gap: var(--fl-space-3);
+  width: 100%;
+  color: var(--fl-text-secondary);
+  font-size: var(--fl-font-size-xs);
+}
+
+.fl-divider::before,
+.fl-divider::after {
+  flex: 1;
+  height: 1px;
+  content: "";
+  background: var(--fl-border);
+}
+
+/* --------------------------------------------------
+ * Bottom Navigation
+ * -------------------------------------------------- */
+
+.fl-bottom-nav {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  width: 100%;
+  min-height: var(--fl-bottom-nav-height);
+  padding: var(--fl-space-2) var(--fl-space-3)
+    calc(var(--fl-space-2) + env(safe-area-inset-bottom));
+  border-top: 1px solid var(--fl-border);
+  background: var(--fl-surface);
+}
+
+.fl-bottom-nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--fl-space-1);
+  color: var(--fl-text-secondary);
+  font-size: var(--fl-font-size-xs);
+  font-weight: var(--fl-font-weight-medium);
+}
+
+.fl-bottom-nav-item ion-icon {
+  font-size: 1.4rem;
+}
+
+.fl-bottom-nav-item.active {
+  color: var(--fl-primary);
+}
+
+/* --------------------------------------------------
+ * Safe Areas für Android und iOS
+ * -------------------------------------------------- */
+
+.fl-safe-top {
+  padding-top: env(safe-area-inset-top);
+}
+
+.fl-safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* --------------------------------------------------
+ * Hilfsklassen
+ * -------------------------------------------------- */
+
+.fl-text-center {
+  text-align: center;
+}
+
+.fl-full-width {
+  width: 100%;
+}
+
+.fl-flex {
+  display: flex;
+}
+
+.fl-items-center {
+  align-items: center;
+}
+
+.fl-justify-between {
+  justify-content: space-between;
+}
+
+.fl-gap-2 {
+  gap: var(--fl-space-2);
+}
+
+.fl-gap-3 {
+  gap: var(--fl-space-3);
+}
+
+.fl-gap-4 {
+  gap: var(--fl-space-4);
+}
+
+/* --------------------------------------------------
+ * Kleine Animationen
+ * -------------------------------------------------- */
+
+@keyframes fl-fade-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fl-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fl-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.55;
+  }
+}
+
+.fl-animate-fade-in {
+  animation: fl-fade-in 400ms ease both;
+}
+
+.fl-animate-fade-up {
+  animation: fl-fade-up 500ms ease both;
+}
+
+.fl-animate-pulse {
+  animation: fl-pulse 1.5s ease-in-out infinite;
+}
+
+/* Animationen bei entsprechender Systemeinstellung reduzieren */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

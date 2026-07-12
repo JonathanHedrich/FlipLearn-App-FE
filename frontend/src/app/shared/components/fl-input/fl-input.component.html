@@ -1,0 +1,42 @@
+<div class="field">
+  @if (label) {
+    <label class="field-label">
+      {{ label }}
+    </label>
+  }
+
+  <div class="input-wrapper" [class.input-invalid]="invalid">
+    @if (icon) {
+      <ion-icon class="input-icon" [name]="icon"></ion-icon>
+    }
+
+    <ion-input
+      [type]="currentType"
+      [value]="value"
+      [placeholder]="placeholder"
+      [autocomplete]="autocomplete"
+      (ionInput)="onInput($event)"
+    ></ion-input>
+
+    @if (type === "password") {
+      <button
+        type="button"
+        class="password-toggle"
+        (click)="togglePassword()"
+        [attr.aria-label]="
+          passwordVisible ? 'Passwort ausblenden' : 'Passwort anzeigen'
+        "
+      >
+        <ion-icon
+          [name]="passwordVisible ? 'eye-off-outline' : 'eye-outline'"
+        ></ion-icon>
+      </button>
+    }
+  </div>
+
+  @if (invalid && errorMessage) {
+    <p class="error-message">
+      {{ errorMessage }}
+    </p>
+  }
+</div>

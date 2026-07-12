@@ -1,0 +1,98 @@
+:host {
+  display: inline-flex;
+}
+
+.logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.85rem;
+  color: #ffffff;
+}
+
+.logo-symbol {
+  position: relative;
+  flex: 0 0 auto;
+}
+
+.logo-card {
+  position: absolute;
+  border: 3px solid currentColor;
+  border-radius: 24%;
+}
+
+.logo-card-back {
+  top: 7%;
+  left: 8%;
+  width: 64%;
+  height: 78%;
+  opacity: 0.62;
+  transform: rotate(-10deg);
+}
+
+.logo-card-front {
+  right: 8%;
+  bottom: 5%;
+  width: 64%;
+  height: 78%;
+  background: rgba(255, 255, 255, 0.12);
+  box-shadow: 0 10px 24px rgba(16, 32, 71, 0.16);
+  backdrop-filter: blur(8px);
+  transform: rotate(7deg);
+}
+
+.logo-text {
+  font-weight: var(--fl-font-weight-extrabold);
+  line-height: 1;
+}
+
+.logo-small {
+  .logo-symbol {
+    width: 40px;
+    height: 40px;
+  }
+
+  .logo-card {
+    border-width: 2px;
+  }
+
+  .logo-text {
+    font-size: 1.2rem;
+  }
+}
+
+.logo-medium {
+  .logo-symbol {
+    width: 76px;
+    height: 76px;
+  }
+
+  .logo-text {
+    font-size: 2rem;
+  }
+}
+
+.logo-large {
+  flex-direction: column;
+  gap: 1.25rem;
+
+  .logo-symbol {
+    width: 110px;
+    height: 110px;
+  }
+
+  .logo-card {
+    border-width: 4px;
+  }
+
+  .logo-text {
+    font-size: 3rem;
+  }
+}
+
+.logo-dark {
+  color: var(--fl-primary);
+
+  .logo-card-front {
+    background: rgba(47, 107, 255, 0.08);
+  }
+}

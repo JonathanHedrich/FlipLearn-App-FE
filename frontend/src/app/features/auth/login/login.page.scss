@@ -1,0 +1,198 @@
+:host {
+  display: block;
+}
+
+ion-content {
+  --background: var(--fl-background);
+}
+
+.login-page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  background: var(--fl-background);
+}
+
+/* ===========================
+   Header
+=========================== */
+
+.login-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  min-height: 250px;
+
+  padding: calc(env(safe-area-inset-top) + 24px) 24px 34px;
+
+  color: white;
+  text-align: center;
+
+  background: var(--fl-gradient-primary);
+}
+
+fl-logo {
+  margin-bottom: 18px;
+}
+
+.login-hero h1 {
+  margin: 0;
+
+  font-size: 2.15rem;
+
+  font-weight: 800;
+
+  line-height: 1.1;
+
+  letter-spacing: -0.5px;
+}
+
+.login-hero p {
+  margin-top: 10px;
+
+  color: rgba(255, 255, 255, 0.88);
+
+  font-size: 16px;
+}
+
+/* ===========================
+   Panel
+=========================== */
+
+.login-panel {
+  flex: 1;
+
+  margin-top: -22px;
+
+  padding: 34px 24px;
+
+  border-radius: 34px 34px 0 0;
+
+  background: var(--fl-background);
+}
+
+.login-form {
+  width: 100%;
+
+  max-width: 360px;
+
+  margin: auto;
+}
+
+/* ===========================
+   Passwort
+=========================== */
+
+.password-heading {
+  display: flex;
+
+  justify-content: space-between;
+
+  align-items: center;
+
+  margin-top: 20px;
+
+  margin-bottom: 8px;
+}
+
+.password-heading span {
+  font-size: 13px;
+
+  font-weight: 700;
+
+  letter-spacing: 0.4px;
+
+  color: #6578a7;
+}
+
+.password-heading a {
+  font-size: 14px;
+
+  font-weight: 600;
+
+  color: var(--fl-primary);
+
+  text-decoration: none;
+}
+
+/* ===========================
+   Button
+=========================== */
+
+.login-button-wrapper {
+  margin-top: 28px;
+}
+
+/* ===========================
+   Divider
+=========================== */
+
+.divider {
+  display: flex;
+
+  align-items: center;
+
+  gap: 14px;
+
+  margin: 28px 0;
+}
+
+.divider span {
+  flex: 1;
+
+  height: 1px;
+
+  background: #d9e3f7;
+}
+
+.divider p {
+  margin: 0;
+
+  font-size: 13px;
+
+  color: #7d8fb8;
+}
+
+/* ===========================
+   Register
+=========================== */
+
+.register-link {
+  margin-top: 28px;
+
+  text-align: center;
+
+  color: #7d8fb8;
+
+  font-size: 15px;
+}
+
+.register-link a {
+  font-weight: 700;
+
+  color: var(--fl-primary);
+
+  text-decoration: none;
+}
+
+/* ===========================
+   Desktop Preview
+=========================== */
+
+@media (min-width: 600px) {
+  .login-page {
+    width: 430px;
+
+    min-height: 932px;
+
+    margin: 24px auto;
+
+    overflow: hidden;
+
+    border-radius: 34px;
+
+    box-shadow: var(--fl-shadow-lg);
+  }
+}

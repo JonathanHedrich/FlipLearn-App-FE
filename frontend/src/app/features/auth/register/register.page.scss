@@ -1,0 +1,144 @@
+:host {
+  display: block;
+}
+
+ion-content {
+  --background: var(--fl-background);
+}
+
+.register-page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  background: var(--fl-background);
+}
+
+/* Header */
+
+.register-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  min-height: 235px;
+
+  padding: calc(env(safe-area-inset-top) + 24px) 24px 36px;
+
+  color: #ffffff;
+  text-align: center;
+  background: var(--fl-gradient-primary);
+}
+
+.register-hero fl-logo {
+  margin-bottom: 18px;
+}
+
+.register-hero h1 {
+  margin: 0;
+  font-size: 2rem;
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: -0.5px;
+}
+
+.register-hero p {
+  max-width: 340px;
+  margin: 10px 0 0;
+  color: rgba(255, 255, 255, 0.86);
+  font-size: 0.92rem;
+  line-height: 1.5;
+}
+
+/* Formularbereich */
+
+.register-panel {
+  flex: 1;
+
+  margin-top: -22px;
+
+  padding: 32px 24px calc(32px + env(safe-area-inset-bottom));
+
+  border-radius: 34px 34px 0 0;
+  background: var(--fl-background);
+}
+
+.register-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+
+  width: 100%;
+  max-width: 360px;
+  margin: 0 auto;
+}
+
+.terms {
+  margin: 0;
+  color: var(--fl-text-secondary);
+  font-size: 0.78rem;
+  line-height: 1.55;
+}
+
+.terms a {
+  color: var(--fl-primary);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.register-button-wrapper {
+  margin-top: 4px;
+}
+
+/* Trenner */
+
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 8px 0;
+}
+
+.divider span {
+  flex: 1;
+  height: 1px;
+  background: var(--fl-border);
+}
+
+.divider p {
+  margin: 0;
+  color: var(--fl-text-muted);
+  font-size: 0.78rem;
+}
+
+/* Login-Link */
+
+.login-link {
+  margin: 4px 0 0;
+  color: var(--fl-text-secondary);
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.login-link a {
+  color: var(--fl-primary);
+  font-weight: 800;
+  text-decoration: none;
+}
+
+/* Desktop-Vorschau */
+
+@media (min-width: 600px) {
+  .register-page {
+    width: 430px;
+    min-height: 932px;
+    margin: 24px auto;
+    overflow: hidden;
+    border-radius: 34px;
+    box-shadow: var(--fl-shadow-lg);
+  }
+
+  .register-panel {
+    border-radius: 34px;
+  }
+}

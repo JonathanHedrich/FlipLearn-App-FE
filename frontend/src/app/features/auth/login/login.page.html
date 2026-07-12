@@ -1,0 +1,78 @@
+<ion-content [fullscreen]="true">
+  <main class="login-page">
+    <section class="login-hero">
+      <fl-logo size="medium"></fl-logo>
+
+      <h1>Welcome back!</h1>
+
+      <p>Sign in to continue learning</p>
+    </section>
+
+    <section class="login-panel">
+      <form
+        class="login-form"
+        [formGroup]="loginForm"
+        (ngSubmit)="submitLogin()"
+        novalidate
+      >
+        <fl-input
+          label="EMAIL ADDRESS"
+          type="email"
+          icon="mail-outline"
+          placeholder="alex@example.com"
+          autocomplete="email"
+          [value]="loginForm.controls.email.value"
+          [invalid]="emailInvalid"
+          errorMessage="Bitte gib eine gültige E-Mail-Adresse ein."
+          (valueChange)="loginForm.controls.email.setValue($event)"
+        >
+        </fl-input>
+
+        <div class="password-heading">
+          <span>PASSWORD</span>
+
+          <a routerLink="/forgot-password"> Forgot Password? </a>
+        </div>
+
+        <fl-input
+          type="password"
+          icon="lock-closed-outline"
+          placeholder="••••••••"
+          autocomplete="current-password"
+          [value]="loginForm.controls.password.value"
+          [invalid]="passwordInvalid"
+          errorMessage="Das Passwort muss mindestens 8 Zeichen enthalten."
+          (valueChange)="loginForm.controls.password.setValue($event)"
+        >
+        </fl-input>
+
+        <div class="login-button-wrapper">
+          <fl-button
+            text="Sign In"
+            [loading]="isSubmitting"
+            (clicked)="submitLogin()"
+          >
+          </fl-button>
+        </div>
+
+        <div class="divider">
+          <span></span>
+          <p>or continue with</p>
+          <span></span>
+        </div>
+
+        <fl-social-button
+          provider="google"
+          text="Mit Google anmelden"
+          (clicked)="signInWithGoogle()"
+        ></fl-social-button>
+
+        <p class="register-link">
+          Don't have an account?
+
+          <a routerLink="/register"> Sign Up </a>
+        </p>
+      </form>
+    </section>
+  </main>
+</ion-content>

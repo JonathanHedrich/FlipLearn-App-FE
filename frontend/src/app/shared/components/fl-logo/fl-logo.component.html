@@ -1,0 +1,16 @@
+<div
+  class="logo"
+  [class.logo-small]="size === 'small'"
+  [class.logo-medium]="size === 'medium'"
+  [class.logo-large]="size === 'large'"
+  [class.logo-dark]="!light"
+>
+  <div class="logo-symbol" aria-hidden="true">
+    <span class="logo-card logo-card-back"></span>
+    <span class="logo-card logo-card-front"></span>
+  </div>
+
+  @if (showText) {
+    <span class="logo-text">FlipLearn</span>
+  }
+</div>
