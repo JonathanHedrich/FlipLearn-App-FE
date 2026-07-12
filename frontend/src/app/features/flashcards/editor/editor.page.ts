@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { IonContent, IonIcon } from '@ionic/angular/standalone';
+import { Location } from '@angular/common';
 import { addIcons } from 'ionicons';
 import {
   addOutline,
@@ -62,6 +63,7 @@ export class EditorPage {
   constructor(
     private readonly route: ActivatedRoute,
     private readonly router: Router,
+    private readonly location: Location,
   ) {
     this.setId = Number(this.route.snapshot.paramMap.get('setId')) || 1;
 
@@ -85,7 +87,7 @@ export class EditorPage {
   }
 
   goBack(): void {
-    void this.router.navigateByUrl('/sets');
+    this.location.back();
   }
 
   toggleEdit(cardId: number): void {
