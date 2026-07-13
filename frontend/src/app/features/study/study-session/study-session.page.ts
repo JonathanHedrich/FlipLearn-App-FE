@@ -119,6 +119,7 @@ export class StudySessionPage {
       this.session = await firstValueFrom(
         this.studyApi.startSession({
           setId: this.setId,
+          mode: 'ALL',
         }),
       );
 

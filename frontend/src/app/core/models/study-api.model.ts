@@ -2,6 +2,7 @@ export type StudyRating = 'AGAIN' | 'HARD' | 'GOOD' | 'EASY';
 
 export interface StartStudySessionRequest {
   setId: number;
+  mode: StudyMode;
 }
 
 export interface StudyCardResponse {
@@ -46,3 +47,5 @@ export interface StudyReviewResponse {
   correctAnswers: number;
   incorrectAnswers: number;
 }
+
+export type StudyMode = 'DUE' | 'ALL';
