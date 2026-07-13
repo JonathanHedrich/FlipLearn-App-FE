@@ -1,15 +1,9 @@
 import { Location } from '@angular/common';
 import { Component } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { IonContent, IonIcon, IonToggle } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { FormsModule } from '@angular/forms';
-import { AuthApi } from '../../../core/services/auth-api';
-
-import { FlashcardStore } from '../../../core/stores/flashcard.store';
-import { StatisticsStore } from '../../../core/stores/statistics.store';
-import { AppTheme, ThemeService } from '../../../core/services/theme.service';
-
 import {
   arrowBackOutline,
   chevronForwardOutline,
@@ -19,7 +13,12 @@ import {
   personOutline,
   radioButtonOnOutline,
 } from 'ionicons/icons';
-import { AuthStore } from 'src/app/core/stores/auth.store';
+
+import { AuthApi } from '../../../core/services/auth-api';
+import { AppTheme, ThemeService } from '../../../core/services/theme.service';
+import { AuthStore } from '../../../core/stores/auth.store';
+import { FlashcardStore } from '../../../core/stores/flashcard.store';
+import { StatisticsStore } from '../../../core/stores/statistics.store';
 
 interface SettingsRow {
   label: string;
@@ -31,7 +30,7 @@ interface SettingsRow {
 @Component({
   selector: 'app-settings',
   standalone: true,
-  imports: [IonContent, IonIcon, IonToggle, FormsModule],
+  imports: [FormsModule, IonContent, IonIcon, IonToggle],
   templateUrl: './settings.page.html',
   styleUrls: ['./settings.page.scss'],
 })
@@ -98,7 +97,7 @@ export class SettingsPage {
   }
 
   editProfile(): void {
-    console.log('Profil bearbeiten wird später ergänzt.');
+    void this.router.navigateByUrl('/profile/edit');
   }
 
   openSetting(action: SettingsRow['action']): void {

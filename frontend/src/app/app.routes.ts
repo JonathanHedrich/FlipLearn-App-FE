@@ -102,6 +102,14 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'profile/edit',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/profile/edit-profile/edit-profile.page').then(
+        (m) => m.EditProfilePage,
+      ),
+  },
+  {
     path: 'settings',
     canActivate: [authGuard],
     loadComponent: () =>
@@ -126,6 +134,13 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./features/flashcards/edit-set/edit-set.page').then(
         (m) => m.EditSetPage,
+      ),
+  },
+  {
+    path: 'edit-profile',
+    loadComponent: () =>
+      import('./features/profile/edit-profile/edit-profile.page').then(
+        (m) => m.EditProfilePage,
       ),
   },
 ];

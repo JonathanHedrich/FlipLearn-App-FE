@@ -1,0 +1,201 @@
+<ion-content [fullscreen]="true">
+  <main class="edit-profile-page">
+    <header class="edit-profile-header">
+      <button
+        class="header-button"
+        type="button"
+        aria-label="Zurück"
+        (click)="goBack()"
+      >
+        <ion-icon name="arrow-back-outline"></ion-icon>
+      </button>
+
+      <h1>Edit Profile</h1>
+
+      <span></span>
+    </header>
+
+    <section class="edit-profile-content">
+      <section class="profile-section">
+        <div class="section-heading">
+          <ion-icon name="person-outline"></ion-icon>
+
+          <div>
+            <h2>Profile</h2>
+            <p>Ändere deinen Anzeigenamen und Benutzernamen.</p>
+          </div>
+        </div>
+
+        <form [formGroup]="profileForm" (ngSubmit)="saveProfile()">
+          <label class="form-group">
+            <span>Display Name</span>
+
+            <input
+              type="text"
+              formControlName="displayName"
+              autocomplete="name"
+            />
+          </label>
+
+          @if (displayNameInvalid) {
+          <p class="validation-message">
+            Der Anzeigename muss zwischen 2 und 150 Zeichen lang sein.
+          </p>
+          }
+
+          <label class="form-group">
+            <span>Username</span>
+
+            <input
+              type="text"
+              formControlName="username"
+              autocomplete="username"
+            />
+          </label>
+
+          @if (usernameInvalid) {
+          <p class="validation-message">
+            Der Benutzername muss zwischen 3 und 100 Zeichen lang sein.
+          </p>
+          } @if (saveError) {
+          <p class="form-error">{{ saveError }}</p>
+          } @if (saveSuccess) {
+          <p class="form-success">{{ saveSuccess }}</p>
+          }
+
+          <button class="save-button" type="submit" [disabled]="isSubmitting">
+            <ion-icon name="save-outline"></ion-icon>
+
+            {{ isSubmitting ? 'Wird gespeichert …' : 'Profil speichern' }}
+          </button>
+        </form>
+      </section>
+      <section class="profile-section">
+        <div class="section-heading">
+          <ion-icon name="mail-outline"></ion-icon>
+
+          <div>
+            <h2>Email</h2>
+
+            <p>
+              Ändere die E-Mail-Adresse, mit der du dich bei FlipLearn
+              anmeldest.
+            </p>
+          </div>
+        </div>
+
+        <form [formGroup]="emailForm" (ngSubmit)="changeEmail()">
+          <label class="form-group">
+            <span>Current Email</span>
+
+            <input type="email" formControlName="currentEmail" />
+          </label>
+
+          <label class="form-group">
+            <span>New Email</span>
+
+            <input
+              type="email"
+              formControlName="newEmail"
+              autocomplete="email"
+              placeholder="new@example.com"
+            />
+          </label>
+
+          @if (newEmailInvalid) {
+          <p class="validation-message">
+            Bitte gib eine gültige E-Mail-Adresse ein.
+          </p>
+          }
+
+          <label class="form-group">
+            <span>Current Password</span>
+
+            <input
+              type="password"
+              formControlName="currentPassword"
+              autocomplete="current-password"
+            />
+          </label>
+
+          @if (emailError) {
+          <p class="form-error">{{ emailError }}</p>
+          }
+
+          <button
+            class="save-button"
+            type="submit"
+            [disabled]="isChangingEmail"
+          >
+            <ion-icon name="mail-outline"></ion-icon>
+
+            {{ isChangingEmail ? 'Wird geändert …' : 'E-Mail ändern' }}
+          </button>
+        </form>
+      </section>
+      <section class="profile-section">
+        <div class="section-heading">
+          <ion-icon name="lock-closed-outline"></ion-icon>
+
+          <div>
+            <h2>Password</h2>
+
+            <p>Ändere dein Passwort für die Anmeldung.</p>
+          </div>
+        </div>
+
+        <form [formGroup]="passwordForm" (ngSubmit)="changePassword()">
+          <label class="form-group">
+            <span>Current Password</span>
+
+            <input
+              type="password"
+              formControlName="currentPassword"
+              autocomplete="current-password"
+            />
+          </label>
+
+          <label class="form-group">
+            <span>New Password</span>
+
+            <input
+              type="password"
+              formControlName="newPassword"
+              autocomplete="new-password"
+            />
+          </label>
+
+          <label class="form-group">
+            <span>Confirm New Password</span>
+
+            <input
+              type="password"
+              formControlName="confirmPassword"
+              autocomplete="new-password"
+            />
+          </label>
+
+          @if ( passwordSubmitted && passwordsDoNotMatch ) {
+          <p class="validation-message">
+            Die neuen Passwörter stimmen nicht überein.
+          </p>
+          } @if (passwordError) {
+          <p class="form-error">{{ passwordError }}</p>
+          } @if (passwordSuccess) {
+          <p class="form-success">{{ passwordSuccess }}</p>
+          }
+
+          <button
+            class="save-button"
+            type="submit"
+            [disabled]="isChangingPassword"
+          >
+            <ion-icon name="lock-closed-outline"></ion-icon>
+
+            {{ isChangingPassword ? 'Wird geändert …' : 'Passwort ändern' }}
+          </button>
+        </form>
+      </section>
+    </section>
+  </main>
+</ion-content>

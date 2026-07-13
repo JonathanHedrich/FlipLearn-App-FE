@@ -3,8 +3,12 @@ import { Injectable, computed, signal } from '@angular/core';
 import { Observable, tap } from 'rxjs';
 
 import { API_BASE_URL } from '../config/api.config';
+
 import {
+  ChangePasswordRequest,
   CurrentUserResponse,
+  UpdateProfileRequest,
+  ChangeEmailRequest,
   LoginRequest,
   LoginResponse,
   RegisterRequest,
@@ -109,5 +113,22 @@ export class AuthApi {
 
   getProfile(): Observable<UserProfileResponse> {
     return this.http.get<UserProfileResponse>(`${API_BASE_URL}/users/profile`);
+  }
+
+  changePassword(request: ChangePasswordRequest): Observable<void> {
+    return this.http.put<void>(`${API_BASE_URL}/users/password`, request);
+  }
+
+  updateProfile(
+    request: UpdateProfileRequest,
+  ): Observable<CurrentUserResponse> {
+    return this.http.put<CurrentUserResponse>(
+      `${API_BASE_URL}/users/profile`,
+      request,
+    );
+  }
+
+  changeEmail(request: ChangeEmailRequest): Observable<void> {
+    return this.http.put<void>(`${API_BASE_URL}/users/email`, request);
   }
 }

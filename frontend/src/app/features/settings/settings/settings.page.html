@@ -83,29 +83,6 @@
         </div>
       </section>
 
-      <section class="settings-group">
-        <h2>Account</h2>
-
-        <div class="settings-list">
-          @for ( setting of accountRows; track setting.action ) {
-          <button
-            class="settings-row"
-            type="button"
-            (click)="openSetting(setting.action)"
-          >
-            <ion-icon class="row-icon" [name]="setting.icon"></ion-icon>
-
-            <span class="row-label"> {{ setting.label }} </span>
-
-            <ion-icon
-              class="row-chevron"
-              name="chevron-forward-outline"
-            ></ion-icon>
-          </button>
-          }
-        </div>
-      </section>
-
       <section class="settings-section">
         <h2>Appearance</h2>
 

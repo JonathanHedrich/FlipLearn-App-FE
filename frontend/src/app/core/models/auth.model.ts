@@ -59,3 +59,18 @@ export interface UserProfileResponse {
   correctReviews: number;
   accuracy: number;
 }
+
+export interface ChangePasswordRequest {
+  currentPassword: string;
+  newPassword: string;
+}
+
+export interface UpdateProfileRequest {
+  displayName: string;
+  username: string;
+}
+
+export interface ChangeEmailRequest {
+  newEmail: string;
+  currentPassword: string;
+}
