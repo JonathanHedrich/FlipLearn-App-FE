@@ -589,3 +589,9 @@ ion-textarea.fl-ion-input {
     transition-duration: 0.01ms !important;
   }
 }
+
+@media (min-width: 600px) {
+  body {
+    background: #f3f6ff;
+  }
+}

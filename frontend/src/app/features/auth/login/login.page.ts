@@ -16,6 +16,7 @@ import { FlButtonComponent } from '../../../shared/components/fl-button/fl-butto
 import { FlInputComponent } from '../../../shared/components/fl-input/fl-input.component';
 import { FlLogoComponent } from '../../../shared/components/fl-logo/fl-logo.component';
 import { FlSocialButtonComponent } from '../../../shared/components/fl-social-button/fl-social-button.component';
+import { AuthStore } from 'src/app/core/stores/auth.store';
 
 @Component({
   selector: 'app-login',
@@ -48,6 +49,7 @@ export class LoginPage {
     private readonly router: Router,
     private readonly authApi: AuthApi,
     private readonly route: ActivatedRoute,
+    private readonly authStore: AuthStore,
   ) {}
 
   get emailInvalid(): boolean {
@@ -85,7 +87,9 @@ export class LoginPage {
         password: formValue.password,
       };
 
-      await firstValueFrom(this.authApi.login(request));
+      const response = await firstValueFrom(this.authApi.login(request));
+
+      this.authStore.setCurrentUser(response);
 
       await firstValueFrom(this.authApi.loadCurrentUser());
 

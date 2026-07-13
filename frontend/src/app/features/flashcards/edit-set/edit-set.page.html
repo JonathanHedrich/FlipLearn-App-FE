@@ -1,0 +1,103 @@
+<ion-content [fullscreen]="true">
+  <main class="edit-set-page">
+    <header class="edit-set-header">
+      <button
+        class="header-button"
+        type="button"
+        aria-label="Zurück"
+        (click)="goBack()"
+      >
+        <ion-icon name="arrow-back-outline"></ion-icon>
+      </button>
+
+      <h1>Set bearbeiten</h1>
+
+      <span></span>
+    </header>
+
+    <section class="edit-set-content">
+      @if (isLoading) {
+      <p class="status-message">Lernset wird geladen …</p>
+      } @else if (loadError) {
+      <section class="error-state">
+        <p>{{ loadError }}</p>
+
+        <button type="button" (click)="loadSet()">Erneut versuchen</button>
+      </section>
+      } @else {
+      <form [formGroup]="editSetForm" (ngSubmit)="saveSet()">
+        <label class="form-group">
+          <span>Titel</span>
+
+          <input
+            type="text"
+            formControlName="title"
+            placeholder="Titel des Lernsets"
+          />
+        </label>
+
+        @if (titleInvalid) {
+        <p class="validation-message">
+          Der Titel muss zwischen 2 und 100 Zeichen lang sein.
+        </p>
+        }
+
+        <label class="form-group">
+          <span>Beschreibung</span>
+
+          <textarea
+            formControlName="description"
+            rows="4"
+            placeholder="Beschreibung"
+          ></textarea>
+        </label>
+
+        <label class="form-group">
+          <span>Ordner</span>
+
+          <div class="input-with-icon">
+            <ion-icon name="folder-outline"></ion-icon>
+
+            <input
+              type="text"
+              formControlName="folder"
+              placeholder="z. B. languages"
+            />
+          </div>
+        </label>
+
+        <section class="color-section">
+          <span>Farbe</span>
+
+          <div class="color-options">
+            @for ( option of colorOptions; track option.value ) {
+            <button
+              type="button"
+              class="color-button"
+              [class.selected]="
+                    selectedColor === option.value
+                  "
+              [style.background]="option.hex"
+              [attr.aria-label]="option.label"
+              (click)="selectColor(option.value)"
+            >
+              @if ( selectedColor === option.value ) {
+              <ion-icon name="checkmark-outline"></ion-icon>
+              }
+            </button>
+            }
+          </div>
+        </section>
+
+        @if (saveError) {
+        <p class="save-error">{{ saveError }}</p>
+        }
+
+        <button class="save-button" type="submit" [disabled]="isSubmitting">
+          {{ isSubmitting ? 'Wird gespeichert …' : 'Änderungen speichern' }}
+        </button>
+      </form>
+      }
+    </section>
+  </main>
+</ion-content>

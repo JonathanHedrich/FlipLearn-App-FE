@@ -14,10 +14,9 @@ import {
   trophyOutline,
 } from 'ionicons/icons';
 
-import { UserProfileResponse } from '../../../core/models/auth.model';
-import { FlashcardSetResponse } from '../../../core/models/flashcard-api.model';
 import { AuthApi } from '../../../core/services/auth-api';
-import { FlashcardApi } from '../../../core/services/flashcard-api';
+import { AuthStore } from '../../../core/stores/auth.store';
+import { FlashcardStore } from '../../../core/stores/flashcard.store';
 import { FlBottomNavComponent } from '../../../shared/components/fl-bottom-nav/fl-bottom-nav.component';
 
 @Component({
@@ -28,15 +27,20 @@ import { FlBottomNavComponent } from '../../../shared/components/fl-bottom-nav/f
   styleUrls: ['./profile.page.scss'],
 })
 export class ProfilePage {
-  readonly profile = signal<UserProfileResponse | null>(null);
-  readonly sets = signal<FlashcardSetResponse[]>([]);
+  /*
+   * Profil und Lernsets kommen direkt aus den zentralen Stores.
+   * Dadurch speichern wir die Daten nicht noch einmal lokal.
+   */
+  readonly profile = this.authStore.profile;
+  readonly sets = this.flashcardStore.sets;
 
   readonly isLoading = signal(true);
   readonly loadError = signal('');
 
   constructor(
     private readonly authApi: AuthApi,
-    private readonly flashcardApi: FlashcardApi,
+    private readonly authStore: AuthStore,
+    private readonly flashcardStore: FlashcardStore,
     private readonly router: Router,
   ) {
     addIcons({
@@ -54,7 +58,7 @@ export class ProfilePage {
   }
 
   get initials(): string {
-    const name = this.profile()?.displayName?.trim();
+    const name = this.profile()?.displayName.trim();
 
     if (!name) {
       return 'FL';
@@ -74,10 +78,16 @@ export class ProfilePage {
       return 'Unbekannt';
     }
 
+    const date = new Date(value);
+
+    if (Number.isNaN(date.getTime())) {
+      return 'Unbekannt';
+    }
+
     return new Intl.DateTimeFormat('de-DE', {
       month: 'short',
       year: 'numeric',
-    }).format(new Date(value));
+    }).format(date);
   }
 
   async loadProfile(): Promise<void> {
@@ -85,13 +95,35 @@ export class ProfilePage {
     this.loadError.set('');
 
     try {
-      const [profile, sets] = await Promise.all([
+      /*
+       * Profil und Sets werden parallel geladen.
+       * loadSets() führt nur dann einen neuen Request aus,
+       * wenn die Sets noch nicht geladen wurden.
+       */
+      const [profile] = await Promise.all([
         firstValueFrom(this.authApi.getProfile()),
-        firstValueFrom(this.flashcardApi.getSets()),
+        this.flashcardStore.loadSets(),
       ]);
 
-      this.profile.set(profile);
-      this.sets.set(sets);
+      this.authStore.setProfile(profile);
+    } catch (error: unknown) {
+      this.loadError.set(this.resolveLoadError(error));
+    } finally {
+      this.isLoading.set(false);
+    }
+  }
+
+  async reloadProfile(): Promise<void> {
+    this.isLoading.set(true);
+    this.loadError.set('');
+
+    try {
+      const [profile] = await Promise.all([
+        firstValueFrom(this.authApi.getProfile()),
+        this.flashcardStore.loadSets(true),
+      ]);
+
+      this.authStore.setProfile(profile);
     } catch (error: unknown) {
       this.loadError.set(this.resolveLoadError(error));
     } finally {
@@ -112,8 +144,25 @@ export class ProfilePage {
   }
 
   private resolveLoadError(error: unknown): string {
-    if (error instanceof HttpErrorResponse && error.status === 0) {
+    if (!(error instanceof HttpErrorResponse)) {
+      return 'Das Profil konnte nicht geladen werden.';
+    }
+
+    if (error.status === 0) {
       return 'Das Backend ist nicht erreichbar.';
+    }
+
+    if (error.status === 401) {
+      return 'Deine Anmeldung ist abgelaufen. Bitte melde dich erneut an.';
+    }
+
+    if (
+      typeof error.error === 'object' &&
+      error.error !== null &&
+      'message' in error.error &&
+      typeof error.error.message === 'string'
+    ) {
+      return error.error.message;
     }
 
     return 'Das Profil konnte nicht geladen werden.';

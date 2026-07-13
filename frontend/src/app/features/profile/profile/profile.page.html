@@ -55,7 +55,9 @@
 
         <p>{{ loadError() }}</p>
 
-        <button type="button" (click)="loadProfile()">Erneut versuchen</button>
+        <button type="button" (click)="reloadProfile()">
+          Erneut versuchen
+        </button>
       </section>
       } @else if (profile()) {
       <section class="stats-grid">

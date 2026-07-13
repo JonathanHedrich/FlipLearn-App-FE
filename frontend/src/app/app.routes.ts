@@ -70,6 +70,14 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'sets/:setId/settings',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/flashcards/edit-set/edit-set.page').then(
+        (m) => m.EditSetPage,
+      ),
+  },
+  {
     path: 'study/:setId',
     canActivate: [authGuard],
     loadComponent: () =>
@@ -112,5 +120,12 @@ export const routes: Routes = [
   {
     path: '**',
     redirectTo: 'splash',
+  },
+  {
+    path: 'edit-set',
+    loadComponent: () =>
+      import('./features/flashcards/edit-set/edit-set.page').then(
+        (m) => m.EditSetPage,
+      ),
   },
 ];

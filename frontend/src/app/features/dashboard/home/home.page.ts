@@ -1,9 +1,7 @@
-import { CommonModule, DecimalPipe } from '@angular/common';
-import { HttpErrorResponse } from '@angular/common/http';
-import { Component, computed, signal } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Component, computed } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { IonContent, IonIcon } from '@ionic/angular/standalone';
-import { firstValueFrom } from 'rxjs';
 import { addIcons } from 'ionicons';
 import {
   barChartOutline,
@@ -19,8 +17,9 @@ import {
   FlashcardSetResponse,
 } from '../../../core/models/flashcard-api.model';
 import { AuthApi } from '../../../core/services/auth-api';
-import { FlashcardApi } from '../../../core/services/flashcard-api';
+import { FlashcardStore } from '../../../core/stores/flashcard.store';
 import { FlBottomNavComponent } from '../../../shared/components/fl-bottom-nav/fl-bottom-nav.component';
+import { AuthStore } from 'src/app/core/stores/auth.store';
 
 interface RecentActivity {
   id: number;
@@ -35,7 +34,6 @@ interface RecentActivity {
   standalone: true,
   imports: [
     CommonModule,
-    DecimalPipe,
     RouterLink,
     IonContent,
     IonIcon,
@@ -45,9 +43,13 @@ interface RecentActivity {
   styleUrls: ['./home.page.scss'],
 })
 export class HomePage {
-  readonly sets = signal<FlashcardSetResponse[]>([]);
-  readonly isLoading = signal(true);
-  readonly loadError = signal('');
+  readonly sets = this.flashcardStore.sets;
+
+  readonly isLoading = this.flashcardStore.isLoadingSets;
+
+  readonly loadError = this.flashcardStore.error;
+
+  readonly totalCards = this.flashcardStore.totalCards;
 
   readonly recentSets = computed(() =>
     [...this.sets()]
@@ -57,10 +59,6 @@ export class HomePage {
           new Date(first.updatedAt).getTime(),
       )
       .slice(0, 3),
-  );
-
-  readonly totalCards = computed(() =>
-    this.sets().reduce((total, set) => total + set.cardCount, 0),
   );
 
   readonly learnedCards = computed(() =>
@@ -101,8 +99,9 @@ export class HomePage {
 
   constructor(
     readonly authApi: AuthApi,
-    private readonly flashcardApi: FlashcardApi,
+    readonly flashcardStore: FlashcardStore,
     private readonly router: Router,
+    private readonly authStore: AuthStore,
   ) {
     addIcons({
       barChartOutline,
@@ -119,7 +118,7 @@ export class HomePage {
   }
 
   get userName(): string {
-    return this.authApi.currentUser()?.displayName ?? 'FlipLearn User';
+    return this.authStore.displayName() || 'FlipLearn User';
   }
 
   get goalProgress(): number {
@@ -131,17 +130,18 @@ export class HomePage {
   }
 
   async loadDashboard(): Promise<void> {
-    this.isLoading.set(true);
-    this.loadError.set('');
-
     try {
-      const sets = await firstValueFrom(this.flashcardApi.getSets());
+      await this.flashcardStore.loadSets();
+    } catch {
+      // Die Fehlermeldung liegt bereits im Store.
+    }
+  }
 
-      this.sets.set(sets);
-    } catch (error: unknown) {
-      this.loadError.set(this.resolveLoadError(error));
-    } finally {
-      this.isLoading.set(false);
+  async reloadDashboard(): Promise<void> {
+    try {
+      await this.flashcardStore.loadSets(true);
+    } catch {
+      // Die Fehlermeldung liegt bereits im Store.
     }
   }
 
@@ -173,6 +173,7 @@ export class HomePage {
 
   private formatUpdatedAt(value: string): string {
     const updatedAt = new Date(value);
+
     const difference = Date.now() - updatedAt.getTime();
 
     const minutes = Math.floor(difference / 60_000);
@@ -194,13 +195,5 @@ export class HomePage {
     const days = Math.floor(hours / 24);
 
     return `${days}d ago`;
-  }
-
-  private resolveLoadError(error: unknown): string {
-    if (error instanceof HttpErrorResponse && error.status === 0) {
-      return 'Das Backend ist nicht erreichbar.';
-    }
-
-    return 'Die Dashboard-Daten konnten nicht geladen werden.';
   }
 }

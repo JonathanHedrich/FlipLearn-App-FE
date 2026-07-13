@@ -1,13 +1,12 @@
 import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
-
-import { AuthApi } from '../services/auth-api';
+import { AuthStore } from '../stores/auth.store';
 
 export const guestGuard: CanActivateFn = () => {
-  const authApi = inject(AuthApi);
   const router = inject(Router);
+  const authStore = inject(AuthStore);
 
-  if (!authApi.isAuthenticated()) {
+  if (!authStore.isLoggedIn()) {
     return true;
   }
 

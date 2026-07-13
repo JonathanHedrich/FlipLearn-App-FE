@@ -393,16 +393,28 @@ ion-content {
 
 @media (min-width: 600px) {
   :host {
+    display: block;
+
     width: 390px;
     height: 844px;
     margin: 24px auto;
 
+    overflow: visible;
+  }
+
+  .editor-page {
+    height: 100%;
     overflow: hidden;
 
     border-radius: 34px;
     box-shadow: var(--fl-shadow-lg);
   }
+
+  .editor-header {
+    overflow: visible;
+  }
 }
+
 .editor-loading,
 .editor-empty-state {
   display: flex;
@@ -494,4 +506,74 @@ ion-content {
   to {
     transform: rotate(360deg);
   }
+}
+
+.editor-header {
+  position: relative;
+  z-index: 20;
+  overflow: visible;
+}
+
+.editor-options {
+  position: relative;
+  flex: 0 0 auto;
+}
+
+.editor-options-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 100;
+
+  display: flex;
+  flex-direction: column;
+
+  width: 190px;
+  padding: 8px;
+
+  border: 1px solid var(--fl-border);
+  border-radius: 16px;
+
+  background: #ffffff;
+  box-shadow: 0 12px 30px rgba(16, 36, 80, 0.18);
+}
+
+.editor-options-menu button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  width: 100%;
+  min-height: 42px;
+  padding: 0 12px;
+
+  border: 0;
+  border-radius: 10px;
+
+  color: var(--fl-text-primary);
+  background: transparent;
+
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
+}
+
+.editor-options-menu button:hover,
+.editor-options-menu button:active {
+  background: var(--fl-primary-light);
+}
+
+.editor-options-menu button ion-icon {
+  flex: 0 0 auto;
+  font-size: 1.05rem;
+}
+
+.editor-options-menu button.danger {
+  color: var(--fl-danger);
+}
+
+.editor-options-menu button.danger:hover,
+.editor-options-menu button.danger:active {
+  background: rgba(220, 38, 38, 0.08);
 }

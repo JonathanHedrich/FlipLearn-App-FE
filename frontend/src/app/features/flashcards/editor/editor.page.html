@@ -12,12 +12,39 @@
 
       <div class="header-title">
         <h1>{{ setTitle }}</h1>
+
         <p>{{ cards.length }} {{ cards.length === 1 ? 'card' : 'cards' }}</p>
       </div>
 
-      <button class="header-button" type="button" aria-label="Weitere Optionen">
-        <ion-icon name="ellipsis-vertical-outline"></ion-icon>
-      </button>
+      <div class="editor-options">
+        <button
+          class="header-button"
+          type="button"
+          aria-label="Weitere Optionen"
+          [attr.aria-expanded]="menuOpen"
+          (click)="toggleMenu()"
+        >
+          <ion-icon name="ellipsis-vertical-outline"></ion-icon>
+        </button>
+
+        @if (menuOpen) {
+        <div class="editor-options-menu">
+          <button type="button" (click)="editSet(); closeMenu()">
+            <ion-icon name="create-outline"></ion-icon>
+            Set bearbeiten
+          </button>
+
+          <button
+            class="danger"
+            type="button"
+            (click)="deleteSet(); closeMenu()"
+          >
+            <ion-icon name="trash-outline"></ion-icon>
+            Set löschen
+          </button>
+        </div>
+        }
+      </div>
     </header>
 
     <section class="editor-content">

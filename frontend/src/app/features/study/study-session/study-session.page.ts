@@ -22,6 +22,7 @@ import {
 } from '../../../core/models/study-api.model';
 import { FlashcardApi } from '../../../core/services/flashcard-api';
 import { StudyApi } from '../../../core/services/study-api';
+import { FlashcardStore } from '../../../core/stores/flashcard.store';
 
 @Component({
   selector: 'app-study-session',
@@ -52,6 +53,7 @@ export class StudySessionPage {
     private readonly location: Location,
     private readonly studyApi: StudyApi,
     private readonly flashcardApi: FlashcardApi,
+    private readonly flashcardStore: FlashcardStore,
   ) {
     this.setId = Number(this.route.snapshot.paramMap.get('setId')) || 0;
 
@@ -197,6 +199,8 @@ export class StudySessionPage {
       this.correctAnswers = response.correctAnswers;
 
       this.incorrectAnswers = response.incorrectAnswers;
+
+      this.flashcardStore.updateProgress(this.setId, response.setProgress);
 
       if (response.sessionComplete) {
         this.sessionComplete = true;

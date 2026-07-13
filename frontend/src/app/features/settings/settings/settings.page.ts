@@ -5,6 +5,9 @@ import { IonContent, IonIcon, IonToggle } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { FormsModule } from '@angular/forms';
 import { AuthApi } from '../../../core/services/auth-api';
+
+import { FlashcardStore } from '../../../core/stores/flashcard.store';
+
 import {
   arrowBackOutline,
   chevronForwardOutline,
@@ -14,6 +17,7 @@ import {
   personOutline,
   radioButtonOnOutline,
 } from 'ionicons/icons';
+import { AuthStore } from 'src/app/core/stores/auth.store';
 
 interface SettingsRow {
   label: string;
@@ -66,6 +70,8 @@ export class SettingsPage {
     private readonly location: Location,
     private readonly router: Router,
     private readonly authApi: AuthApi,
+    private readonly flashcardStore: FlashcardStore,
+    private readonly authStore: AuthStore,
   ) {
     addIcons({
       arrowBackOutline,
@@ -103,6 +109,8 @@ export class SettingsPage {
     }
 
     this.authApi.logout();
+    this.authStore.clear();
+    this.flashcardStore.clear();
 
     void this.router.navigateByUrl('/login', {
       replaceUrl: true,

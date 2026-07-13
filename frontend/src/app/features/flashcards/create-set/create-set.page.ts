@@ -3,8 +3,11 @@ import { Component } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { IonContent, IonIcon } from '@ionic/angular/standalone';
-import { firstValueFrom } from 'rxjs';
 import { addIcons } from 'ionicons';
+
+import { FlButtonComponent } from '../../../shared/components/fl-button/fl-button.component';
+import { FlashcardStore } from '../../../core/stores/flashcard.store';
+
 import {
   arrowBackOutline,
   bookOutline,
@@ -17,8 +20,6 @@ import {
   CreateFlashcardSetRequest,
   FlashcardSetColor,
 } from '../../../core/models/flashcard-api.model';
-import { FlashcardApi } from '../../../core/services/flashcard-api';
-import { FlButtonComponent } from '../../../shared/components/fl-button/fl-button.component';
 
 interface ColorOption {
   value: FlashcardSetColor;
@@ -85,7 +86,7 @@ export class CreateSetPage {
   constructor(
     private readonly formBuilder: FormBuilder,
     private readonly router: Router,
-    private readonly flashcardApi: FlashcardApi,
+    private readonly flashcardStore: FlashcardStore,
   ) {
     addIcons({
       arrowBackOutline,
@@ -153,9 +154,7 @@ export class CreateSetPage {
         color: this.selectedColor,
       };
 
-      const createdSet = await firstValueFrom(
-        this.flashcardApi.createSet(request),
-      );
+      const createdSet = await this.flashcardStore.createSet(request);
 
       await this.router.navigate(['/sets', createdSet.id, 'edit'], {
         replaceUrl: true,

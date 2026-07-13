@@ -46,6 +46,7 @@ export interface StudyReviewResponse {
   sessionComplete: boolean;
   correctAnswers: number;
   incorrectAnswers: number;
+  setProgress: number;
 }
 
 export type StudyMode = 'DUE' | 'ALL';

@@ -1,11 +1,13 @@
 import { CommonModule } from '@angular/common';
-import { HttpErrorResponse } from '@angular/common/http';
 import { Component, computed, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { IonContent, IonIcon } from '@ionic/angular/standalone';
-import { firstValueFrom } from 'rxjs';
 import { addIcons } from 'ionicons';
+
+import { FlashcardStore } from '../../../core/stores/flashcard.store';
+import { FlBottomNavComponent } from '../../../shared/components/fl-bottom-nav/fl-bottom-nav.component';
+
 import {
   addOutline,
   createOutline,
@@ -20,8 +22,6 @@ import {
   FlashcardSetColor,
   FlashcardSetResponse,
 } from '../../../core/models/flashcard-api.model';
-import { FlashcardApi } from '../../../core/services/flashcard-api';
-import { FlBottomNavComponent } from '../../../shared/components/fl-bottom-nav/fl-bottom-nav.component';
 
 type MainFilter = 'all' | 'favorites' | 'recent';
 
@@ -41,16 +41,21 @@ type MainFilter = 'all' | 'favorites' | 'recent';
 export class FlashcardListPage {
   searchTerm = '';
 
-  readonly sets = signal<FlashcardSetResponse[]>([]);
-  readonly isLoading = signal(true);
-  readonly loadError = signal('');
-
   readonly activeFilter = signal<MainFilter>('all');
-  readonly activeCategory = signal('all');
 
-  readonly totalCards = computed(() =>
-    this.sets().reduce((total, set) => total + set.cardCount, 0),
-  );
+  readonly activeCategory = signal<string>('all');
+
+  /*
+   * Öffentliche Signals des zentralen Stores.
+   * Diese werden im Template gelesen, aber nicht direkt verändert.
+   */
+  readonly sets = this.flashcardStore.sets;
+
+  readonly isLoading = this.flashcardStore.isLoadingSets;
+
+  readonly loadError = this.flashcardStore.error;
+
+  readonly totalCards = this.flashcardStore.totalCards;
 
   readonly filteredSets = computed(() => {
     const query = this.searchTerm.trim().toLowerCase();
@@ -59,10 +64,14 @@ export class FlashcardListPage {
     const category = this.activeCategory();
 
     let result = this.sets().filter((set) => {
+      const title = set.title.toLowerCase();
+
+      const description = (set.description ?? '').toLowerCase();
+
       const matchesSearch =
         query.length === 0 ||
-        set.title.toLowerCase().includes(query) ||
-        (set.description ?? '').toLowerCase().includes(query);
+        title.includes(query) ||
+        description.includes(query);
 
       const matchesFilter =
         filter === 'all' ||
@@ -86,7 +95,7 @@ export class FlashcardListPage {
   });
 
   constructor(
-    private readonly flashcardApi: FlashcardApi,
+    readonly flashcardStore: FlashcardStore,
     private readonly router: Router,
   ) {
     addIcons({
@@ -101,21 +110,27 @@ export class FlashcardListPage {
   }
 
   ionViewWillEnter(): void {
-    void this.loadSets();
+    void this.reloadSets();
   }
 
   async loadSets(): Promise<void> {
-    this.isLoading.set(true);
-    this.loadError.set('');
-
     try {
-      const sets = await firstValueFrom(this.flashcardApi.getSets());
+      await this.flashcardStore.loadSets();
+    } catch {
+      /*
+       * Der Store speichert die Fehlermeldung bereits
+       * in flashcardStore.error.
+       */
+    }
+  }
 
-      this.sets.set(sets);
-    } catch (error: unknown) {
-      this.loadError.set(this.resolveLoadError(error));
-    } finally {
-      this.isLoading.set(false);
+  async reloadSets(): Promise<void> {
+    try {
+      await this.flashcardStore.loadSets(true);
+    } catch {
+      /*
+       * Der Fehler wird über loadError im Template angezeigt.
+       */
     }
   }
 
@@ -135,17 +150,7 @@ export class FlashcardListPage {
     event.stopPropagation();
 
     try {
-      const updatedSet = await firstValueFrom(
-        this.flashcardApi.updateSet(set.id, {
-          title: set.title,
-          description: set.description,
-          folder: set.folder,
-          color: set.color,
-          favorite: !set.favorite,
-        }),
-      );
-
-      this.replaceSet(updatedSet);
+      await this.flashcardStore.toggleFavorite(set.id);
     } catch {
       window.alert('Der Favoritenstatus konnte nicht gespeichert werden.');
     }
@@ -178,7 +183,7 @@ export class FlashcardListPage {
     event.stopPropagation();
 
     const confirmed = window.confirm(
-      `Möchtest du „${set.title}“ wirklich löschen?`,
+      `Möchtest du „${set.title}“ und alle enthaltenen Karten wirklich löschen?`,
     );
 
     if (!confirmed) {
@@ -186,27 +191,9 @@ export class FlashcardListPage {
     }
 
     try {
-      await firstValueFrom(this.flashcardApi.deleteSet(set.id));
-
-      this.sets.update((sets) =>
-        sets.filter((existingSet) => existingSet.id !== set.id),
-      );
+      await this.flashcardStore.deleteSet(set.id);
     } catch {
       window.alert('Das Lernset konnte nicht gelöscht werden.');
     }
-  }
-
-  private replaceSet(updatedSet: FlashcardSetResponse): void {
-    this.sets.update((sets) =>
-      sets.map((set) => (set.id === updatedSet.id ? updatedSet : set)),
-    );
-  }
-
-  private resolveLoadError(error: unknown): string {
-    if (error instanceof HttpErrorResponse && error.status === 0) {
-      return 'Das Backend ist nicht erreichbar.';
-    }
-
-    return 'Die Lernsets konnten nicht geladen werden.';
   }
 }

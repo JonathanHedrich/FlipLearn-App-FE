@@ -4,12 +4,15 @@ import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { IonContent, IonIcon } from '@ionic/angular/standalone';
-import { firstValueFrom } from 'rxjs';
 import { addIcons } from 'ionicons';
+
+import { FlashcardStore } from '../../../core/stores/flashcard.store';
+
 import {
   addOutline,
   arrowBackOutline,
   closeOutline,
+  createOutline,
   ellipsisVerticalOutline,
   trashOutline,
 } from 'ionicons/icons';
@@ -18,7 +21,6 @@ import {
   FlashcardResponse,
   FlashcardSetResponse,
 } from '../../../core/models/flashcard-api.model';
-import { FlashcardApi } from '../../../core/services/flashcard-api';
 
 interface EditableFlashcard extends FlashcardResponse {
   draftFront: string;
@@ -44,12 +46,13 @@ export class EditorPage {
   isLoading = true;
   isAddingCard = false;
   loadError = '';
+  menuOpen = false;
 
   constructor(
     private readonly route: ActivatedRoute,
     private readonly router: Router,
     private readonly location: Location,
-    private readonly flashcardApi: FlashcardApi,
+    private readonly flashcardStore: FlashcardStore,
   ) {
     this.setId = Number(this.route.snapshot.paramMap.get('setId')) || 0;
 
@@ -57,9 +60,18 @@ export class EditorPage {
       addOutline,
       arrowBackOutline,
       closeOutline,
+      createOutline,
       ellipsisVerticalOutline,
       trashOutline,
     });
+  }
+
+  toggleMenu(): void {
+    this.menuOpen = !this.menuOpen;
+  }
+
+  closeMenu(): void {
+    this.menuOpen = false;
   }
 
   ionViewWillEnter(): void {
@@ -91,8 +103,8 @@ export class EditorPage {
 
     try {
       const [set, cards] = await Promise.all([
-        firstValueFrom(this.flashcardApi.getSet(this.setId)),
-        firstValueFrom(this.flashcardApi.getCards(this.setId)),
+        this.flashcardStore.loadSet(this.setId, true),
+        this.flashcardStore.loadCards(this.setId, true),
       ]);
 
       this.currentSet = set;
@@ -154,12 +166,10 @@ export class EditorPage {
        * leeren Karten. Deshalb erstellen wir einen kleinen
        * Platzhalter und öffnen sie sofort zum Bearbeiten.
        */
-      const createdCard = await firstValueFrom(
-        this.flashcardApi.createCard(this.setId, {
-          front: 'Neue Vorderseite',
-          back: 'Neue Rückseite',
-        }),
-      );
+      const createdCard = await this.flashcardStore.createCard(this.setId, {
+        front: 'Neue Vorderseite',
+        back: 'Neue Rückseite',
+      });
 
       const editableCard = this.toEditableCard(createdCard);
 
@@ -199,12 +209,14 @@ export class EditorPage {
     card.isSaving = true;
 
     try {
-      const updatedCard = await firstValueFrom(
-        this.flashcardApi.updateCard(this.setId, card.id, {
+      const updatedCard = await this.flashcardStore.updateCard(
+        this.setId,
+        card.id,
+        {
           front,
           back,
           favorite: card.favorite,
-        }),
+        },
       );
 
       this.replaceCard(this.toEditableCard(updatedCard));
@@ -231,7 +243,7 @@ export class EditorPage {
     }
 
     try {
-      await firstValueFrom(this.flashcardApi.deleteCard(this.setId, cardId));
+      await this.flashcardStore.deleteCard(this.setId, cardId);
 
       this.cards = this.cards.filter((card) => card.id !== cardId);
 
@@ -281,5 +293,29 @@ export class EditorPage {
     }
 
     return error.error?.message ?? 'Der Editor konnte nicht geladen werden.';
+  }
+
+  async deleteSet(): Promise<void> {
+    const confirmed = window.confirm(
+      `Möchtest du das Lernset „${this.setTitle}“ wirklich löschen? Alle Karten werden ebenfalls gelöscht.`,
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    try {
+      await this.flashcardStore.deleteSet(this.setId);
+
+      await this.router.navigateByUrl('/sets', {
+        replaceUrl: true,
+      });
+    } catch {
+      window.alert('Das Lernset konnte nicht gelöscht werden.');
+    }
+  }
+
+  editSet(): void {
+    void this.router.navigate(['/sets', this.setId, 'settings']);
   }
 }
