@@ -79,7 +79,7 @@ export class EditProfilePage {
   }
 
   ionViewWillEnter(): void {
-    this.loadCurrentValues();
+    void this.loadProfile();
   }
 
   get displayNameInvalid(): boolean {
@@ -126,7 +126,8 @@ export class EditProfilePage {
       );
 
       this.authApi.setCurrentUser(updatedUser);
-      this.authStore.setCurrentUser(updatedUser);
+
+      this.authStore.updateProfileData(updatedUser);
 
       this.saveSuccess = 'Dein Profil wurde gespeichert.';
     } catch (error: unknown) {
@@ -154,20 +155,6 @@ export class EditProfilePage {
       newEmail: '',
       currentPassword: '',
     });
-  }
-
-  private resolveError(error: unknown): string {
-    if (!(error instanceof HttpErrorResponse)) {
-      return 'Das Profil konnte nicht gespeichert werden.';
-    }
-
-    if (error.status === 0) {
-      return 'Das Backend ist nicht erreichbar.';
-    }
-
-    return (
-      error.error?.message ?? 'Das Profil konnte nicht gespeichert werden.'
-    );
   }
 
   readonly emailForm = this.formBuilder.nonNullable.group({
@@ -309,6 +296,27 @@ export class EditProfilePage {
       );
     } finally {
       this.isChangingPassword = false;
+    }
+  }
+
+  async loadProfile(): Promise<void> {
+    try {
+      const user = await firstValueFrom(this.authApi.loadCurrentUser());
+
+      this.authStore.updateProfileData(user);
+
+      this.profileForm.patchValue({
+        displayName: user.displayName,
+        username: user.username,
+      });
+
+      this.emailForm.patchValue({
+        currentEmail: user.email,
+        newEmail: '',
+        currentPassword: '',
+      });
+    } catch {
+      this.loadCurrentValues();
     }
   }
 }

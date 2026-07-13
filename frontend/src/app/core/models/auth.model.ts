@@ -50,6 +50,7 @@ export interface ApiErrorResponse {
 export interface UserProfileResponse {
   id: number;
   displayName: string;
+  username: string;
   email: string;
   role: string;
   memberSince: string;
