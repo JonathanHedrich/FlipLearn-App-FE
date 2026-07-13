@@ -595,3 +595,50 @@ ion-textarea.fl-ion-input {
     background: #f3f6ff;
   }
 }
+
+body {
+  transition:
+    background 180ms ease,
+    color 180ms ease;
+}
+
+body.dark {
+  --fl-background: #111827;
+  --fl-surface: #1f2937;
+  --fl-input-background: #273244;
+
+  --fl-text-primary: #f8fafc;
+  --fl-text-secondary: #aab6c7;
+  --fl-text-muted: #7d899b;
+
+  --fl-border: #344154;
+
+  --fl-primary-light: rgba(79, 124, 255, 0.16);
+
+  background: #0b1120;
+  color: var(--fl-text-primary);
+}
+
+body.dark ion-content {
+  --background: var(--fl-background);
+}
+
+body.dark input,
+body.dark textarea,
+body.dark select {
+  color: var(--fl-text-primary);
+  background: var(--fl-input-background);
+}
+
+body.dark .weekly-summary-card,
+body.dark .line-chart-card,
+body.dark .accuracy-card,
+body.dark .calendar-card,
+body.dark .achievements-card,
+body.dark .set-card,
+body.dark .flashcard-editor,
+body.dark .profile-summary article,
+body.dark .stat-card {
+  border-color: var(--fl-border);
+  background: var(--fl-surface);
+}

@@ -8,6 +8,7 @@ import { AuthApi } from '../../../core/services/auth-api';
 
 import { FlashcardStore } from '../../../core/stores/flashcard.store';
 import { StatisticsStore } from '../../../core/stores/statistics.store';
+import { AppTheme, ThemeService } from '../../../core/services/theme.service';
 
 import {
   arrowBackOutline,
@@ -71,9 +72,10 @@ export class SettingsPage {
     private readonly location: Location,
     private readonly router: Router,
     private readonly authApi: AuthApi,
-    private readonly flashcardStore: FlashcardStore,
     private readonly authStore: AuthStore,
+    private readonly flashcardStore: FlashcardStore,
     private readonly statisticsStore: StatisticsStore,
+    readonly themeService: ThemeService,
   ) {
     addIcons({
       arrowBackOutline,
@@ -118,5 +120,13 @@ export class SettingsPage {
     void this.router.navigateByUrl('/login', {
       replaceUrl: true,
     });
+  }
+
+  changeTheme(value: string): void {
+    if (value !== 'light' && value !== 'dark' && value !== 'system') {
+      return;
+    }
+
+    this.themeService.setTheme(value as AppTheme);
   }
 }

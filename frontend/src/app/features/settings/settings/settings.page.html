@@ -106,6 +106,63 @@
         </div>
       </section>
 
+      <section class="settings-section">
+        <h2>Appearance</h2>
+
+        <div class="settings-card">
+          <label class="theme-option">
+            <div>
+              <strong>Light</strong>
+              <span>Immer helles Design</span>
+            </div>
+
+            <input
+              type="radio"
+              name="theme"
+              value="light"
+              [checked]="
+          themeService.theme() === 'light'
+        "
+              (change)="changeTheme('light')"
+            />
+          </label>
+
+          <label class="theme-option">
+            <div>
+              <strong>Dark</strong>
+              <span>Immer dunkles Design</span>
+            </div>
+
+            <input
+              type="radio"
+              name="theme"
+              value="dark"
+              [checked]="
+          themeService.theme() === 'dark'
+        "
+              (change)="changeTheme('dark')"
+            />
+          </label>
+
+          <label class="theme-option">
+            <div>
+              <strong>System</strong>
+              <span> Geräteeinstellung übernehmen </span>
+            </div>
+
+            <input
+              type="radio"
+              name="theme"
+              value="system"
+              [checked]="
+          themeService.theme() === 'system'
+        "
+              (change)="changeTheme('system')"
+            />
+          </label>
+        </div>
+      </section>
+
       <button class="logout-button" type="button" (click)="logout()">
         <ion-icon name="log-out-outline"></ion-icon>
         Log Out
