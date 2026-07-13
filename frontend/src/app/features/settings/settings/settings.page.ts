@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { IonContent, IonIcon, IonToggle } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { FormsModule } from '@angular/forms';
+import { AuthApi } from '../../../core/services/auth-api';
 import {
   arrowBackOutline,
   chevronForwardOutline,
@@ -64,6 +65,7 @@ export class SettingsPage {
   constructor(
     private readonly location: Location,
     private readonly router: Router,
+    private readonly authApi: AuthApi,
   ) {
     addIcons({
       arrowBackOutline,
@@ -100,12 +102,7 @@ export class SettingsPage {
       return;
     }
 
-    /*
-     * Später:
-     * - JWT entfernen
-     * - Refresh Token löschen
-     * - Auth-State zurücksetzen
-     */
+    this.authApi.logout();
 
     void this.router.navigateByUrl('/login', {
       replaceUrl: true,

@@ -1,6 +1,9 @@
-import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { HttpErrorResponse } from '@angular/common/http';
+import { Component, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { IonContent, IonIcon } from '@ionic/angular/standalone';
+import { firstValueFrom } from 'rxjs';
 import { addIcons } from 'ionicons';
 import {
   bookOutline,
@@ -8,81 +11,92 @@ import {
   notificationsOutline,
   settingsOutline,
   starOutline,
+  trophyOutline,
 } from 'ionicons/icons';
 
+import { UserProfileResponse } from '../../../core/models/auth.model';
+import { FlashcardSetResponse } from '../../../core/models/flashcard-api.model';
+import { AuthApi } from '../../../core/services/auth-api';
+import { FlashcardApi } from '../../../core/services/flashcard-api';
 import { FlBottomNavComponent } from '../../../shared/components/fl-bottom-nav/fl-bottom-nav.component';
-
-type ProfileSetTheme = 'blue' | 'purple' | 'green' | 'orange';
-
-interface ProfileSet {
-  id: number;
-  title: string;
-  cards: number;
-  progress: number;
-  theme: ProfileSetTheme;
-}
 
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [IonContent, IonIcon, FlBottomNavComponent],
+  imports: [CommonModule, IonContent, IonIcon, FlBottomNavComponent],
   templateUrl: './profile.page.html',
   styleUrls: ['./profile.page.scss'],
 })
 export class ProfilePage {
-  readonly user = {
-    initials: 'AJ',
-    name: 'Alex Johnson',
-    email: 'alex@example.com',
-    memberSince: 'Jan 2024',
-  };
+  readonly profile = signal<UserProfileResponse | null>(null);
+  readonly sets = signal<FlashcardSetResponse[]>([]);
 
-  readonly stats = {
-    sets: 4,
-    cards: 16,
-    streak: 14,
-    accuracy: 87,
-  };
+  readonly isLoading = signal(true);
+  readonly loadError = signal('');
 
-  readonly sets: ProfileSet[] = [
-    {
-      id: 1,
-      title: 'Spanish Vocabulary',
-      cards: 5,
-      progress: 72,
-      theme: 'blue',
-    },
-    {
-      id: 2,
-      title: 'Chemistry Basics',
-      cards: 4,
-      progress: 45,
-      theme: 'purple',
-    },
-    {
-      id: 3,
-      title: 'World Capitals',
-      cards: 4,
-      progress: 90,
-      theme: 'green',
-    },
-    {
-      id: 4,
-      title: 'JavaScript Concepts',
-      cards: 3,
-      progress: 30,
-      theme: 'orange',
-    },
-  ];
-
-  constructor(private readonly router: Router) {
+  constructor(
+    private readonly authApi: AuthApi,
+    private readonly flashcardApi: FlashcardApi,
+    private readonly router: Router,
+  ) {
     addIcons({
       bookOutline,
       chevronForwardOutline,
       notificationsOutline,
       settingsOutline,
       starOutline,
+      trophyOutline,
     });
+  }
+
+  ionViewWillEnter(): void {
+    void this.loadProfile();
+  }
+
+  get initials(): string {
+    const name = this.profile()?.displayName?.trim();
+
+    if (!name) {
+      return 'FL';
+    }
+
+    return name
+      .split(/\s+/)
+      .slice(0, 2)
+      .map((part) => part.charAt(0).toUpperCase())
+      .join('');
+  }
+
+  get memberSince(): string {
+    const value = this.profile()?.memberSince;
+
+    if (!value) {
+      return 'Unbekannt';
+    }
+
+    return new Intl.DateTimeFormat('de-DE', {
+      month: 'short',
+      year: 'numeric',
+    }).format(new Date(value));
+  }
+
+  async loadProfile(): Promise<void> {
+    this.isLoading.set(true);
+    this.loadError.set('');
+
+    try {
+      const [profile, sets] = await Promise.all([
+        firstValueFrom(this.authApi.getProfile()),
+        firstValueFrom(this.flashcardApi.getSets()),
+      ]);
+
+      this.profile.set(profile);
+      this.sets.set(sets);
+    } catch (error: unknown) {
+      this.loadError.set(this.resolveLoadError(error));
+    } finally {
+      this.isLoading.set(false);
+    }
   }
 
   openNotifications(): void {
@@ -95,5 +109,13 @@ export class ProfilePage {
 
   openSet(setId: number): void {
     void this.router.navigate(['/sets', setId, 'edit']);
+  }
+
+  private resolveLoadError(error: unknown): string {
+    if (error instanceof HttpErrorResponse && error.status === 0) {
+      return 'Das Backend ist nicht erreichbar.';
+    }
+
+    return 'Das Profil konnte nicht geladen werden.';
   }
 }

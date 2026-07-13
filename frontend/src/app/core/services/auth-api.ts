@@ -9,6 +9,7 @@ import {
   LoginResponse,
   RegisterRequest,
   RegisterResponse,
+  UserProfileResponse,
 } from '../models/auth.model';
 
 const TOKEN_STORAGE_KEY = 'fliplearn.accessToken';
@@ -104,5 +105,9 @@ export class AuthApi {
 
       return null;
     }
+  }
+
+  getProfile(): Observable<UserProfileResponse> {
+    return this.http.get<UserProfileResponse>(`${API_BASE_URL}/users/profile`);
   }
 }

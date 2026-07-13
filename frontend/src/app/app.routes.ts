@@ -1,4 +1,6 @@
 import { Routes } from '@angular/router';
+import { authGuard } from './core/guards/auth.guard';
+import { guestGuard } from './core/guards/guest.guard';
 
 export const routes: Routes = [
   {
@@ -15,11 +17,13 @@ export const routes: Routes = [
   },
   {
     path: 'login',
+    canActivate: [guestGuard],
     loadComponent: () =>
       import('./features/auth/login/login.page').then((page) => page.LoginPage),
   },
   {
     path: 'register',
+    canActivate: [guestGuard],
     loadComponent: () =>
       import('./features/auth/register/register.page').then(
         (page) => page.RegisterPage,
@@ -27,6 +31,7 @@ export const routes: Routes = [
   },
   {
     path: 'forgot-password',
+    canActivate: [guestGuard],
     loadComponent: () =>
       import('./features/auth/forgot-password/forgot-password.page').then(
         (page) => page.ForgotPasswordPage,
@@ -34,6 +39,7 @@ export const routes: Routes = [
   },
   {
     path: 'home',
+    canActivate: [authGuard],
     loadComponent: () =>
       import('./features/dashboard/home/home.page').then(
         (page) => page.HomePage,
@@ -41,6 +47,7 @@ export const routes: Routes = [
   },
   {
     path: 'sets',
+    canActivate: [authGuard],
     loadComponent: () =>
       import('./features/flashcards/flashcard-list/flashcard-list.page').then(
         (page) => page.FlashcardListPage,
@@ -48,6 +55,7 @@ export const routes: Routes = [
   },
   {
     path: 'sets/create',
+    canActivate: [authGuard],
     loadComponent: () =>
       import('./features/flashcards/create-set/create-set.page').then(
         (page) => page.CreateSetPage,
@@ -55,6 +63,7 @@ export const routes: Routes = [
   },
   {
     path: 'sets/:setId/edit',
+    canActivate: [authGuard],
     loadComponent: () =>
       import('./features/flashcards/editor/editor.page').then(
         (page) => page.EditorPage,
@@ -62,6 +71,7 @@ export const routes: Routes = [
   },
   {
     path: 'study/:setId',
+    canActivate: [authGuard],
     loadComponent: () =>
       import('./features/study/study-session/study-session.page').then(
         (page) => page.StudySessionPage,
@@ -69,6 +79,7 @@ export const routes: Routes = [
   },
   {
     path: 'statistics',
+    canActivate: [authGuard],
     loadComponent: () =>
       import('./features/statistics/statistics/statistics.page').then(
         (page) => page.StatisticsPage,
@@ -76,6 +87,7 @@ export const routes: Routes = [
   },
   {
     path: 'profile',
+    canActivate: [authGuard],
     loadComponent: () =>
       import('./features/profile/profile/profile.page').then(
         (page) => page.ProfilePage,
@@ -83,6 +95,7 @@ export const routes: Routes = [
   },
   {
     path: 'settings',
+    canActivate: [authGuard],
     loadComponent: () =>
       import('./features/settings/settings/settings.page').then(
         (page) => page.SettingsPage,
@@ -90,6 +103,7 @@ export const routes: Routes = [
   },
   {
     path: 'notifications',
+    canActivate: [authGuard],
     loadComponent: () =>
       import('./features/notifications/notifications/notifications.page').then(
         (page) => page.NotificationsPage,

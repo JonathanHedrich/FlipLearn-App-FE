@@ -44,3 +44,18 @@ export interface ApiErrorResponse {
   timestamp?: string;
   validationErrors?: Record<string, string>;
 }
+
+export interface UserProfileResponse {
+  id: number;
+  displayName: string;
+  email: string;
+  role: string;
+  memberSince: string;
+  totalSets: number;
+  totalCards: number;
+  favoriteSets: number;
+  completedSessions: number;
+  totalReviews: number;
+  correctReviews: number;
+  accuracy: number;
+}

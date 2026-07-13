@@ -5,6 +5,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { IonContent } from '@ionic/angular/standalone';
 import { firstValueFrom } from 'rxjs';
+import { ActivatedRoute } from '@angular/router';
 
 import {
   ApiErrorResponse,
@@ -46,6 +47,7 @@ export class LoginPage {
     private readonly formBuilder: FormBuilder,
     private readonly router: Router,
     private readonly authApi: AuthApi,
+    private readonly route: ActivatedRoute,
   ) {}
 
   get emailInvalid(): boolean {
@@ -87,7 +89,10 @@ export class LoginPage {
 
       await firstValueFrom(this.authApi.loadCurrentUser());
 
-      await this.router.navigateByUrl('/home', {
+      const returnUrl =
+        this.route.snapshot.queryParamMap.get('returnUrl') ?? '/home';
+
+      await this.router.navigateByUrl(returnUrl, {
         replaceUrl: true,
       });
     } catch (error: unknown) {

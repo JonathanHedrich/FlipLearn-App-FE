@@ -12,7 +12,6 @@
             (click)="openNotifications()"
           >
             <ion-icon name="notifications-outline"></ion-icon>
-            <span class="notification-badge">2</span>
           </button>
 
           <button
@@ -26,47 +25,102 @@
         </div>
       </div>
 
+      @if (!isLoading() && profile()) {
       <section class="profile-identity">
-        <div class="avatar">{{ user.initials }}</div>
+        <div class="avatar">{{ initials }}</div>
 
-        <h2>{{ user.name }}</h2>
-        <p>{{ user.email }}</p>
+        <h2>{{ profile()!.displayName }}</h2>
+
+        <p>{{ profile()!.email }}</p>
 
         <div class="member-badge">
           <ion-icon name="star-outline"></ion-icon>
-          Member since {{ user.memberSince }}
+
+          Member since {{ memberSince }}
         </div>
       </section>
+      }
     </header>
 
     <section class="profile-content">
+      @if (isLoading()) {
+      <section class="profile-loading">
+        <div class="profile-spinner"></div>
+
+        <p>Profil wird geladen …</p>
+      </section>
+      } @else if (loadError()) {
+      <section class="profile-error">
+        <h2>Laden fehlgeschlagen</h2>
+
+        <p>{{ loadError() }}</p>
+
+        <button type="button" (click)="loadProfile()">Erneut versuchen</button>
+      </section>
+      } @else if (profile()) {
       <section class="stats-grid">
         <article class="stat-card">
-          <strong>{{ stats.sets }}</strong>
+          <strong>{{ profile()!.totalSets }}</strong>
           <span>Sets</span>
         </article>
 
         <article class="stat-card">
-          <strong>{{ stats.cards }}</strong>
+          <strong>{{ profile()!.totalCards }}</strong>
           <span>Cards</span>
         </article>
 
         <article class="stat-card">
-          <strong>{{ stats.streak }}d</strong>
-          <span>Streak</span>
+          <strong>{{ profile()!.completedSessions }}</strong>
+          <span>Sessions</span>
         </article>
 
         <article class="stat-card">
-          <strong>{{ stats.accuracy }}%</strong>
+          <strong>{{ profile()!.accuracy }}%</strong>
           <span>Accuracy</span>
+        </article>
+      </section>
+
+      <section class="profile-summary">
+        <article>
+          <div class="summary-icon">
+            <ion-icon name="trophy-outline"></ion-icon>
+          </div>
+
+          <div>
+            <strong>{{ profile()!.correctReviews }}</strong>
+            <span>Correct Reviews</span>
+          </div>
+        </article>
+
+        <article>
+          <div class="summary-icon">
+            <ion-icon name="star-outline"></ion-icon>
+          </div>
+
+          <div>
+            <strong>{{ profile()!.favoriteSets }}</strong>
+            <span>Favorite Sets</span>
+          </div>
+        </article>
+
+        <article>
+          <div class="summary-icon">
+            <ion-icon name="book-outline"></ion-icon>
+          </div>
+
+          <div>
+            <strong>{{ profile()!.totalReviews }}</strong>
+            <span>Total Reviews</span>
+          </div>
         </article>
       </section>
 
       <section class="my-sets-section">
         <h2>My Sets</h2>
 
+        @if (sets().length > 0) {
         <div class="sets-list">
-          @for (set of sets; track set.id) {
+          @for (set of sets(); track set.id) {
           <button
             class="profile-set-card"
             type="button"
@@ -74,10 +128,12 @@
           >
             <div
               class="set-icon"
-              [class.theme-blue]="set.theme === 'blue'"
-              [class.theme-purple]="set.theme === 'purple'"
-              [class.theme-green]="set.theme === 'green'"
-              [class.theme-orange]="set.theme === 'orange'"
+              [class.theme-blue]="set.color === 'blue'"
+              [class.theme-purple]="set.color === 'purple'"
+              [class.theme-green]="set.color === 'green'"
+              [class.theme-orange]="set.color === 'orange'"
+              [class.theme-red]="set.color === 'red'"
+              [class.theme-cyan]="set.color === 'cyan'"
             >
               <ion-icon name="book-outline"></ion-icon>
             </div>
@@ -85,7 +141,10 @@
             <div class="set-information">
               <h3>{{ set.title }}</h3>
 
-              <p>{{ set.cards }} cards · {{ set.progress }}% complete</p>
+              <p>
+                {{ set.cardCount }} {{ set.cardCount === 1 ? 'card' : 'cards' }}
+                · {{ set.progress }}% complete
+              </p>
             </div>
 
             <ion-icon
@@ -95,7 +154,11 @@
           </button>
           }
         </div>
+        } @else {
+        <p class="empty-sets">Du hast noch keine Lernsets erstellt.</p>
+        }
       </section>
+      }
     </section>
   </main>
 </ion-content>
