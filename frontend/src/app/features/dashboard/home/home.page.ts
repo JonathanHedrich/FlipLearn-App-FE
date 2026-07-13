@@ -1,7 +1,9 @@
-import { Component, computed } from '@angular/core';
+import { CommonModule, DecimalPipe } from '@angular/common';
+import { HttpErrorResponse } from '@angular/common/http';
+import { Component, computed, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { IonContent, IonIcon } from '@ionic/angular/standalone';
-import { DecimalPipe } from '@angular/common';
+import { firstValueFrom } from 'rxjs';
 import { addIcons } from 'ionicons';
 import {
   barChartOutline,
@@ -9,15 +11,15 @@ import {
   flameOutline,
   notificationsOutline,
   settingsOutline,
-  timeOutline,
   trophyOutline,
 } from 'ionicons/icons';
 
 import {
-  FlashcardSet,
   FlashcardSetColor,
-} from '../../../core/models/flashcard.model';
-import { FlashcardStore } from '../../../core/services/flashcard-store';
+  FlashcardSetResponse,
+} from '../../../core/models/flashcard-api.model';
+import { AuthApi } from '../../../core/services/auth-api';
+import { FlashcardApi } from '../../../core/services/flashcard-api';
 import { FlBottomNavComponent } from '../../../shared/components/fl-bottom-nav/fl-bottom-nav.component';
 
 interface RecentActivity {
@@ -31,76 +33,75 @@ interface RecentActivity {
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [RouterLink, IonContent, IonIcon, FlBottomNavComponent, DecimalPipe],
+  imports: [
+    CommonModule,
+    DecimalPipe,
+    RouterLink,
+    IonContent,
+    IonIcon,
+    FlBottomNavComponent,
+  ],
   templateUrl: './home.page.html',
   styleUrls: ['./home.page.scss'],
 })
 export class HomePage {
-  readonly userName = 'Alex Johnson';
+  readonly sets = signal<FlashcardSetResponse[]>([]);
+  readonly isLoading = signal(true);
+  readonly loadError = signal('');
 
   readonly recentSets = computed(() =>
-    [...this.flashcardStore.sets()]
+    [...this.sets()]
       .sort(
-        (firstSet, secondSet) =>
-          new Date(secondSet.updatedAt).getTime() -
-          new Date(firstSet.updatedAt).getTime(),
+        (first, second) =>
+          new Date(second.updatedAt).getTime() -
+          new Date(first.updatedAt).getTime(),
       )
       .slice(0, 3),
   );
 
+  readonly totalCards = computed(() =>
+    this.sets().reduce((total, set) => total + set.cardCount, 0),
+  );
+
   readonly learnedCards = computed(() =>
-    this.flashcardStore
-      .sets()
-      .reduce(
-        (total, set) =>
-          total + Math.round(set.cards.length * (set.progress / 100)),
-        0,
-      ),
+    this.sets().reduce(
+      (total, set) => total + Math.round(set.cardCount * (set.progress / 100)),
+      0,
+    ),
   );
 
   readonly averageAccuracy = computed(() => {
-    const sets = this.flashcardStore.sets();
+    const setsWithCards = this.sets().filter((set) => set.cardCount > 0);
 
-    if (sets.length === 0) {
+    if (setsWithCards.length === 0) {
       return 0;
     }
 
-    const totalProgress = sets.reduce((total, set) => total + set.progress, 0);
+    const totalProgress = setsWithCards.reduce(
+      (total, set) => total + set.progress,
+      0,
+    );
 
-    return Math.round(totalProgress / sets.length);
+    return Math.round(totalProgress / setsWithCards.length);
   });
-
-  readonly dueCards = computed(() =>
-    this.flashcardStore
-      .sets()
-      .reduce(
-        (total, set) =>
-          total +
-          Math.max(
-            0,
-            set.cards.length -
-              Math.round(set.cards.length * (set.progress / 100)),
-          ),
-        0,
-      ),
-  );
 
   readonly recentActivities = computed<RecentActivity[]>(() =>
     this.recentSets()
-      .filter((set) => set.cards.length > 0)
+      .filter((set) => set.cardCount > 0)
       .slice(0, 2)
       .map((set) => ({
         id: set.id,
         title: set.title,
         description:
-          `${set.cards.length} cards · ` + this.formatUpdatedAt(set.updatedAt),
+          `${set.cardCount} cards · ` + this.formatUpdatedAt(set.updatedAt),
         result: `${set.progress}%`,
         color: set.color,
       })),
   );
 
   constructor(
-    readonly flashcardStore: FlashcardStore,
+    readonly authApi: AuthApi,
+    private readonly flashcardApi: FlashcardApi,
     private readonly router: Router,
   ) {
     addIcons({
@@ -109,9 +110,39 @@ export class HomePage {
       flameOutline,
       notificationsOutline,
       settingsOutline,
-      timeOutline,
       trophyOutline,
     });
+  }
+
+  ionViewWillEnter(): void {
+    void this.loadDashboard();
+  }
+
+  get userName(): string {
+    return this.authApi.currentUser()?.displayName ?? 'FlipLearn User';
+  }
+
+  get goalProgress(): number {
+    return Math.min(this.learnedCards(), 30);
+  }
+
+  get goalPercentage(): number {
+    return Math.round((this.goalProgress / 30) * 100);
+  }
+
+  async loadDashboard(): Promise<void> {
+    this.isLoading.set(true);
+    this.loadError.set('');
+
+    try {
+      const sets = await firstValueFrom(this.flashcardApi.getSets());
+
+      this.sets.set(sets);
+    } catch (error: unknown) {
+      this.loadError.set(this.resolveLoadError(error));
+    } finally {
+      this.isLoading.set(false);
+    }
   }
 
   openNotifications(): void {
@@ -122,28 +153,22 @@ export class HomePage {
     void this.router.navigateByUrl('/settings');
   }
 
-  openSet(setId: number): void {
-    const set = this.flashcardStore.getSetById(setId);
-
-    if (!set) {
-      return;
-    }
-
-    if (set.cards.length === 0) {
-      void this.router.navigate(['/sets', setId, 'edit']);
+  openSet(set: FlashcardSetResponse): void {
+    if (set.cardCount === 0) {
+      void this.router.navigate(['/sets', set.id, 'edit']);
 
       return;
     }
 
-    void this.router.navigate(['/study', setId]);
+    void this.router.navigate(['/study', set.id]);
   }
 
   getThemeClass(color: FlashcardSetColor): string {
     return `theme-${color}`;
   }
 
-  getCardLabel(set: FlashcardSet): string {
-    return set.cards.length === 1 ? '1 card' : `${set.cards.length} cards`;
+  getCardLabel(set: FlashcardSetResponse): string {
+    return set.cardCount === 1 ? '1 card' : `${set.cardCount} cards`;
   }
 
   private formatUpdatedAt(value: string): string {
@@ -169,5 +194,13 @@ export class HomePage {
     const days = Math.floor(hours / 24);
 
     return `${days}d ago`;
+  }
+
+  private resolveLoadError(error: unknown): string {
+    if (error instanceof HttpErrorResponse && error.status === 0) {
+      return 'Das Backend ist nicht erreichbar.';
+    }
+
+    return 'Die Dashboard-Daten konnten nicht geladen werden.';
   }
 }

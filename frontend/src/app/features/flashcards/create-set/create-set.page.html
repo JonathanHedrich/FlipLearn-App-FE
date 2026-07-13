@@ -110,6 +110,10 @@
         </div>
       </section>
 
+      @if (createError) {
+      <p class="create-error" role="alert">{{ createError }}</p>
+      }
+
       <fl-button
         text="Create Set & Add Cards"
         [loading]="isSubmitting"

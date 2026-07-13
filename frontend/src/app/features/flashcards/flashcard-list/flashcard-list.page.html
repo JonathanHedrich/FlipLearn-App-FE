@@ -5,10 +5,7 @@
         <div>
           <h1>My Sets</h1>
 
-          <p>
-            {{ flashcardStore.totalSets() }} Lernsets · {{
-            flashcardStore.totalCards() }} Karten
-          </p>
+          <p>{{ sets().length }} Lernsets · {{ totalCards() }} Karten</p>
         </div>
 
         <button
@@ -100,7 +97,25 @@
         </button>
       </div>
 
-      @if (filteredSets().length > 0) {
+      @if (isLoading()) {
+      <section class="loading-state">
+        <div class="loading-spinner"></div>
+
+        <p>Lernsets werden geladen …</p>
+      </section>
+      } @else if (loadError()) {
+      <section class="empty-state">
+        <div class="empty-icon">
+          <ion-icon name="folder-outline"></ion-icon>
+        </div>
+
+        <h2>Laden fehlgeschlagen</h2>
+
+        <p>{{ loadError() }}</p>
+
+        <button type="button" (click)="loadSets()">Erneut versuchen</button>
+      </section>
+      } @else if (filteredSets().length > 0) {
       <section class="sets-grid">
         @for (set of filteredSets(); track set.id) {
         <article
@@ -115,8 +130,7 @@
               <h2>{{ set.title }}</h2>
 
               <p>
-                {{ set.cards.length }} {{ set.cards.length === 1 ? 'card' :
-                'cards' }}
+                {{ set.cardCount }} {{ set.cardCount === 1 ? 'card' : 'cards' }}
               </p>
             </div>
 
@@ -153,7 +167,7 @@
             <button
               class="study-button"
               type="button"
-              (click)="startStudy(set.id, $event)"
+              (click)="startStudy(set, $event)"
             >
               Study
             </button>

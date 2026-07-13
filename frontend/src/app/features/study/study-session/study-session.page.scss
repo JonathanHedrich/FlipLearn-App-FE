@@ -699,3 +699,25 @@ ion-content {
     margin-top: 12px;
   }
 }
+
+.study-loading-spinner {
+  width: 42px;
+  height: 42px;
+
+  border: 4px solid var(--fl-primary-light);
+  border-top-color: var(--fl-primary);
+  border-radius: 50%;
+
+  animation: study-loading 700ms linear infinite;
+}
+
+.rating-button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+@keyframes study-loading {
+  to {
+    transform: rotate(360deg);
+  }
+}

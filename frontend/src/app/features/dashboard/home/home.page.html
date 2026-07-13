@@ -15,6 +15,7 @@
             (click)="openNotifications()"
           >
             <ion-icon name="notifications-outline"></ion-icon>
+
             <span class="badge">2</span>
           </button>
 
@@ -31,37 +32,45 @@
 
       <section class="goal-card">
         <div class="goal-content">
-          <span class="goal-label">TODAY'S GOAL</span>
+          <span class="goal-label"> TODAY'S GOAL </span>
 
           <h2>Study 30 cards</h2>
 
           <div class="goal-meta">
             <span>
               <ion-icon name="flame-outline"></ion-icon>
+
               14-day streak
             </span>
 
-            <span> ⚡ {{ learnedCards() }} / 30 done </span>
+            <span> ⚡ {{ goalProgress }} / 30 done </span>
           </div>
         </div>
 
-        <div
-          class="goal-ring"
-          [style.--goal-progress]="
-            learnedCards() > 30
-              ? 30
-              : learnedCards()
-          "
-        >
-          <div class="goal-ring-inner">
-            {{ learnedCards() >= 30 ? 100 : (learnedCards() / 30) * 100 |
-            number: '1.0-0' }}%
-          </div>
+        <div class="goal-ring" [style.--goal-progress]="goalProgress">
+          <div class="goal-ring-inner">{{ goalPercentage }}%</div>
         </div>
       </section>
     </header>
 
     <section class="dashboard-content">
+      @if (isLoading()) {
+      <section class="home-loading">
+        <div class="home-spinner"></div>
+        <p>Dashboard wird geladen …</p>
+      </section>
+
+      } @else if (loadError()) {
+      <section class="home-error">
+        <h2>Laden fehlgeschlagen</h2>
+        <p>{{ loadError() }}</p>
+
+        <button type="button" (click)="loadDashboard()">
+          Erneut versuchen
+        </button>
+      </section>
+
+      } @else {
       <section class="stats-grid">
         <article class="stat-card">
           <div class="stat-icon blue">
@@ -77,7 +86,7 @@
             <ion-icon name="book-outline"></ion-icon>
           </div>
 
-          <strong>{{ flashcardStore.totalCards() }}</strong>
+          <strong>{{ totalCards() }}</strong>
           <span>Total Cards</span>
         </article>
 
@@ -86,7 +95,8 @@
             <ion-icon name="bar-chart-outline"></ion-icon>
           </div>
 
-          <strong>{{ averageAccuracy() }}%</strong>
+          <strong> {{ averageAccuracy() }}% </strong>
+
           <span>Accuracy</span>
         </article>
       </section>
@@ -100,12 +110,14 @@
 
         @if (recentSets().length > 0) {
         <div class="study-scroll">
-          @for (set of recentSets(); track set.id) {
+          @for ( set of recentSets(); track set.id ) {
           <button
             class="study-card"
-            [class]="getThemeClass(set.color)"
+            [ngClass]="
+                    getThemeClass(set.color)
+                  "
             type="button"
-            (click)="openSet(set.id)"
+            (click)="openSet(set)"
           >
             <div class="study-icon">
               <ion-icon name="book-outline"></ion-icon>
@@ -119,11 +131,16 @@
 
             <div class="progress-label">
               <span>Progress</span>
-              <strong>{{ set.progress }}%</strong>
+              <strong> {{ set.progress }}% </strong>
             </div>
 
             <div class="progress-track">
-              <div class="progress-value" [style.width.%]="set.progress"></div>
+              <div
+                class="progress-value"
+                [style.width.%]="
+                        set.progress
+                      "
+              ></div>
             </div>
           </button>
           }
@@ -131,7 +148,9 @@
         } @else {
         <a class="empty-home-card" routerLink="/sets/create">
           <div>＋</div>
-          <strong>Create your first set</strong>
+
+          <strong> Create your first set </strong>
+
           <span> Add flashcards and start learning. </span>
         </a>
         }
@@ -140,20 +159,28 @@
       <section class="activity-section">
         <h2>Recent Activity</h2>
 
-        @if (recentActivities().length > 0) {
+        @if ( recentActivities().length > 0 ) {
         <div class="activity-list">
           @for ( activity of recentActivities(); track activity.id ) {
           <article class="activity-card">
-            <div class="activity-icon" [class]="getThemeClass(activity.color)">
+            <div
+              class="activity-icon"
+              [ngClass]="
+                      getThemeClass(
+                        activity.color
+                      )
+                    "
+            >
               <ion-icon name="book-outline"></ion-icon>
             </div>
 
             <div class="activity-content">
               <h3>{{ activity.title }}</h3>
+
               <p>{{ activity.description }}</p>
             </div>
 
-            <strong>{{ activity.result }}</strong>
+            <strong> {{ activity.result }} </strong>
           </article>
           }
         </div>
@@ -161,6 +188,7 @@
         <p class="empty-activity">Noch keine Lernaktivitäten vorhanden.</p>
         }
       </section>
+      }
     </section>
   </main>
 </ion-content>

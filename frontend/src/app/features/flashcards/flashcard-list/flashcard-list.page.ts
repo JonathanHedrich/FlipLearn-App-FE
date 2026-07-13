@@ -1,8 +1,10 @@
+import { CommonModule } from '@angular/common';
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component, computed, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { NgClass } from '@angular/common';
 import { IonContent, IonIcon } from '@ionic/angular/standalone';
+import { firstValueFrom } from 'rxjs';
 import { addIcons } from 'ionicons';
 import {
   addOutline,
@@ -15,10 +17,10 @@ import {
 } from 'ionicons/icons';
 
 import {
-  FlashcardSet,
   FlashcardSetColor,
-} from '../../../core/models/flashcard.model';
-import { FlashcardStore } from '../../../core/services/flashcard-store';
+  FlashcardSetResponse,
+} from '../../../core/models/flashcard-api.model';
+import { FlashcardApi } from '../../../core/services/flashcard-api';
 import { FlBottomNavComponent } from '../../../shared/components/fl-bottom-nav/fl-bottom-nav.component';
 
 type MainFilter = 'all' | 'favorites' | 'recent';
@@ -26,54 +28,65 @@ type MainFilter = 'all' | 'favorites' | 'recent';
 @Component({
   selector: 'app-flashcard-list',
   standalone: true,
-  imports: [NgClass, FormsModule, IonContent, IonIcon, FlBottomNavComponent],
+  imports: [
+    CommonModule,
+    FormsModule,
+    IonContent,
+    IonIcon,
+    FlBottomNavComponent,
+  ],
   templateUrl: './flashcard-list.page.html',
   styleUrls: ['./flashcard-list.page.scss'],
 })
 export class FlashcardListPage {
   searchTerm = '';
 
+  readonly sets = signal<FlashcardSetResponse[]>([]);
+  readonly isLoading = signal(true);
+  readonly loadError = signal('');
+
   readonly activeFilter = signal<MainFilter>('all');
-  readonly activeCategory = signal<string>('all');
+  readonly activeCategory = signal('all');
+
+  readonly totalCards = computed(() =>
+    this.sets().reduce((total, set) => total + set.cardCount, 0),
+  );
 
   readonly filteredSets = computed(() => {
     const query = this.searchTerm.trim().toLowerCase();
 
-    const selectedFilter = this.activeFilter();
-    const selectedCategory = this.activeCategory();
+    const filter = this.activeFilter();
+    const category = this.activeCategory();
 
-    return this.flashcardStore
-      .sets()
-      .filter((set) => {
-        const matchesSearch =
-          query.length === 0 ||
-          set.title.toLowerCase().includes(query) ||
-          set.description.toLowerCase().includes(query);
+    let result = this.sets().filter((set) => {
+      const matchesSearch =
+        query.length === 0 ||
+        set.title.toLowerCase().includes(query) ||
+        (set.description ?? '').toLowerCase().includes(query);
 
-        const matchesFilter =
-          selectedFilter === 'all' ||
-          (selectedFilter === 'favorites' && set.favorite) ||
-          selectedFilter === 'recent';
+      const matchesFilter =
+        filter === 'all' ||
+        (filter === 'favorites' && set.favorite) ||
+        filter === 'recent';
 
-        const matchesCategory =
-          selectedCategory === 'all' || set.folder === selectedCategory;
+      const matchesCategory = category === 'all' || set.folder === category;
 
-        return matchesSearch && matchesFilter && matchesCategory;
-      })
-      .sort((firstSet, secondSet) => {
-        if (selectedFilter !== 'recent') {
-          return 0;
-        }
+      return matchesSearch && matchesFilter && matchesCategory;
+    });
 
-        return (
-          new Date(secondSet.updatedAt).getTime() -
-          new Date(firstSet.updatedAt).getTime()
-        );
-      });
+    if (filter === 'recent') {
+      result = [...result].sort(
+        (first, second) =>
+          new Date(second.updatedAt).getTime() -
+          new Date(first.updatedAt).getTime(),
+      );
+    }
+
+    return result;
   });
 
   constructor(
-    readonly flashcardStore: FlashcardStore,
+    private readonly flashcardApi: FlashcardApi,
     private readonly router: Router,
   ) {
     addIcons({
@@ -85,6 +98,25 @@ export class FlashcardListPage {
       searchOutline,
       timeOutline,
     });
+  }
+
+  ionViewWillEnter(): void {
+    void this.loadSets();
+  }
+
+  async loadSets(): Promise<void> {
+    this.isLoading.set(true);
+    this.loadError.set('');
+
+    try {
+      const sets = await firstValueFrom(this.flashcardApi.getSets());
+
+      this.sets.set(sets);
+    } catch (error: unknown) {
+      this.loadError.set(this.resolveLoadError(error));
+    } finally {
+      this.isLoading.set(false);
+    }
   }
 
   setMainFilter(filter: MainFilter): void {
@@ -99,10 +131,24 @@ export class FlashcardListPage {
     return `theme-${color}`;
   }
 
-  toggleFavorite(set: FlashcardSet, event: Event): void {
+  async toggleFavorite(set: FlashcardSetResponse, event: Event): Promise<void> {
     event.stopPropagation();
 
-    this.flashcardStore.toggleFavorite(set.id);
+    try {
+      const updatedSet = await firstValueFrom(
+        this.flashcardApi.updateSet(set.id, {
+          title: set.title,
+          description: set.description,
+          folder: set.folder,
+          color: set.color,
+          favorite: !set.favorite,
+        }),
+      );
+
+      this.replaceSet(updatedSet);
+    } catch {
+      window.alert('Der Favoritenstatus konnte nicht gespeichert werden.');
+    }
   }
 
   openCreateSet(): void {
@@ -115,39 +161,52 @@ export class FlashcardListPage {
     void this.router.navigate(['/sets', setId, 'edit']);
   }
 
-  startStudy(setId: number, event: Event): void {
+  startStudy(set: FlashcardSetResponse, event: Event): void {
     event.stopPropagation();
 
-    const set = this.flashcardStore.getSetById(setId);
-
-    if (!set || set.cards.length === 0) {
+    if (set.cardCount === 0) {
       window.alert('Füge zuerst mindestens eine Lernkarte hinzu.');
 
-      void this.router.navigate(['/sets', setId, 'edit']);
-
+      this.openEditor(set.id);
       return;
     }
 
-    void this.router.navigate(['/study', setId]);
+    void this.router.navigate(['/study', set.id]);
   }
 
-  deleteSet(setId: number, event: Event): void {
+  async deleteSet(set: FlashcardSetResponse, event: Event): Promise<void> {
     event.stopPropagation();
 
-    const set = this.flashcardStore.getSetById(setId);
-
-    if (!set) {
-      return;
-    }
-
     const confirmed = window.confirm(
-      `Möchtest du „${set.title}“ und alle enthaltenen Karten wirklich löschen?`,
+      `Möchtest du „${set.title}“ wirklich löschen?`,
     );
 
     if (!confirmed) {
       return;
     }
 
-    this.flashcardStore.deleteSet(setId);
+    try {
+      await firstValueFrom(this.flashcardApi.deleteSet(set.id));
+
+      this.sets.update((sets) =>
+        sets.filter((existingSet) => existingSet.id !== set.id),
+      );
+    } catch {
+      window.alert('Das Lernset konnte nicht gelöscht werden.');
+    }
+  }
+
+  private replaceSet(updatedSet: FlashcardSetResponse): void {
+    this.sets.update((sets) =>
+      sets.map((set) => (set.id === updatedSet.id ? updatedSet : set)),
+    );
+  }
+
+  private resolveLoadError(error: unknown): string {
+    if (error instanceof HttpErrorResponse && error.status === 0) {
+      return 'Das Backend ist nicht erreichbar.';
+    }
+
+    return 'Die Lernsets konnten nicht geladen werden.';
   }
 }

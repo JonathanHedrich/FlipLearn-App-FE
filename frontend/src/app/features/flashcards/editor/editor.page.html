@@ -4,7 +4,7 @@
       <button
         class="header-button"
         type="button"
-        aria-label="Zurück zu den Lernsets"
+        aria-label="Zurück"
         (click)="goBack()"
       >
         <ion-icon name="arrow-back-outline"></ion-icon>
@@ -12,7 +12,7 @@
 
       <div class="header-title">
         <h1>{{ setTitle }}</h1>
-        <p>{{ cards.length }} cards</p>
+        <p>{{ cards.length }} {{ cards.length === 1 ? 'card' : 'cards' }}</p>
       </div>
 
       <button class="header-button" type="button" aria-label="Weitere Optionen">
@@ -21,15 +21,32 @@
     </header>
 
     <section class="editor-content">
+      @if (isLoading) {
+      <section class="editor-loading">
+        <div class="editor-spinner"></div>
+        <p>Editor wird geladen …</p>
+      </section>
+      } @else if (loadError) {
+      <section class="editor-empty-state">
+        <h2>Laden fehlgeschlagen</h2>
+        <p>{{ loadError }}</p>
+
+        <button class="retry-button" type="button" (click)="loadEditorData()">
+          Erneut versuchen
+        </button>
+      </section>
+      } @else {
       <div class="cards-list">
         @for ( card of cards; track card.id; let index = $index ) {
         <article
           class="flashcard-editor"
           [id]="'card-' + card.id"
-          [class.editing]="editingCardId === card.id"
+          [class.editing]="
+                editingCardId === card.id
+              "
         >
           <header class="card-header">
-            <span>Card {{ index + 1 }}</span>
+            <span> Card {{ index + 1 }} </span>
 
             <button
               class="delete-button"
@@ -41,16 +58,15 @@
             </button>
           </header>
 
-          @if (editingCardId === card.id) {
+          @if ( editingCardId === card.id ) {
           <div class="card-fields">
             <label>
               <span>Front</span>
 
               <textarea
-                [ngModel]="card.front"
-                (ngModelChange)="
-    updateCard(card.id, 'front', $event)
-  "
+                [(ngModel)]="
+                        card.draftFront
+                      "
                 placeholder="Enter term or question..."
                 rows="3"
               ></textarea>
@@ -60,22 +76,33 @@
               <span>Back</span>
 
               <textarea
-                [ngModel]="card.back"
-                (ngModelChange)="
-    updateCard(card.id, 'back', $event)
-  "
+                [(ngModel)]="
+                        card.draftBack
+                      "
                 placeholder="Enter definition or answer..."
                 rows="3"
               ></textarea>
             </label>
 
-            <button
-              class="done-button"
-              type="button"
-              (click)="toggleEdit(card.id)"
-            >
-              Done
-            </button>
+            <div class="edit-actions">
+              <button
+                class="cancel-button"
+                type="button"
+                [disabled]="card.isSaving"
+                (click)="cancelEdit(card.id)"
+              >
+                Abbrechen
+              </button>
+
+              <button
+                class="done-button"
+                type="button"
+                [disabled]="card.isSaving"
+                (click)="saveCard(card)"
+              >
+                {{ card.isSaving ? 'Speichert …' : 'Speichern' }}
+              </button>
+            </div>
           </div>
           } @else {
           <button
@@ -85,12 +112,14 @@
           >
             <div>
               <span>Front</span>
-              <strong> {{ card.front || 'Tap to enter front' }} </strong>
+
+              <strong> {{ card.front }} </strong>
             </div>
 
             <div>
               <span>Back</span>
-              <strong> {{ card.back || 'Tap to enter back' }} </strong>
+
+              <strong> {{ card.back }} </strong>
             </div>
           </button>
           }
@@ -98,13 +127,21 @@
         }
       </div>
 
-      <button class="add-card" type="button" (click)="addCard()">
+      <button
+        class="add-card"
+        type="button"
+        [disabled]="isAddingCard"
+        (click)="addCard()"
+      >
         <span class="add-card-icon">
           <ion-icon name="add-outline"></ion-icon>
         </span>
 
-        <strong>Add New Card</strong>
-        <small>Tap to add a term &amp; definition</small>
+        <strong>
+          {{ isAddingCard ? 'Karte wird erstellt …' : 'Add New Card' }}
+        </strong>
+
+        <small> Tap to add a term &amp; definition </small>
       </button>
 
       <button
@@ -117,11 +154,11 @@
         <span aria-hidden="true">→</span>
       </button>
 
-      @if (!cardsComplete) {
+      @if (!cardsComplete && cards.length > 0) {
       <p class="form-hint">
         Bitte fülle bei jeder Lernkarte Vorder- und Rückseite aus.
       </p>
-      }
+      } }
     </section>
   </main>
 </ion-content>

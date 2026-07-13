@@ -72,10 +72,15 @@
           <a href="#">Datenschutzerklärung</a>.
         </p>
 
+        @if (registerError) {
+        <p class="register-error" role="alert">{{ registerError }}</p>
+        }
+
         <div class="register-button-wrapper">
           <fl-button
             text="Konto erstellen"
             [loading]="isSubmitting"
+            [disabled]="isSubmitting"
             (clicked)="submitRegistration()"
           ></fl-button>
         </div>

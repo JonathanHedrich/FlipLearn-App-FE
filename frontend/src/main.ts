@@ -1,4 +1,8 @@
 import { bootstrapApplication } from '@angular/platform-browser';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
+
+import { authInterceptor } from './app/core/interceptors/auth.interceptor';
+
 import {
   PreloadAllModules,
   provideRouter,
@@ -21,6 +25,7 @@ bootstrapApplication(AppComponent, {
     },
     provideIonicAngular(),
     provideRouter(routes, withPreloading(PreloadAllModules)),
+    provideHttpClient(withInterceptors([authInterceptor])),
   ],
 }).catch((error: unknown) => {
   console.error('FlipLearn konnte nicht gestartet werden:', error);

@@ -1,43 +1,31 @@
 import { CommonModule } from '@angular/common';
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
+import { IonContent } from '@ionic/angular/standalone';
+import { firstValueFrom } from 'rxjs';
 
-import { FlLogoComponent } from '../../../shared/components/fl-logo/fl-logo.component';
+import {
+  ApiErrorResponse,
+  LoginRequest,
+} from '../../../core/models/auth.model';
+import { AuthApi } from '../../../core/services/auth-api';
 import { FlButtonComponent } from '../../../shared/components/fl-button/fl-button.component';
 import { FlInputComponent } from '../../../shared/components/fl-input/fl-input.component';
+import { FlLogoComponent } from '../../../shared/components/fl-logo/fl-logo.component';
 import { FlSocialButtonComponent } from '../../../shared/components/fl-social-button/fl-social-button.component';
-
-import {
-  IonButton,
-  IonContent,
-  IonIcon,
-  IonInput,
-  IonSpinner,
-} from '@ionic/angular/standalone';
-import { addIcons } from 'ionicons';
-import {
-  eyeOffOutline,
-  eyeOutline,
-  lockClosedOutline,
-  logoGoogle,
-  mailOutline,
-} from 'ionicons/icons';
 
 @Component({
   selector: 'app-login',
+  standalone: true,
   templateUrl: './login.page.html',
   styleUrls: ['./login.page.scss'],
-  standalone: true,
   imports: [
     CommonModule,
     ReactiveFormsModule,
     RouterLink,
-    IonButton,
     IonContent,
-    IonIcon,
-    IonInput,
-    IonSpinner,
     FlLogoComponent,
     FlButtonComponent,
     FlInputComponent,
@@ -45,9 +33,9 @@ import {
   ],
 })
 export class LoginPage {
-  passwordVisible = false;
   isSubmitting = false;
   submitted = false;
+  loginError = '';
 
   readonly loginForm = this.formBuilder.nonNullable.group({
     email: ['', [Validators.required, Validators.email]],
@@ -57,15 +45,8 @@ export class LoginPage {
   constructor(
     private readonly formBuilder: FormBuilder,
     private readonly router: Router,
-  ) {
-    addIcons({
-      eyeOffOutline,
-      eyeOutline,
-      lockClosedOutline,
-      logoGoogle,
-      mailOutline,
-    });
-  }
+    private readonly authApi: AuthApi,
+  ) {}
 
   get emailInvalid(): boolean {
     const control = this.loginForm.controls.email;
@@ -79,32 +60,38 @@ export class LoginPage {
     return control.invalid && (control.touched || this.submitted);
   }
 
-  togglePasswordVisibility(): void {
-    this.passwordVisible = !this.passwordVisible;
-  }
-
   async submitLogin(): Promise<void> {
+    if (this.isSubmitting) {
+      return;
+    }
+
     this.submitted = true;
+    this.loginError = '';
+    this.loginForm.markAllAsTouched();
 
     if (this.loginForm.invalid) {
-      this.loginForm.markAllAsTouched();
       return;
     }
 
     this.isSubmitting = true;
 
     try {
-      /*
-       * Das Spring-Boot-Backend wird später hier aufgerufen.
-       * Bis dahin simulieren wir einen erfolgreichen Login.
-       */
-      await new Promise<void>((resolve) => {
-        window.setTimeout(resolve, 600);
-      });
+      const formValue = this.loginForm.getRawValue();
+
+      const request: LoginRequest = {
+        email: formValue.email.trim().toLowerCase(),
+        password: formValue.password,
+      };
+
+      await firstValueFrom(this.authApi.login(request));
+
+      await firstValueFrom(this.authApi.loadCurrentUser());
 
       await this.router.navigateByUrl('/home', {
         replaceUrl: true,
       });
+    } catch (error: unknown) {
+      this.loginError = this.resolveLoginError(error);
     } finally {
       this.isSubmitting = false;
     }
@@ -112,5 +99,26 @@ export class LoginPage {
 
   signInWithGoogle(): void {
     console.log('Google-Anmeldung wird später implementiert.');
+  }
+
+  private resolveLoginError(error: unknown): string {
+    if (!(error instanceof HttpErrorResponse)) {
+      return 'Beim Anmelden ist ein unbekannter Fehler aufgetreten.';
+    }
+
+    if (error.status === 0) {
+      return 'Das Backend ist nicht erreichbar. Prüfe, ob Spring Boot auf Port 8080 läuft.';
+    }
+
+    if (error.status === 401) {
+      return 'E-Mail-Adresse oder Passwort ist falsch.';
+    }
+
+    const apiError = error.error as Partial<ApiErrorResponse> | null;
+
+    return (
+      apiError?.message ??
+      'Die Anmeldung ist fehlgeschlagen. Bitte versuche es erneut.'
+    );
   }
 }

@@ -1,9 +1,10 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { IonContent, IonIcon } from '@ionic/angular/standalone';
+import { firstValueFrom } from 'rxjs';
 import { addIcons } from 'ionicons';
-import { FlashcardStore } from '../../../core/services/flashcard-store';
 import {
   arrowBackOutline,
   bookOutline,
@@ -12,12 +13,15 @@ import {
   folderOutline,
 } from 'ionicons/icons';
 
+import {
+  CreateFlashcardSetRequest,
+  FlashcardSetColor,
+} from '../../../core/models/flashcard-api.model';
+import { FlashcardApi } from '../../../core/services/flashcard-api';
 import { FlButtonComponent } from '../../../shared/components/fl-button/fl-button.component';
 
-type SetColor = 'blue' | 'purple' | 'green' | 'orange' | 'red' | 'cyan';
-
 interface ColorOption {
-  value: SetColor;
+  value: FlashcardSetColor;
   hex: string;
   label: string;
 }
@@ -32,7 +36,9 @@ interface ColorOption {
 export class CreateSetPage {
   submitted = false;
   isSubmitting = false;
-  selectedColor: SetColor = 'blue';
+  createError = '';
+
+  selectedColor: FlashcardSetColor = 'blue';
 
   readonly colorOptions: ColorOption[] = [
     {
@@ -70,16 +76,16 @@ export class CreateSetPage {
   readonly createSetForm = this.formBuilder.nonNullable.group({
     title: [
       '',
-      [Validators.required, Validators.minLength(2), Validators.maxLength(60)],
+      [Validators.required, Validators.minLength(2), Validators.maxLength(100)],
     ],
-    description: ['', [Validators.maxLength(250)]],
+    description: ['', [Validators.maxLength(500)]],
     folder: [''],
   });
 
   constructor(
     private readonly formBuilder: FormBuilder,
     private readonly router: Router,
-    private readonly flashcardStore: FlashcardStore,
+    private readonly flashcardApi: FlashcardApi,
   ) {
     addIcons({
       arrowBackOutline,
@@ -109,16 +115,26 @@ export class CreateSetPage {
     );
   }
 
-  selectColor(color: SetColor): void {
+  selectColor(color: FlashcardSetColor): void {
     this.selectedColor = color;
   }
 
   goBack(): void {
+    if (window.history.length > 1) {
+      window.history.back();
+      return;
+    }
+
     void this.router.navigateByUrl('/sets');
   }
 
   async createSet(): Promise<void> {
+    if (this.isSubmitting) {
+      return;
+    }
+
     this.submitted = true;
+    this.createError = '';
     this.createSetForm.markAllAsTouched();
 
     if (this.createSetForm.invalid) {
@@ -130,18 +146,50 @@ export class CreateSetPage {
     try {
       const formValue = this.createSetForm.getRawValue();
 
-      const newSet = this.flashcardStore.createSet({
-        title: formValue.title,
-        description: formValue.description,
-        folder: formValue.folder,
+      const request: CreateFlashcardSetRequest = {
+        title: formValue.title.trim(),
+        description: formValue.description.trim() || null,
+        folder: formValue.folder.trim() || null,
         color: this.selectedColor,
-      });
+      };
 
-      await this.router.navigate(['/sets', newSet.id, 'edit'], {
+      const createdSet = await firstValueFrom(
+        this.flashcardApi.createSet(request),
+      );
+
+      await this.router.navigate(['/sets', createdSet.id, 'edit'], {
         replaceUrl: true,
       });
+    } catch (error: unknown) {
+      this.createError = this.resolveCreateError(error);
     } finally {
       this.isSubmitting = false;
     }
+  }
+
+  private resolveCreateError(error: unknown): string {
+    if (!(error instanceof HttpErrorResponse)) {
+      return 'Beim Erstellen des Lernsets ist ein unbekannter Fehler aufgetreten.';
+    }
+
+    if (error.status === 0) {
+      return 'Das Backend ist nicht erreichbar.';
+    }
+
+    if (error.status === 401) {
+      return 'Deine Anmeldung ist abgelaufen. Bitte melde dich erneut an.';
+    }
+
+    if (error.status === 400) {
+      const validationErrors = error.error?.validationErrors as
+        | Record<string, string>
+        | undefined;
+
+      return validationErrors
+        ? Object.values(validationErrors)[0]
+        : 'Die eingegebenen Daten sind ungültig.';
+    }
+
+    return error.error?.message ?? 'Das Lernset konnte nicht erstellt werden.';
   }
 }

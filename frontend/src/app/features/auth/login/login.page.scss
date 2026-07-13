@@ -196,3 +196,18 @@ fl-logo {
     box-shadow: var(--fl-shadow-lg);
   }
 }
+
+.login-error {
+  margin: 16px 0 0;
+  padding: 12px 14px;
+
+  border: 1px solid rgba(220, 38, 38, 0.2);
+  border-radius: 14px;
+
+  color: var(--fl-danger);
+  background: rgba(220, 38, 38, 0.08);
+
+  font-size: 0.8rem;
+  line-height: 1.45;
+  text-align: center;
+}

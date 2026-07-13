@@ -1,61 +1,73 @@
-import { Location } from '@angular/common';
+import { Location, NgClass } from '@angular/common';
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { IonContent, IonIcon } from '@ionic/angular/standalone';
+import { firstValueFrom } from 'rxjs';
 import { addIcons } from 'ionicons';
 import {
   addOutline,
   arrowBackOutline,
-  bookOutline,
   closeOutline,
   ellipsisVerticalOutline,
   trashOutline,
 } from 'ionicons/icons';
 
-import { Flashcard } from '../../../core/models/flashcard.model';
-import { FlashcardStore } from '../../../core/services/flashcard-store';
+import {
+  FlashcardResponse,
+  FlashcardSetResponse,
+} from '../../../core/models/flashcard-api.model';
+import { FlashcardApi } from '../../../core/services/flashcard-api';
+
+interface EditableFlashcard extends FlashcardResponse {
+  draftFront: string;
+  draftBack: string;
+  isSaving: boolean;
+}
 
 @Component({
   selector: 'app-editor',
   standalone: true,
-  imports: [FormsModule, IonContent, IonIcon],
+  imports: [NgClass, FormsModule, IonContent, IonIcon],
   templateUrl: './editor.page.html',
   styleUrls: ['./editor.page.scss'],
 })
 export class EditorPage {
   readonly setId: number;
 
+  currentSet: FlashcardSetResponse | null = null;
+  cards: EditableFlashcard[] = [];
+
   editingCardId: number | null = null;
+
+  isLoading = true;
+  isAddingCard = false;
+  loadError = '';
 
   constructor(
     private readonly route: ActivatedRoute,
     private readonly router: Router,
     private readonly location: Location,
-    private readonly flashcardStore: FlashcardStore,
+    private readonly flashcardApi: FlashcardApi,
   ) {
     this.setId = Number(this.route.snapshot.paramMap.get('setId')) || 0;
 
     addIcons({
       addOutline,
       arrowBackOutline,
-      bookOutline,
       closeOutline,
       ellipsisVerticalOutline,
       trashOutline,
     });
   }
 
-  get currentSet() {
-    return this.flashcardStore.getSetById(this.setId);
+  ionViewWillEnter(): void {
+    void this.loadEditorData();
   }
 
   get setTitle(): string {
-    return this.currentSet?.title ?? 'Unbekanntes Lernset';
-  }
-
-  get cards(): Flashcard[] {
-    return this.currentSet?.cards ?? [];
+    return this.currentSet?.title ?? 'Lernset';
   }
 
   get cardsComplete(): boolean {
@@ -65,6 +77,31 @@ export class EditorPage {
         (card) => card.front.trim().length > 0 && card.back.trim().length > 0,
       )
     );
+  }
+
+  async loadEditorData(): Promise<void> {
+    if (!this.setId) {
+      this.loadError = 'Die Lernset-ID ist ungültig.';
+      this.isLoading = false;
+      return;
+    }
+
+    this.isLoading = true;
+    this.loadError = '';
+
+    try {
+      const [set, cards] = await Promise.all([
+        firstValueFrom(this.flashcardApi.getSet(this.setId)),
+        firstValueFrom(this.flashcardApi.getCards(this.setId)),
+      ]);
+
+      this.currentSet = set;
+      this.cards = cards.map((card) => this.toEditableCard(card));
+    } catch (error: unknown) {
+      this.loadError = this.resolveLoadError(error);
+    } finally {
+      this.isLoading = false;
+    }
   }
 
   goBack(): void {
@@ -77,33 +114,114 @@ export class EditorPage {
   }
 
   toggleEdit(cardId: number): void {
-    this.editingCardId = this.editingCardId === cardId ? null : cardId;
-  }
-
-  addCard(): void {
-    const newCard = this.flashcardStore.addCard(this.setId);
-
-    if (!newCard) {
+    if (this.editingCardId === cardId) {
+      this.cancelEdit(cardId);
       return;
     }
 
-    this.editingCardId = newCard.id;
+    const card = this.cards.find((item) => item.id === cardId);
 
-    window.setTimeout(() => {
-      document.getElementById(`card-${newCard.id}`)?.scrollIntoView({
-        behavior: 'smooth',
-        block: 'center',
+    if (!card) {
+      return;
+    }
+
+    card.draftFront = card.front;
+    card.draftBack = card.back;
+    this.editingCardId = cardId;
+  }
+
+  cancelEdit(cardId: number): void {
+    const card = this.cards.find((item) => item.id === cardId);
+
+    if (card) {
+      card.draftFront = card.front;
+      card.draftBack = card.back;
+    }
+
+    this.editingCardId = null;
+  }
+
+  async addCard(): Promise<void> {
+    if (this.isAddingCard) {
+      return;
+    }
+
+    this.isAddingCard = true;
+
+    try {
+      /*
+       * Das Backend akzeptiert aktuell keine vollständig
+       * leeren Karten. Deshalb erstellen wir einen kleinen
+       * Platzhalter und öffnen sie sofort zum Bearbeiten.
+       */
+      const createdCard = await firstValueFrom(
+        this.flashcardApi.createCard(this.setId, {
+          front: 'Neue Vorderseite',
+          back: 'Neue Rückseite',
+        }),
+      );
+
+      const editableCard = this.toEditableCard(createdCard);
+
+      editableCard.draftFront = '';
+      editableCard.draftBack = '';
+
+      this.cards = [...this.cards, editableCard];
+
+      this.editingCardId = editableCard.id;
+
+      window.setTimeout(() => {
+        document.getElementById(`card-${editableCard.id}`)?.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center',
+        });
       });
-    });
+    } catch {
+      window.alert('Die Lernkarte konnte nicht erstellt werden.');
+    } finally {
+      this.isAddingCard = false;
+    }
   }
 
-  updateCard(cardId: number, field: 'front' | 'back', value: string): void {
-    this.flashcardStore.updateCard(this.setId, cardId, {
-      [field]: value,
-    });
+  async saveCard(card: EditableFlashcard): Promise<void> {
+    const front = card.draftFront.trim();
+    const back = card.draftBack.trim();
+
+    if (!front || !back) {
+      window.alert('Vorder- und Rückseite dürfen nicht leer sein.');
+      return;
+    }
+
+    if (card.isSaving) {
+      return;
+    }
+
+    card.isSaving = true;
+
+    try {
+      const updatedCard = await firstValueFrom(
+        this.flashcardApi.updateCard(this.setId, card.id, {
+          front,
+          back,
+          favorite: card.favorite,
+        }),
+      );
+
+      this.replaceCard(this.toEditableCard(updatedCard));
+
+      this.editingCardId = null;
+    } catch {
+      window.alert('Die Änderungen konnten nicht gespeichert werden.');
+    } finally {
+      const currentCard = this.cards.find((item) => item.id === card.id);
+
+      if (currentCard) {
+        currentCard.isSaving = false;
+      }
+    }
   }
 
-  deleteCard(cardId: number): void {
+  async deleteCard(cardId: number): Promise<void> {
     const confirmed = window.confirm(
       'Möchtest du diese Lernkarte wirklich löschen?',
     );
@@ -112,18 +230,56 @@ export class EditorPage {
       return;
     }
 
-    this.flashcardStore.deleteCard(this.setId, cardId);
+    try {
+      await firstValueFrom(this.flashcardApi.deleteCard(this.setId, cardId));
 
-    if (this.editingCardId === cardId) {
-      this.editingCardId = null;
+      this.cards = this.cards.filter((card) => card.id !== cardId);
+
+      if (this.editingCardId === cardId) {
+        this.editingCardId = null;
+      }
+    } catch {
+      window.alert('Die Lernkarte konnte nicht gelöscht werden.');
     }
   }
 
   startStudying(): void {
     if (!this.cardsComplete) {
+      window.alert('Fülle zuerst alle Karten vollständig aus.');
       return;
     }
 
     void this.router.navigate(['/study', this.setId]);
+  }
+
+  private replaceCard(updatedCard: EditableFlashcard): void {
+    this.cards = this.cards.map((card) =>
+      card.id === updatedCard.id ? updatedCard : card,
+    );
+  }
+
+  private toEditableCard(card: FlashcardResponse): EditableFlashcard {
+    return {
+      ...card,
+      draftFront: card.front,
+      draftBack: card.back,
+      isSaving: false,
+    };
+  }
+
+  private resolveLoadError(error: unknown): string {
+    if (!(error instanceof HttpErrorResponse)) {
+      return 'Die Daten konnten nicht geladen werden.';
+    }
+
+    if (error.status === 0) {
+      return 'Das Backend ist nicht erreichbar.';
+    }
+
+    if (error.status === 404) {
+      return 'Das Lernset wurde nicht gefunden.';
+    }
+
+    return error.error?.message ?? 'Der Editor konnte nicht geladen werden.';
   }
 }

@@ -46,6 +46,10 @@
         >
         </fl-input>
 
+        @if (loginError) {
+        <p class="login-error" role="alert">{{ loginError }}</p>
+        }
+
         <div class="login-button-wrapper">
           <fl-button
             text="Sign In"

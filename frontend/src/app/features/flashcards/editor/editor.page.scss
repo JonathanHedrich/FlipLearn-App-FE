@@ -403,3 +403,95 @@ ion-content {
     box-shadow: var(--fl-shadow-lg);
   }
 }
+.editor-loading,
+.editor-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  padding: 64px 20px;
+
+  color: var(--fl-text-secondary);
+  text-align: center;
+}
+
+.editor-spinner {
+  width: 38px;
+  height: 38px;
+
+  border: 4px solid var(--fl-primary-light);
+  border-top-color: var(--fl-primary);
+  border-radius: 50%;
+
+  animation: editor-loading 700ms linear infinite;
+}
+
+.editor-loading p,
+.editor-empty-state p {
+  margin: 14px 0 0;
+  font-size: 0.8rem;
+}
+
+.editor-empty-state h2 {
+  margin: 0;
+  color: var(--fl-text-primary);
+  font-size: 1.1rem;
+}
+
+.retry-button {
+  min-height: 42px;
+  margin-top: 18px;
+  padding: 0 18px;
+
+  border: 0;
+  border-radius: 14px;
+
+  color: #ffffff;
+  background: var(--fl-gradient-button);
+
+  font-weight: 800;
+}
+
+.edit-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+
+  grid-column: 1 / -1;
+}
+
+.cancel-button,
+.done-button {
+  min-height: 36px;
+  padding: 0 16px;
+
+  border-radius: 12px;
+
+  font-size: 0.76rem;
+  font-weight: 800;
+}
+
+.cancel-button {
+  border: 1px solid var(--fl-border);
+  color: var(--fl-text-secondary);
+  background: #ffffff;
+}
+
+.done-button {
+  border: 0;
+  color: #ffffff;
+  background: var(--fl-gradient-button);
+}
+
+.cancel-button:disabled,
+.done-button:disabled,
+.add-card:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+@keyframes editor-loading {
+  to {
+    transform: rotate(360deg);
+  }
+}
