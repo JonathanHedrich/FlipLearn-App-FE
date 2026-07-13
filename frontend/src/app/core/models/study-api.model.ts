@@ -1,5 +1,7 @@
 export type StudyRating = 'AGAIN' | 'HARD' | 'GOOD' | 'EASY';
 
+export type StudyMode = 'DUE' | 'ALL';
+
 export interface StartStudySessionRequest {
   setId: number;
   mode: StudyMode;
@@ -48,5 +50,3 @@ export interface StudyReviewResponse {
   incorrectAnswers: number;
   setProgress: number;
 }
-
-export type StudyMode = 'DUE' | 'ALL';

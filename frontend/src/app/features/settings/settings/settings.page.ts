@@ -7,6 +7,7 @@ import { FormsModule } from '@angular/forms';
 import { AuthApi } from '../../../core/services/auth-api';
 
 import { FlashcardStore } from '../../../core/stores/flashcard.store';
+import { StatisticsStore } from '../../../core/stores/statistics.store';
 
 import {
   arrowBackOutline,
@@ -72,6 +73,7 @@ export class SettingsPage {
     private readonly authApi: AuthApi,
     private readonly flashcardStore: FlashcardStore,
     private readonly authStore: AuthStore,
+    private readonly statisticsStore: StatisticsStore,
   ) {
     addIcons({
       arrowBackOutline,
@@ -111,6 +113,7 @@ export class SettingsPage {
     this.authApi.logout();
     this.authStore.clear();
     this.flashcardStore.clear();
+    this.statisticsStore.clear();
 
     void this.router.navigateByUrl('/login', {
       replaceUrl: true,

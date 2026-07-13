@@ -5,6 +5,9 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { IonContent, IonIcon } from '@ionic/angular/standalone';
 import { firstValueFrom } from 'rxjs';
 import { addIcons } from 'ionicons';
+
+import { StatisticsStore } from '../../../core/stores/statistics.store';
+
 import {
   arrowBackOutline,
   checkmarkOutline,
@@ -54,6 +57,7 @@ export class StudySessionPage {
     private readonly studyApi: StudyApi,
     private readonly flashcardApi: FlashcardApi,
     private readonly flashcardStore: FlashcardStore,
+    private readonly statisticsStore: StatisticsStore,
   ) {
     this.setId = Number(this.route.snapshot.paramMap.get('setId')) || 0;
 
@@ -201,6 +205,8 @@ export class StudySessionPage {
       this.incorrectAnswers = response.incorrectAnswers;
 
       this.flashcardStore.updateProgress(this.setId, response.setProgress);
+
+      void this.statisticsStore.loadOverview(true);
 
       if (response.sessionComplete) {
         this.sessionComplete = true;

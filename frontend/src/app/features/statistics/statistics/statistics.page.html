@@ -1,151 +1,249 @@
 <ion-content [fullscreen]="true">
   <main class="statistics-page">
     <header class="statistics-header">
-      <div class="header-content">
-        <div>
+      <div class="header-navigation">
+        <button
+          class="header-button"
+          type="button"
+          aria-label="Zurück"
+          (click)="goBack()"
+        >
+          <ion-icon name="arrow-back-outline"></ion-icon>
+        </button>
+
+        <div class="header-title">
           <h1>Statistics</h1>
           <p>Your learning progress</p>
         </div>
 
-        <div class="streak-badge">
-          <ion-icon name="flame-outline"></ion-icon>
-          <span>{{ streakDays }} day streak</span>
+        <button
+          class="header-button"
+          type="button"
+          aria-label="Benachrichtigungen"
+          (click)="openNotifications()"
+        >
+          <ion-icon name="notifications-outline"></ion-icon>
+        </button>
+      </div>
+
+      <div class="streak-row">
+        <div class="streak-pill">
+          <span aria-hidden="true">🔥</span>
+
+          {{ currentStreak() }} {{ currentStreak() === 1 ? 'day streak' : 'day
+          streak' }}
         </div>
       </div>
     </header>
 
     <section class="statistics-content">
-      <section class="summary-card">
-        <span class="section-label">This week</span>
+      @if (isLoading()) {
+      <section class="statistics-loading">
+        <div class="statistics-spinner"></div>
 
-        <div class="summary-grid">
-          <article class="summary-item">
-            <div class="summary-icon blue">
+        <p>Statistiken werden geladen …</p>
+      </section>
+      } @else if (loadError()) {
+      <section class="statistics-error">
+        <div class="error-icon">
+          <ion-icon name="bar-chart-outline"></ion-icon>
+        </div>
+
+        <h2>Laden fehlgeschlagen</h2>
+
+        <p>{{ loadError() }}</p>
+
+        <button type="button" (click)="reloadStatistics()">
+          <ion-icon name="refresh-outline"></ion-icon>
+
+          Erneut versuchen
+        </button>
+      </section>
+      } @else {
+      <section class="weekly-summary-card">
+        <span class="section-eyebrow"> THIS WEEK </span>
+
+        <div class="weekly-summary-grid">
+          <article>
+            <div class="weekly-icon blue">
               <ion-icon name="book-outline"></ion-icon>
             </div>
 
-            <strong>{{ weeklyCards }}</strong>
+            <strong> {{ reviewsThisWeek() }} </strong>
+
             <span>Cards Studied</span>
           </article>
 
-          <article class="summary-item">
-            <div class="summary-icon purple">
+          <article>
+            <div class="weekly-icon purple">
               <ion-icon name="time-outline"></ion-icon>
             </div>
 
-            <strong>{{ weeklyStudyTime }}</strong>
+            <strong> {{ weeklyStudyTimeLabel }} </strong>
+
             <span>Study Time</span>
           </article>
 
-          <article class="summary-item">
-            <div class="summary-icon green">
-              <ion-icon name="trophy-outline"></ion-icon>
+          <article>
+            <div class="weekly-icon green">
+              <ion-icon name="radio-button-on-outline"></ion-icon>
             </div>
 
-            <strong>{{ weeklyAccuracy }}%</strong>
+            <strong> {{ weeklyAccuracy() }}% </strong>
+
             <span>Avg. Accuracy</span>
           </article>
         </div>
       </section>
 
-      <section class="chart-card">
-        <div class="card-heading">
+      <section class="line-chart-card">
+        <div class="chart-heading">
           <h2>Cards per Day</h2>
           <p>This week</p>
         </div>
 
-        <div class="chart-wrapper">
-          <div class="y-axis">
-            <span>80</span>
-            <span>40</span>
-            <span>20</span>
-            <span>0</span>
-          </div>
+        <div class="line-chart">
+          <svg
+            viewBox="0 0 300 120"
+            preserveAspectRatio="none"
+            role="img"
+            aria-label="Cards studied per day"
+          >
+            <defs>
+              <linearGradient
+                id="statisticsAreaGradient"
+                x1="0"
+                y1="0"
+                x2="0"
+                y2="1"
+              >
+                <stop
+                  offset="0%"
+                  stop-color="#2f6bff"
+                  stop-opacity="0.28"
+                ></stop>
 
-          <div class="chart-main">
-            <svg
-              class="line-chart"
-              viewBox="0 0 276 96"
-              preserveAspectRatio="none"
-              role="img"
-              aria-label="Gelernte Karten pro Wochentag"
-            >
-              <defs>
-                <linearGradient
-                  id="chartAreaGradient"
-                  x1="0"
-                  y1="0"
-                  x2="0"
-                  y2="1"
-                >
-                  <stop offset="0%" stop-color="#2f6bff" stop-opacity="0.22" />
+                <stop
+                  offset="100%"
+                  stop-color="#2f6bff"
+                  stop-opacity="0"
+                ></stop>
+              </linearGradient>
+            </defs>
 
-                  <stop offset="100%" stop-color="#2f6bff" stop-opacity="0" />
-                </linearGradient>
-              </defs>
+            <polyline
+              class="chart-area"
+              [attr.points]="
+                  '0,120 ' +
+                  chartPoints() +
+                  ' 300,120'
+                "
+            ></polyline>
 
-              <line x1="0" y1="24" x2="276" y2="24" class="grid-line"></line>
+            <polyline
+              class="chart-line"
+              [attr.points]="chartPoints()"
+            ></polyline>
+          </svg>
+        </div>
 
-              <line x1="0" y1="48" x2="276" y2="48" class="grid-line"></line>
-
-              <line x1="0" y1="72" x2="276" y2="72" class="grid-line"></line>
-
-              <polygon
-                [attr.points]="chartAreaPoints"
-                fill="url(#chartAreaGradient)"
-              ></polygon>
-
-              <polyline
-                [attr.points]="chartPolylinePoints"
-                class="chart-line"
-              ></polyline>
-
-              @for (point of chartPoints; track point.day) {
-              <circle
-                [attr.cx]="point.x"
-                [attr.cy]="point.y"
-                r="3"
-                class="chart-point"
-              ></circle>
-              }
-            </svg>
-
-            <div class="x-axis">
-              @for (point of chartPoints; track point.day) {
-              <span>{{ point.day }}</span>
-              }
-            </div>
-          </div>
+        <div class="chart-labels">
+          @for ( activity of lastSevenDays(); track activity.date ) {
+          <span> {{ getDayLabel(activity.date) }} </span>
+          }
         </div>
       </section>
 
       <section class="accuracy-card">
-        <div class="card-heading">
+        <div class="chart-heading">
           <h2>Accuracy by Set</h2>
           <p>Last session results</p>
         </div>
 
+        @if (setAccuracies().length > 0) {
         <div class="accuracy-list">
-          @for (set of setAccuracies; track set.id) {
-          <article
-            class="accuracy-item"
-            [class.theme-blue]="set.theme === 'blue'"
-            [class.theme-purple]="set.theme === 'purple'"
-            [class.theme-green]="set.theme === 'green'"
-            [class.theme-orange]="set.theme === 'orange'"
-          >
-            <div class="accuracy-heading">
+          @for ( set of setAccuracies(); track set.setId ) {
+          <article class="accuracy-row">
+            <div class="accuracy-row-heading">
               <span>{{ set.title }}</span>
-              <strong>{{ set.accuracy }}%</strong>
+
+              <strong
+                [ngClass]="
+                getSetColorClass(set.color)
+              "
+              >
+                {{ set.accuracy }}%
+              </strong>
             </div>
 
             <div class="accuracy-track">
-              <div class="accuracy-value" [style.width.%]="set.accuracy"></div>
+              <div
+                class="accuracy-value"
+                [ngClass]="
+                getSetColorClass(set.color)
+              "
+                [style.width.%]="set.accuracy"
+              ></div>
             </div>
           </article>
           }
         </div>
+        } @else {
+        <p class="empty-section-text">Noch keine Set-Statistiken vorhanden.</p>
+        }
       </section>
+
+      <section class="calendar-card">
+        <div class="chart-heading">
+          <h2>Study Calendar</h2>
+          <p>This week – keep the fire going!</p>
+        </div>
+
+        <div class="study-calendar-grid">
+          @for ( activity of studyCalendar(); track activity.date ) {
+          <article class="calendar-day">
+            <span> {{ getDayLabel(activity.date).charAt(0) }} </span>
+
+            <div class="calendar-circle" [class.active]="activity.reviews > 0">
+              @if (activity.reviews > 0) {
+              <span aria-hidden="true">🔥</span>
+              }
+            </div>
+
+            <small> {{ activity.reviews > 0 ? activity.reviews : '—' }} </small>
+          </article>
+          }
+        </div>
+      </section>
+
+      <section class="achievements-card">
+        <div class="achievements-heading">
+          <h2>Achievements</h2>
+
+          <strong>
+            {{ earnedAchievements() }} / {{ achievements().length }} earned
+          </strong>
+        </div>
+
+        <div class="achievements-grid">
+          @for ( achievement of achievements(); track achievement.code ) {
+          <article class="achievement-item" [class.earned]="achievement.earned">
+            <div class="achievement-icon">
+              <ion-icon
+                [name]="
+              getAchievementIcon(
+                achievement.icon
+              )
+            "
+              ></ion-icon>
+            </div>
+
+            <span>{{ achievement.title }}</span>
+          </article>
+          }
+        </div>
+      </section>
+      }
     </section>
   </main>
 </ion-content>

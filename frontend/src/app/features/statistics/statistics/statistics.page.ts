@@ -1,93 +1,218 @@
-import { Component } from '@angular/core';
+import { CommonModule, Location } from '@angular/common';
+import { Component, computed } from '@angular/core';
+import { Router } from '@angular/router';
 import { IonContent, IonIcon } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
+  arrowBackOutline,
+  barChartOutline,
   bookOutline,
+  calendarOutline,
+  checkmarkCircleOutline,
+  closeCircleOutline,
   flameOutline,
+  flashOutline,
+  heartOutline,
+  notificationsOutline,
+  radioButtonOnOutline,
+  refreshOutline,
+  ribbonOutline,
+  schoolOutline,
+  starOutline,
   timeOutline,
   trophyOutline,
 } from 'ionicons/icons';
 
+import { StatisticsStore } from '../../../core/stores/statistics.store';
 import { FlBottomNavComponent } from '../../../shared/components/fl-bottom-nav/fl-bottom-nav.component';
-
-interface SetAccuracy {
-  id: number;
-  title: string;
-  accuracy: number;
-  theme: 'blue' | 'purple' | 'green' | 'orange';
-}
-
-interface ChartPoint {
-  day: string;
-  value: number;
-  x: number;
-  y: number;
-}
 
 @Component({
   selector: 'app-statistics',
   standalone: true,
-  imports: [IonContent, IonIcon, FlBottomNavComponent],
+  imports: [CommonModule, IonContent, IonIcon, FlBottomNavComponent],
   templateUrl: './statistics.page.html',
   styleUrls: ['./statistics.page.scss'],
 })
 export class StatisticsPage {
-  readonly weeklyCards = 271;
-  readonly weeklyStudyTime = '3h 8m';
-  readonly weeklyAccuracy = 82;
-  readonly streakDays = 14;
+  readonly isLoading = this.statisticsStore.isLoading;
 
-  readonly chartPoints: ChartPoint[] = [
-    { day: 'Mon', value: 25, x: 0, y: 70 },
-    { day: 'Tue', value: 39, x: 46, y: 54 },
-    { day: 'Wed', value: 17, x: 92, y: 78 },
-    { day: 'Thu', value: 52, x: 138, y: 38 },
-    { day: 'Fri', value: 31, x: 184, y: 61 },
-    { day: 'Sat', value: 74, x: 230, y: 16 },
-    { day: 'Sun', value: 47, x: 276, y: 45 },
-  ];
+  readonly loadError = this.statisticsStore.error;
 
-  readonly setAccuracies: SetAccuracy[] = [
-    {
-      id: 1,
-      title: 'Spanish Vocabulary',
-      accuracy: 85,
-      theme: 'blue',
-    },
-    {
-      id: 2,
-      title: 'Chemistry Basics',
-      accuracy: 68,
-      theme: 'purple',
-    },
-    {
-      id: 3,
-      title: 'World Capitals',
-      accuracy: 92,
-      theme: 'green',
-    },
-    {
-      id: 4,
-      title: 'JavaScript Concepts',
-      accuracy: 55,
-      theme: 'orange',
-    },
-  ];
+  readonly totalReviews = this.statisticsStore.totalReviews;
 
-  constructor() {
+  readonly correctReviews = this.statisticsStore.correctReviews;
+
+  readonly incorrectReviews = this.statisticsStore.incorrectReviews;
+
+  readonly lastSevenDays = this.statisticsStore.lastSevenDays;
+
+  readonly reviewsThisWeek = this.statisticsStore.reviewsThisWeek;
+
+  readonly weeklyAccuracy = this.statisticsStore.weeklyAccuracy;
+
+  readonly weeklyStudyMinutes = this.statisticsStore.weeklyStudyMinutes;
+
+  readonly currentStreak = this.statisticsStore.currentStreak;
+
+  readonly bestDay = computed(() => {
+    const activities = this.lastSevenDays();
+
+    if (activities.length === 0) {
+      return null;
+    }
+
+    return activities.reduce((best, current) =>
+      current.reviews > best.reviews ? current : best,
+    );
+  });
+
+  readonly chartPoints = computed(() => {
+    const activities = this.lastSevenDays();
+
+    if (activities.length === 0) {
+      return '';
+    }
+
+    const width = 300;
+    const height = 110;
+
+    const maximum = Math.max(
+      1,
+      ...activities.map((activity) => activity.reviews),
+    );
+
+    return activities
+      .map((activity, index) => {
+        const x =
+          activities.length === 1
+            ? width / 2
+            : index * (width / (activities.length - 1));
+
+        const y = height - (activity.reviews / maximum) * 90 - 10;
+
+        return `${x},${y}`;
+      })
+      .join(' ');
+  });
+
+  readonly setAccuracies = this.statisticsStore.setAccuracies;
+
+  readonly studyCalendar = this.statisticsStore.studyCalendar;
+
+  readonly achievements = this.statisticsStore.achievements;
+
+  readonly earnedAchievements = this.statisticsStore.earnedAchievements;
+
+  constructor(
+    readonly statisticsStore: StatisticsStore,
+    private readonly location: Location,
+    private readonly router: Router,
+  ) {
     addIcons({
+      arrowBackOutline,
+      barChartOutline,
       bookOutline,
+      calendarOutline,
+      checkmarkCircleOutline,
+      closeCircleOutline,
       flameOutline,
+      flashOutline,
+      heartOutline,
+      notificationsOutline,
+      radioButtonOnOutline,
+      refreshOutline,
+      ribbonOutline,
+      schoolOutline,
+      starOutline,
       timeOutline,
       trophyOutline,
     });
   }
 
-  get chartPolylinePoints(): string {
-    return this.chartPoints.map((point) => `${point.x},${point.y}`).join(' ');
+  ionViewWillEnter(): void {
+    void this.loadStatistics();
   }
 
-  get chartAreaPoints(): string {
-    return `0,96 ${this.chartPolylinePoints} 276,96`;
+  get weeklyStudyTimeLabel(): string {
+    const totalMinutes = this.weeklyStudyMinutes();
+
+    const hours = Math.floor(totalMinutes / 60);
+
+    const minutes = totalMinutes % 60;
+
+    if (hours === 0) {
+      return `${minutes}m`;
+    }
+
+    if (minutes === 0) {
+      return `${hours}h`;
+    }
+
+    return `${hours}h ${minutes}m`;
+  }
+
+  goBack(): void {
+    if (window.history.length > 1) {
+      this.location.back();
+      return;
+    }
+
+    void this.router.navigateByUrl('/home');
+  }
+
+  openNotifications(): void {
+    void this.router.navigateByUrl('/notifications');
+  }
+
+  async loadStatistics(): Promise<void> {
+    try {
+      await this.statisticsStore.loadOverview();
+    } catch {
+      // Der Fehler liegt bereits im Store.
+    }
+  }
+
+  async reloadStatistics(): Promise<void> {
+    try {
+      await this.statisticsStore.loadOverview(true);
+    } catch {
+      // Der Fehler liegt bereits im Store.
+    }
+  }
+
+  getDayLabel(dateValue: string): string {
+    const date = new Date(`${dateValue}T00:00:00`);
+
+    return new Intl.DateTimeFormat('en-US', {
+      weekday: 'short',
+    }).format(date);
+  }
+
+  getDateLabel(dateValue: string): string {
+    const date = new Date(`${dateValue}T00:00:00`);
+
+    return new Intl.DateTimeFormat('de-DE', {
+      day: '2-digit',
+      month: '2-digit',
+    }).format(date);
+  }
+
+  getSetColorClass(color: string): string {
+    return `accuracy-${color}`;
+  }
+
+  getAchievementIcon(icon: string): string {
+    const iconMap: Record<string, string> = {
+      trophy: 'trophy-outline',
+      flame: 'flame-outline',
+      brain: 'school-outline',
+      flash: 'flash-outline',
+      ribbon: 'ribbon-outline',
+      target: 'radio-button-on-outline',
+      star: 'star-outline',
+      heart: 'heart-outline',
+    };
+
+    return iconMap[icon] ?? 'trophy-outline';
   }
 }
