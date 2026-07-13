@@ -34,7 +34,7 @@
         <div class="goal-content">
           <span class="goal-label"> TODAY'S GOAL </span>
 
-          <h2>Study 30 cards</h2>
+          <h2>Study {{ dailyStudyGoal }} cards</h2>
 
           <div class="goal-meta">
             <span>
@@ -43,12 +43,17 @@
               14-day streak
             </span>
 
-            <span> ⚡ {{ goalProgress }} / 30 done </span>
+            <span> ⚡ {{ goalProgress }} / {{ dailyStudyGoal }} done </span>
           </div>
         </div>
 
-        <div class="goal-ring" [style.--goal-progress]="goalProgress">
-          <div class="goal-ring-inner">{{ goalPercentage }}%</div>
+        <div
+          class="goal-progress-ring"
+          [style.--goal-progress]="goalPercentage"
+        >
+          <div class="goal-progress-ring-inner">
+            <strong>{{ goalPercentage }}%</strong>
+          </div>
         </div>
       </section>
     </header>

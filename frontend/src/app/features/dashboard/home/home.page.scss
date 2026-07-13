@@ -688,3 +688,40 @@ fl-bottom-nav {
     transform: rotate(360deg);
   }
 }
+.goal-progress-ring {
+  --goal-progress: 0;
+
+  display: grid;
+  place-items: center;
+
+  width: 64px;
+  height: 64px;
+
+  border-radius: 50%;
+
+  background: conic-gradient(
+    #ffffff 0deg,
+    #ffffff calc(var(--goal-progress) * 3.6deg),
+    rgba(255, 255, 255, 0.25) calc(var(--goal-progress) * 3.6deg),
+    rgba(255, 255, 255, 0.25) 360deg
+  );
+}
+
+.goal-progress-ring-inner {
+  display: grid;
+  place-items: center;
+
+  width: 48px;
+  height: 48px;
+
+  border-radius: 50%;
+
+  background: #5865e8;
+}
+
+.goal-progress-ring-inner strong {
+  color: #ffffff;
+
+  font-size: 0.78rem;
+  font-weight: 900;
+}

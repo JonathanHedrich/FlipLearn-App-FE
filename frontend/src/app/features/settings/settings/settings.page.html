@@ -93,7 +93,10 @@
 
             <span class="row-label"> {{ setting.label }} </span>
 
-            <span class="row-value"> {{ setting.value }} </span>
+            <span class="row-value">
+              @if (setting.action === 'goal') { {{ selectedStudyGoal }} cards }
+              @else { {{ setting.value }} }
+            </span>
 
             <ion-icon
               class="row-chevron"
@@ -127,6 +130,79 @@
           </div>
         </div>
       </section>
+
+      @if (studyGoalMenuOpen) {
+      <div class="settings-modal-backdrop" (click)="closeStudyGoalMenu()">
+        <section
+          class="settings-modal"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="study-goal-title"
+          (click)="$event.stopPropagation()"
+        >
+          <div class="settings-modal-header">
+            <div>
+              <h2 id="study-goal-title">Daily Study Goal</h2>
+
+              <p>Wie viele Karten möchtest du täglich lernen?</p>
+            </div>
+
+            <button
+              type="button"
+              aria-label="Schließen"
+              (click)="closeStudyGoalMenu()"
+            >
+              ×
+            </button>
+          </div>
+
+          <div class="goal-options">
+            @for ( goal of availableStudyGoals; track goal ) {
+            <button
+              type="button"
+              [class.active]="
+              selectedStudyGoal === goal
+            "
+              (click)="selectStudyGoal(goal)"
+            >
+              <strong>{{ goal }}</strong>
+              <span>cards per day</span>
+            </button>
+            }
+          </div>
+          <section class="custom-goal-section">
+            <div>
+              <h3>Eigenes Ziel</h3>
+
+              <p>
+                Lege selbst fest, wie viele Karten du täglich lernen möchtest.
+              </p>
+            </div>
+
+            <div class="custom-goal-input">
+              <input
+                type="number"
+                name="customStudyGoal"
+                min="1"
+                max="999"
+                step="1"
+                inputmode="numeric"
+                placeholder="z. B. 75"
+                [(ngModel)]="customStudyGoal"
+              />
+
+              <button type="button" (click)="saveCustomStudyGoal()">
+                Speichern
+              </button>
+            </div>
+
+            @if (customStudyGoalError) {
+            <p class="custom-goal-error">{{ customStudyGoalError }}</p>
+            }
+          </section>
+        </section>
+      </div>
+      }
 
       <button class="logout-button" type="button" (click)="logout()">
         <ion-icon name="log-out-outline"></ion-icon>

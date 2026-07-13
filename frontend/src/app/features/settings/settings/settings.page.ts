@@ -26,6 +26,13 @@ interface SettingsRow {
   action: 'goal' | 'order';
 }
 
+type StudyGoal = number;
+
+const MIN_STUDY_GOAL = 1;
+const MAX_STUDY_GOAL = 999;
+
+const STUDY_GOAL_STORAGE_KEY = 'fliplearn.studyGoal';
+
 @Component({
   selector: 'app-settings',
   standalone: true,
@@ -40,7 +47,6 @@ export class SettingsPage {
   readonly studyPreferences: SettingsRow[] = [
     {
       label: 'Daily Study Goal',
-      value: '30 cards',
       icon: 'radio-button-on-outline',
       action: 'goal',
     },
@@ -51,6 +57,15 @@ export class SettingsPage {
       action: 'order',
     },
   ];
+
+  readonly availableStudyGoals: StudyGoal[] = [10, 20, 30, 50, 100, 500];
+
+  selectedStudyGoal: StudyGoal = this.loadStudyGoal();
+
+  customStudyGoal: number | null = null;
+  customStudyGoalError = '';
+
+  studyGoalMenuOpen = false;
 
   constructor(
     private readonly location: Location,
@@ -115,7 +130,12 @@ export class SettingsPage {
   }
 
   openSetting(action: SettingsRow['action']): void {
-    console.log('Einstellung öffnen:', action);
+    if (action === 'goal') {
+      this.studyGoalMenuOpen = true;
+      return;
+    }
+
+    console.log('Card Order wird später ergänzt.');
   }
 
   changeTheme(value: string): void {
@@ -141,5 +161,54 @@ export class SettingsPage {
     void this.router.navigateByUrl('/login', {
       replaceUrl: true,
     });
+  }
+
+  selectStudyGoal(goal: StudyGoal): void {
+    this.saveStudyGoal(goal);
+    this.studyGoalMenuOpen = false;
+  }
+
+  saveCustomStudyGoal(): void {
+    this.customStudyGoalError = '';
+
+    const goal = Number(this.customStudyGoal);
+
+    if (
+      !Number.isInteger(goal) ||
+      goal < MIN_STUDY_GOAL ||
+      goal > MAX_STUDY_GOAL
+    ) {
+      this.customStudyGoalError = `Das Ziel muss eine ganze Zahl zwischen ${MIN_STUDY_GOAL} und ${MAX_STUDY_GOAL} sein.`;
+
+      return;
+    }
+
+    this.saveStudyGoal(goal);
+    this.customStudyGoal = null;
+    this.studyGoalMenuOpen = false;
+  }
+
+  private saveStudyGoal(goal: StudyGoal): void {
+    this.selectedStudyGoal = goal;
+
+    localStorage.setItem(STUDY_GOAL_STORAGE_KEY, String(goal));
+  }
+
+  closeStudyGoalMenu(): void {
+    this.studyGoalMenuOpen = false;
+  }
+
+  private loadStudyGoal(): StudyGoal {
+    const value = Number(localStorage.getItem(STUDY_GOAL_STORAGE_KEY));
+
+    if (
+      Number.isInteger(value) &&
+      value >= MIN_STUDY_GOAL &&
+      value <= MAX_STUDY_GOAL
+    ) {
+      return value;
+    }
+
+    return 30;
   }
 }

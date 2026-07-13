@@ -20,6 +20,7 @@ import { AuthApi } from '../../../core/services/auth-api';
 import { FlashcardStore } from '../../../core/stores/flashcard.store';
 import { FlBottomNavComponent } from '../../../shared/components/fl-bottom-nav/fl-bottom-nav.component';
 import { AuthStore } from 'src/app/core/stores/auth.store';
+import { StatisticsStore } from 'src/app/core/stores/statistics.store';
 
 interface RecentActivity {
   id: number;
@@ -97,11 +98,14 @@ export class HomePage {
       })),
   );
 
+  readonly reviewsToday = this.statisticsStore.reviewsToday;
+
   constructor(
     readonly authApi: AuthApi,
     readonly flashcardStore: FlashcardStore,
     private readonly router: Router,
     private readonly authStore: AuthStore,
+    private readonly statisticsStore: StatisticsStore,
   ) {
     addIcons({
       barChartOutline,
@@ -122,11 +126,18 @@ export class HomePage {
   }
 
   get goalProgress(): number {
-    return Math.min(this.learnedCards(), 30);
+    return Math.min(this.reviewsToday(), this.dailyStudyGoal);
   }
 
   get goalPercentage(): number {
-    return Math.round((this.goalProgress / 30) * 100);
+    if (this.dailyStudyGoal <= 0) {
+      return 0;
+    }
+
+    return Math.min(
+      100,
+      Math.max(0, Math.round((this.goalProgress / this.dailyStudyGoal) * 100)),
+    );
   }
 
   async loadDashboard(): Promise<void> {
@@ -195,5 +206,11 @@ export class HomePage {
     const days = Math.floor(hours / 24);
 
     return `${days}d ago`;
+  }
+
+  get dailyStudyGoal(): number {
+    const storedGoal = Number(localStorage.getItem('fliplearn.studyGoal'));
+
+    return storedGoal > 0 ? storedGoal : 30;
   }
 }
