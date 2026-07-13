@@ -11,26 +11,71 @@
       </button>
 
       <h1>Settings</h1>
+
+      <span></span>
     </header>
 
     <section class="settings-content">
       <button class="profile-card" type="button" (click)="editProfile()">
-        <div class="profile-avatar">{{ user.initials }}</div>
+        <div class="profile-avatar">{{ userInitials }}</div>
 
         <div class="profile-information">
-          <strong>{{ user.name }}</strong>
-          <span>{{ user.email }}</span>
+          <strong>{{ userName }}</strong>
+          <span>{{ userEmail }}</span>
           <small>Edit Profile</small>
         </div>
 
         <ion-icon class="row-chevron" name="chevron-forward-outline"></ion-icon>
       </button>
 
-      <section class="settings-group appearance-group">
+      <section class="settings-group">
         <h2>Appearance</h2>
 
-        <div class="appearance-placeholder">
-          <span>Theme options will be added later</span>
+        <div class="settings-list">
+          <label class="theme-option">
+            <div>
+              <strong>Light</strong>
+              <span>Immer helles Design</span>
+            </div>
+
+            <input
+              type="radio"
+              name="theme"
+              value="light"
+              [checked]="themeService.theme() === 'light'"
+              (change)="changeTheme('light')"
+            />
+          </label>
+
+          <label class="theme-option">
+            <div>
+              <strong>Dark</strong>
+              <span>Immer dunkles Design</span>
+            </div>
+
+            <input
+              type="radio"
+              name="theme"
+              value="dark"
+              [checked]="themeService.theme() === 'dark'"
+              (change)="changeTheme('dark')"
+            />
+          </label>
+
+          <label class="theme-option">
+            <div>
+              <strong>System</strong>
+              <span>Geräteeinstellung übernehmen</span>
+            </div>
+
+            <input
+              type="radio"
+              name="theme"
+              value="system"
+              [checked]="themeService.theme() === 'system'"
+              (change)="changeTheme('system')"
+            />
+          </label>
         </div>
       </section>
 
@@ -80,63 +125,6 @@
               [(ngModel)]="streakAlertsEnabled"
             ></ion-toggle>
           </div>
-        </div>
-      </section>
-
-      <section class="settings-section">
-        <h2>Appearance</h2>
-
-        <div class="settings-card">
-          <label class="theme-option">
-            <div>
-              <strong>Light</strong>
-              <span>Immer helles Design</span>
-            </div>
-
-            <input
-              type="radio"
-              name="theme"
-              value="light"
-              [checked]="
-          themeService.theme() === 'light'
-        "
-              (change)="changeTheme('light')"
-            />
-          </label>
-
-          <label class="theme-option">
-            <div>
-              <strong>Dark</strong>
-              <span>Immer dunkles Design</span>
-            </div>
-
-            <input
-              type="radio"
-              name="theme"
-              value="dark"
-              [checked]="
-          themeService.theme() === 'dark'
-        "
-              (change)="changeTheme('dark')"
-            />
-          </label>
-
-          <label class="theme-option">
-            <div>
-              <strong>System</strong>
-              <span> Geräteeinstellung übernehmen </span>
-            </div>
-
-            <input
-              type="radio"
-              name="theme"
-              value="system"
-              [checked]="
-          themeService.theme() === 'system'
-        "
-              (change)="changeTheme('system')"
-            />
-          </label>
         </div>
       </section>
 

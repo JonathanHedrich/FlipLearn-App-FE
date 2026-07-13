@@ -1,12 +1,18 @@
 import { Injectable, computed, signal } from '@angular/core';
 
-import { LoginResponse, UserProfileResponse } from '../models/auth.model';
+import {
+  CurrentUserResponse,
+  LoginResponse,
+  UserProfileResponse,
+} from '../models/auth.model';
+
+export type AuthUser = LoginResponse | CurrentUserResponse;
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthStore {
-  private readonly currentUserState = signal<LoginResponse | null>(null);
+  private readonly currentUserState = signal<AuthUser | null>(null);
 
   private readonly profileState = signal<UserProfileResponse | null>(null);
 
@@ -23,11 +29,13 @@ export class AuthStore {
       '',
   );
 
+  readonly username = computed(() => this.currentUserState()?.username ?? '');
+
   readonly email = computed(
     () => this.currentUserState()?.email ?? this.profileState()?.email ?? '',
   );
 
-  setCurrentUser(user: LoginResponse): void {
+  setCurrentUser(user: AuthUser): void {
     this.currentUserState.set(user);
   }
 

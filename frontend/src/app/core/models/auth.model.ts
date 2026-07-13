@@ -23,6 +23,7 @@ export interface LoginResponse {
   expiresIn: number;
   userId: number;
   displayName: string;
+  username: string;
   email: string;
   role: string;
 }
@@ -30,6 +31,7 @@ export interface LoginResponse {
 export interface CurrentUserResponse {
   id: number;
   displayName: string;
+  username: string;
   email: string;
   role: string;
   enabled: boolean;

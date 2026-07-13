@@ -125,7 +125,8 @@ export class EditProfilePage {
         }),
       );
 
-      this.authStore.setCurrentUser(updatedUser as any);
+      this.authApi.setCurrentUser(updatedUser);
+      this.authStore.setCurrentUser(updatedUser);
 
       this.saveSuccess = 'Dein Profil wurde gespeichert.';
     } catch (error: unknown) {
@@ -145,7 +146,7 @@ export class EditProfilePage {
 
     this.profileForm.patchValue({
       displayName: user?.displayName ?? profile?.displayName ?? '',
-      username: (user as { username?: string } | null)?.username ?? '',
+      username: user?.username ?? '',
     });
 
     this.emailForm.patchValue({

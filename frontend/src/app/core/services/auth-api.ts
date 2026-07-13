@@ -84,6 +84,7 @@ export class AuthApi {
     const user: CurrentUserResponse = {
       id: response.userId,
       displayName: response.displayName,
+      username: response.username,
       email: response.email,
       role: response.role,
       enabled: true,
@@ -130,5 +131,11 @@ export class AuthApi {
 
   changeEmail(request: ChangeEmailRequest): Observable<void> {
     return this.http.put<void>(`${API_BASE_URL}/users/email`, request);
+  }
+
+  setCurrentUser(user: CurrentUserResponse): void {
+    this.userState.set(user);
+
+    localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(user));
   }
 }

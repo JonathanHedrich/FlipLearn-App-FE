@@ -8,7 +8,6 @@ import {
   arrowBackOutline,
   chevronForwardOutline,
   layersOutline,
-  lockClosedOutline,
   logOutOutline,
   personOutline,
   radioButtonOnOutline,
@@ -24,7 +23,7 @@ interface SettingsRow {
   label: string;
   value?: string;
   icon: string;
-  action: 'goal' | 'order' | 'password';
+  action: 'goal' | 'order';
 }
 
 @Component({
@@ -37,12 +36,6 @@ interface SettingsRow {
 export class SettingsPage {
   studyRemindersEnabled = true;
   streakAlertsEnabled = true;
-
-  readonly user = {
-    initials: 'AJ',
-    name: 'Alex Johnson',
-    email: 'alex@example.com',
-  };
 
   readonly studyPreferences: SettingsRow[] = [
     {
@@ -59,14 +52,6 @@ export class SettingsPage {
     },
   ];
 
-  readonly accountRows: SettingsRow[] = [
-    {
-      label: 'Change Password',
-      icon: 'lock-closed-outline',
-      action: 'password',
-    },
-  ];
-
   constructor(
     private readonly location: Location,
     private readonly router: Router,
@@ -80,11 +65,40 @@ export class SettingsPage {
       arrowBackOutline,
       chevronForwardOutline,
       layersOutline,
-      lockClosedOutline,
       logOutOutline,
       personOutline,
       radioButtonOnOutline,
     });
+  }
+
+  get userName(): string {
+    return (
+      this.authStore.currentUser()?.displayName ??
+      this.authStore.profile()?.displayName ??
+      'FlipLearn User'
+    );
+  }
+
+  get userEmail(): string {
+    return (
+      this.authStore.currentUser()?.email ??
+      this.authStore.profile()?.email ??
+      ''
+    );
+  }
+
+  get userInitials(): string {
+    const name = this.userName.trim();
+
+    if (!name) {
+      return 'FL';
+    }
+
+    return name
+      .split(/\s+/)
+      .slice(0, 2)
+      .map((part) => part.charAt(0).toUpperCase())
+      .join('');
   }
 
   goBack(): void {
@@ -104,6 +118,14 @@ export class SettingsPage {
     console.log('Einstellung öffnen:', action);
   }
 
+  changeTheme(value: string): void {
+    if (value !== 'light' && value !== 'dark' && value !== 'system') {
+      return;
+    }
+
+    this.themeService.setTheme(value as AppTheme);
+  }
+
   logout(): void {
     const confirmed = window.confirm('Möchtest du dich wirklich abmelden?');
 
@@ -119,13 +141,5 @@ export class SettingsPage {
     void this.router.navigateByUrl('/login', {
       replaceUrl: true,
     });
-  }
-
-  changeTheme(value: string): void {
-    if (value !== 'light' && value !== 'dark' && value !== 'system') {
-      return;
-    }
-
-    this.themeService.setTheme(value as AppTheme);
   }
 }
