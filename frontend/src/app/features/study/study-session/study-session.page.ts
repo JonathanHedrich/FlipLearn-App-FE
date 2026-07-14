@@ -7,6 +7,7 @@ import { firstValueFrom } from 'rxjs';
 import { addIcons } from 'ionicons';
 
 import { StatisticsStore } from '../../../core/stores/statistics.store';
+import { AppNotificationService } from '../../../core/services/app-notification.service';
 
 import {
   arrowBackOutline,
@@ -63,6 +64,7 @@ export class StudySessionPage {
     private readonly flashcardApi: FlashcardApi,
     private readonly flashcardStore: FlashcardStore,
     private readonly statisticsStore: StatisticsStore,
+    private readonly appNotificationService: AppNotificationService,
   ) {
     this.setId = Number(this.route.snapshot.paramMap.get('setId')) || 0;
 
@@ -219,7 +221,9 @@ export class StudySessionPage {
 
       this.flashcardStore.updateProgress(this.setId, response.setProgress);
 
-      void this.statisticsStore.loadOverview(true);
+      await this.statisticsStore.loadOverview(true);
+
+      this.appNotificationService.rebuildNotifications();
 
       if (response.sessionComplete) {
         this.sessionComplete = true;

@@ -37,6 +37,7 @@ import {
 import { StatisticsStore } from '../../../core/stores/statistics.store';
 import { FlBottomNavComponent } from '../../../shared/components/fl-bottom-nav/fl-bottom-nav.component';
 import { AchievementResponse } from '../../../core/models/statistics-api.model';
+import { AppNotificationService } from '../../../core/services/app-notification.service';
 
 @Component({
   selector: 'app-statistics',
@@ -127,12 +128,15 @@ export class StatisticsPage {
     return achievements.slice(0, 12);
   });
 
+  readonly unreadNotifications = this.appNotificationService.unreadCount;
+
   selectedAchievement: AchievementResponse | null = null;
 
   constructor(
     readonly statisticsStore: StatisticsStore,
     private readonly location: Location,
     private readonly router: Router,
+    readonly appNotificationService: AppNotificationService,
   ) {
     addIcons({
       albumsOutline,
@@ -203,7 +207,9 @@ export class StatisticsPage {
 
   async loadStatistics(): Promise<void> {
     try {
-      await this.statisticsStore.loadOverview();
+      await this.statisticsStore.loadOverview(true);
+
+      this.appNotificationService.rebuildNotifications();
     } catch {
       // Der Fehler liegt bereits im Store.
     }

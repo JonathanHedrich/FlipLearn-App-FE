@@ -19,6 +19,7 @@ import { AuthStore } from '../../../core/stores/auth.store';
 import { FlashcardStore } from '../../../core/stores/flashcard.store';
 import { StatisticsStore } from '../../../core/stores/statistics.store';
 import { NotificationService } from '../../../core/services/notification.service';
+import { AppNotificationService } from '../../../core/services/app-notification.service';
 
 interface SettingsRow {
   label: string;
@@ -115,6 +116,7 @@ export class SettingsPage {
     private readonly statisticsStore: StatisticsStore,
     private readonly notificationService: NotificationService,
     readonly themeService: ThemeService,
+    private readonly appNotificationService: AppNotificationService,
   ) {
     addIcons({
       arrowBackOutline,
@@ -209,6 +211,7 @@ export class SettingsPage {
     this.authStore.clear();
     this.flashcardStore.clear();
     this.statisticsStore.clear();
+    this.appNotificationService.clear();
 
     void this.router.navigateByUrl('/login', {
       replaceUrl: true,
@@ -244,6 +247,8 @@ export class SettingsPage {
     this.selectedStudyGoal = goal;
 
     localStorage.setItem(STUDY_GOAL_STORAGE_KEY, String(goal));
+
+    this.appNotificationService.rebuildNotifications();
   }
 
   closeStudyGoalMenu(): void {

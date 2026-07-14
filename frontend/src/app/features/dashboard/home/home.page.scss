@@ -928,3 +928,29 @@ fl-bottom-nav {
     height: 100%;
   }
 }
+.notification-action {
+  position: relative;
+}
+
+.notification-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+
+  display: grid;
+  place-items: center;
+
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+
+  border: 2px solid #5b5eef;
+  border-radius: 999px;
+
+  color: #ffffff;
+  background: #ef3f4b;
+
+  font-size: 0.52rem;
+  font-weight: 900;
+  line-height: 1;
+}

@@ -7,6 +7,7 @@ import { IonContent, IonIcon } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 
 import { FlashcardStore } from '../../../core/stores/flashcard.store';
+import { AppNotificationService } from '../../../core/services/app-notification.service';
 
 import {
   addOutline,
@@ -53,6 +54,7 @@ export class EditorPage {
     private readonly router: Router,
     private readonly location: Location,
     private readonly flashcardStore: FlashcardStore,
+    private readonly appNotificationService: AppNotificationService,
   ) {
     this.setId = Number(this.route.snapshot.paramMap.get('setId')) || 0;
 
@@ -178,6 +180,10 @@ export class EditorPage {
 
       this.cards = [...this.cards, editableCard];
 
+      this.flashcardStore.updateCardCount(this.setId, this.cards.length);
+
+      this.appNotificationService.rebuildNotifications();
+
       this.editingCardId = editableCard.id;
 
       window.setTimeout(() => {
@@ -246,6 +252,10 @@ export class EditorPage {
       await this.flashcardStore.deleteCard(this.setId, cardId);
 
       this.cards = this.cards.filter((card) => card.id !== cardId);
+
+      this.flashcardStore.updateCardCount(this.setId, this.cards.length);
+
+      this.appNotificationService.rebuildNotifications();
 
       if (this.editingCardId === cardId) {
         this.editingCardId = null;

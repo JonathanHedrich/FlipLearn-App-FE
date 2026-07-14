@@ -17,12 +17,18 @@
         </div>
 
         <button
-          class="header-button"
+          class="header-button notification-action"
           type="button"
           aria-label="Benachrichtigungen"
           (click)="openNotifications()"
         >
           <ion-icon name="notifications-outline"></ion-icon>
+
+          @if (unreadNotifications() > 0) {
+          <span class="notification-badge">
+            {{ unreadNotifications() > 9 ? '9+' : unreadNotifications() }}
+          </span>
+          }
         </button>
       </div>
 

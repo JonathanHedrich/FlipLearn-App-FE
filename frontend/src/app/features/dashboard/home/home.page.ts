@@ -26,6 +26,7 @@ import { AuthStore } from '../../../core/stores/auth.store';
 import { FlashcardStore } from '../../../core/stores/flashcard.store';
 import { StatisticsStore } from '../../../core/stores/statistics.store';
 import { FlBottomNavComponent } from '../../../shared/components/fl-bottom-nav/fl-bottom-nav.component';
+import { AppNotificationService } from '../../../core/services/app-notification.service';
 
 const STUDY_GOAL_STORAGE_KEY = 'fliplearn.studyGoal';
 
@@ -132,11 +133,14 @@ export class HomePage {
     return 'Jede Wiederholung bringt dich deinem Ziel näher.';
   });
 
+  readonly unreadNotifications = this.appNotificationService.unreadCount;
+
   constructor(
     readonly authStore: AuthStore,
     readonly flashcardStore: FlashcardStore,
     readonly statisticsStore: StatisticsStore,
     private readonly router: Router,
+    readonly appNotificationService: AppNotificationService,
   ) {
     addIcons({
       addOutline,
@@ -219,6 +223,8 @@ export class HomePage {
         this.flashcardStore.loadSets(true),
         this.statisticsStore.loadOverview(true),
       ]);
+
+      this.appNotificationService.rebuildNotifications();
     } catch {
       // Die Fehler werden bereits in den Stores gespeichert.
     }

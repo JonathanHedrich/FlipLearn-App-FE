@@ -121,7 +121,7 @@ export const routes: Routes = [
     path: 'notifications',
     canActivate: [authGuard],
     loadComponent: () =>
-      import('./features/notifications/notifications/notifications.page').then(
+      import('./features/notifications/notifications.page').then(
         (page) => page.NotificationsPage,
       ),
   },

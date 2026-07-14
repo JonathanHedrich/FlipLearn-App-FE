@@ -7,6 +7,7 @@ import { addIcons } from 'ionicons';
 
 import { FlashcardStore } from '../../../core/stores/flashcard.store';
 import { FlBottomNavComponent } from '../../../shared/components/fl-bottom-nav/fl-bottom-nav.component';
+import { AppNotificationService } from '../../../core/services/app-notification.service';
 
 import {
   addOutline,
@@ -97,6 +98,7 @@ export class FlashcardListPage {
   constructor(
     readonly flashcardStore: FlashcardStore,
     private readonly router: Router,
+    private readonly appNotificationService: AppNotificationService,
   ) {
     addIcons({
       addOutline,
@@ -192,6 +194,8 @@ export class FlashcardListPage {
 
     try {
       await this.flashcardStore.deleteSet(set.id);
+
+      this.appNotificationService.rebuildNotifications();
     } catch {
       window.alert('Das Lernset konnte nicht gelöscht werden.');
     }

@@ -10,12 +10,18 @@
 
         <div class="header-actions">
           <button
-            class="header-action"
+            class="header-action notification-action"
             type="button"
             aria-label="Benachrichtigungen"
             (click)="openNotifications()"
           >
             <ion-icon name="notifications-outline"></ion-icon>
+
+            @if (unreadNotifications() > 0) {
+            <span class="notification-badge">
+              {{ unreadNotifications() > 9 ? '9+' : unreadNotifications() }}
+            </span>
+            }
           </button>
 
           <button
@@ -35,7 +41,7 @@
 
           <h2>Study {{ dailyStudyGoal() }} cards</h2>
 
-          <p>{{ reviewsToday() }} / {{ dailyStudyGoal }} completed</p>
+          <p>{{ reviewsToday() }} / {{ dailyStudyGoal() }} completed</p>
 
           <div class="goal-progress-track">
             <div
