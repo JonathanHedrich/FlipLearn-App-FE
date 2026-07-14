@@ -54,6 +54,44 @@
       </div>
     </header>
 
+    <div class="study-mode-button-container">
+      <button
+        class="study-mode-button"
+        type="button"
+        (click)="openStudyModeMenu()"
+      >
+        <span> {{ selectedStudyModeLabel }} </span>
+
+        <ion-icon name="chevron-down-outline"></ion-icon>
+      </button>
+    </div>
+
+    <div class="lightning-mode-container">
+      @if (isLightningMode && !sessionComplete) {
+      <section class="lightning-timer">
+        <div class="lightning-timer-heading">
+          <div>
+            <ion-icon name="flash-outline"></ion-icon>
+
+            <span>Lightning Mode</span>
+          </div>
+
+          <strong> {{ lightningSecondsLeft() }}s </strong>
+        </div>
+
+        <div class="lightning-timer-track">
+          <div
+            class="lightning-timer-value"
+            [style.width.%]="lightningProgress()"
+            [class.warning]="
+          lightningSecondsLeft() <= 2
+        "
+          ></div>
+        </div>
+      </section>
+      }
+    </div>
+
     <section class="study-content">
       <p class="instruction">Tap the card to reveal the answer</p>
 
@@ -264,7 +302,66 @@
         </button>
       </div>
     </section>
+    } @if (studyModeMenuOpen) {
+    <div class="study-mode-backdrop" (click)="closeStudyModeMenu()">
+      <section
+        class="study-mode-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="study-mode-title"
+        (click)="$event.stopPropagation()"
+      >
+        <div class="study-mode-modal-header">
+          <div>
+            <span>STUDY MODE</span>
 
+            <h2 id="study-mode-title">Choose your mode</h2>
+
+            <p>Wähle aus, wie diese Lernsitzung aufgebaut werden soll.</p>
+          </div>
+
+          <button
+            type="button"
+            aria-label="Schließen"
+            (click)="closeStudyModeMenu()"
+          >
+            <ion-icon name="close-outline"></ion-icon>
+          </button>
+        </div>
+
+        <div class="study-mode-list">
+          @for ( option of studyModeOptions; track option.value ) {
+          <button
+            class="study-mode-option"
+            type="button"
+            [class.active]="
+              selectedStudyMode === option.value
+            "
+            [disabled]="!option.available"
+            (click)="selectStudyMode(option.value)"
+          >
+            <div class="study-mode-option-icon">
+              <ion-icon [name]="option.icon"></ion-icon>
+            </div>
+
+            <div class="study-mode-option-content">
+              <div class="study-mode-option-heading">
+                <strong>{{ option.title }}</strong>
+
+                @if (option.badge) {
+                <span>{{ option.badge }}</span>
+                }
+              </div>
+
+              <p>{{ option.description }}</p>
+            </div>
+
+            <div class="study-mode-radio"></div>
+          </button>
+          }
+        </div>
+      </section>
+    </div>
     }
   </main>
 </ion-content>

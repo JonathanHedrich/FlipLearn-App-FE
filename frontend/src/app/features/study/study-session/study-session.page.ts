@@ -1,6 +1,6 @@
 import { Location } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component } from '@angular/core';
+import { Component, OnDestroy, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { IonContent, IonIcon } from '@ionic/angular/standalone';
 import { firstValueFrom } from 'rxjs';
@@ -8,19 +8,32 @@ import { addIcons } from 'ionicons';
 
 import { StatisticsStore } from '../../../core/stores/statistics.store';
 import { AppNotificationService } from '../../../core/services/app-notification.service';
+import { StudyModeOption } from '../../../core/models/study-mode-option.model';
 
 import {
+  albumsOutline,
   arrowBackOutline,
   checkmarkOutline,
+  chevronDownOutline,
+  closeCircleOutline,
   closeOutline,
+  fitnessOutline,
+  flameOutline,
+  flashOutline,
+  heartCircleOutline,
   refreshOutline,
+  schoolOutline,
+  shuffleOutline,
+  sparklesOutline,
   starOutline,
   starSharp,
+  timeOutline,
   trophyOutline,
 } from 'ionicons/icons';
 
 import {
   StudyCardResponse,
+  StudyMode,
   StudyRating,
   StudySessionResponse,
 } from '../../../core/models/study-api.model';
@@ -39,7 +52,7 @@ const CARD_ORDER_STORAGE_KEY = 'fliplearn.cardOrder';
   templateUrl: './study-session.page.html',
   styleUrls: ['./study-session.page.scss'],
 })
-export class StudySessionPage {
+export class StudySessionPage implements OnDestroy {
   readonly setId: number;
 
   session: StudySessionResponse | null = null;
@@ -56,6 +69,102 @@ export class StudySessionPage {
   isSubmittingRating = false;
   loadError = '';
 
+  selectedStudyMode: StudyMode = 'ALL';
+
+  studyModeMenuOpen = false;
+
+  readonly lightningDurationSeconds = 5;
+
+  readonly lightningSecondsLeft = signal(this.lightningDurationSeconds);
+
+  readonly lightningProgress = signal(100);
+
+  private lightningIntervalId: ReturnType<typeof window.setInterval> | null =
+    null;
+
+  readonly studyModeOptions: StudyModeOption[] = [
+    {
+      value: 'ALL',
+      title: 'All Cards',
+      description: 'Alle Karten des Lernsets lernen.',
+      icon: 'albums-outline',
+      available: true,
+    },
+    {
+      value: 'RANDOM',
+      title: 'Random',
+      description: 'Alle Karten in zufälliger Reihenfolge.',
+      icon: 'shuffle-outline',
+      available: true,
+    },
+    {
+      value: 'FAVORITES',
+      title: 'Favorites',
+      description: 'Nur favorisierte Karten lernen.',
+      icon: 'star-outline',
+      available: true,
+    },
+    {
+      value: 'DIFFICULT',
+      title: 'Difficult',
+      description: 'Schwierige Karten zuerst lernen.',
+      icon: 'flame-outline',
+      available: true,
+    },
+    {
+      value: 'WRONG_ONLY',
+      title: 'Wrong Answers Only',
+      description: 'Nur Karten lernen, die zuletzt falsch beantwortet wurden.',
+      icon: 'close-circle-outline',
+      available: true,
+    },
+    {
+      value: 'NEW_ONLY',
+      title: 'New Cards Only',
+      description: 'Nur Karten lernen, die noch nie beantwortet wurden.',
+      icon: 'sparkles-outline',
+      available: true,
+    },
+    {
+      value: 'DUE_ONLY',
+      title: 'Due Cards Only',
+      description: 'Nur aktuell fällige Karten lernen.',
+      icon: 'time-outline',
+      available: true,
+    },
+    {
+      value: 'FAVORITES_DUE',
+      title: 'Favorites + Due',
+      description: 'Nur favorisierte Karten, die aktuell fällig sind.',
+      icon: 'heart-circle-outline',
+      available: true,
+    },
+    {
+      value: 'MARATHON',
+      title: 'Marathon Mode',
+      description: 'Alle verfügbaren Karten ohne Sitzungsbegrenzung.',
+      icon: 'fitness-outline',
+      available: true,
+      badge: 'Long Session',
+    },
+    {
+      value: 'LIGHTNING',
+      title: 'Lightning Mode',
+      description: 'Nur fünf Sekunden pro Karte.',
+      icon: 'flash-outline',
+      available: true,
+      badge: '5 sec',
+    },
+    {
+      value: 'EXAM',
+      title: 'Exam Mode',
+      description: 'Keine sofortige Auswertung. Ergebnis erst am Ende.',
+      icon: 'school-outline',
+      available: true,
+      badge: 'No hints',
+    },
+  ];
+
   constructor(
     private readonly route: ActivatedRoute,
     private readonly router: Router,
@@ -71,12 +180,27 @@ export class StudySessionPage {
     addIcons({
       arrowBackOutline,
       checkmarkOutline,
+      chevronDownOutline,
       closeOutline,
       refreshOutline,
       starOutline,
       starSharp,
       trophyOutline,
+      albumsOutline,
+      closeCircleOutline,
+      fitnessOutline,
+      flameOutline,
+      flashOutline,
+      heartCircleOutline,
+      schoolOutline,
+      shuffleOutline,
+      sparklesOutline,
+      timeOutline,
     });
+  }
+
+  ngOnDestroy(): void {
+    this.stopLightningTimer();
   }
 
   ionViewWillEnter(): void {
@@ -132,7 +256,7 @@ export class StudySessionPage {
       const session = await firstValueFrom(
         this.studyApi.startSession({
           setId: this.setId,
-          mode: 'ALL',
+          mode: this.selectedStudyMode,
         }),
       );
 
@@ -143,6 +267,7 @@ export class StudySessionPage {
       this.correctAnswers = session.correctAnswers;
 
       this.incorrectAnswers = session.incorrectAnswers;
+      this.startLightningTimer();
     } catch (error: unknown) {
       this.loadError = this.resolveSessionError(error);
     } finally {
@@ -151,6 +276,8 @@ export class StudySessionPage {
   }
 
   goBack(): void {
+    this.stopLightningTimer();
+
     if (window.history.length > 1) {
       this.location.back();
       return;
@@ -205,6 +332,7 @@ export class StudySessionPage {
       return;
     }
 
+    this.stopLightningTimer();
     this.isSubmittingRating = true;
 
     try {
@@ -226,12 +354,14 @@ export class StudySessionPage {
       this.appNotificationService.rebuildNotifications();
 
       if (response.sessionComplete) {
+        this.stopLightningTimer();
         this.sessionComplete = true;
         return;
       }
 
       this.currentIndex += 1;
       this.isFlipped = false;
+      this.startLightningTimer();
     } catch (error: unknown) {
       window.alert(this.resolveReviewError(error));
     } finally {
@@ -254,6 +384,8 @@ export class StudySessionPage {
   }
 
   private resetLocalSession(): void {
+    this.stopLightningTimer();
+
     this.session = null;
     this.orderedCards = [];
     this.currentIndex = 0;
@@ -354,5 +486,105 @@ export class StudySessionPage {
     }
 
     return 'random';
+  }
+
+  openStudyModeMenu(): void {
+    this.studyModeMenuOpen = true;
+  }
+
+  closeStudyModeMenu(): void {
+    this.studyModeMenuOpen = false;
+  }
+
+  selectStudyMode(mode: StudyMode): void {
+    this.selectedStudyMode = mode;
+    this.studyModeMenuOpen = false;
+
+    void this.startSession();
+  }
+
+  get selectedStudyModeLabel(): string {
+    return (
+      this.studyModeOptions.find(
+        (option) => option.value === this.selectedStudyMode,
+      )?.title ?? 'All Cards'
+    );
+  }
+
+  get activeStudyMode(): StudyMode {
+    return this.session?.mode ?? this.selectedStudyMode;
+  }
+
+  get isLightningMode(): boolean {
+    return this.activeStudyMode === 'LIGHTNING';
+  }
+
+  private startLightningTimer(): void {
+    this.stopLightningTimer();
+
+    if (!this.isLightningMode || !this.currentCard || this.sessionComplete) {
+      return;
+    }
+
+    this.lightningSecondsLeft.set(this.lightningDurationSeconds);
+
+    this.lightningProgress.set(100);
+
+    const startedAt = Date.now();
+
+    this.lightningIntervalId = window.setInterval(() => {
+      const elapsedMilliseconds = Date.now() - startedAt;
+
+      const elapsedSeconds = elapsedMilliseconds / 1000;
+
+      const remainingSeconds = Math.max(
+        0,
+        this.lightningDurationSeconds - elapsedSeconds,
+      );
+
+      this.lightningSecondsLeft.set(Math.ceil(remainingSeconds));
+
+      this.lightningProgress.set(
+        Math.max(
+          0,
+          Math.round((remainingSeconds / this.lightningDurationSeconds) * 100),
+        ),
+      );
+
+      if (remainingSeconds <= 0) {
+        this.stopLightningTimer();
+
+        void this.handleLightningTimeout();
+      }
+    }, 100);
+  }
+
+  private stopLightningTimer(): void {
+    if (this.lightningIntervalId === null) {
+      return;
+    }
+
+    window.clearInterval(this.lightningIntervalId);
+
+    this.lightningIntervalId = null;
+  }
+
+  private async handleLightningTimeout(): Promise<void> {
+    if (
+      !this.currentCard ||
+      !this.session ||
+      this.sessionComplete ||
+      this.isSubmittingRating
+    ) {
+      return;
+    }
+
+    /*
+     * Die Rückseite wird bei Ablauf kurz sichtbar,
+     * bevor die Karte als falsch bewertet wird.
+     */
+    this.isFlipped = true;
+
+    await this.rateCard('AGAIN');
   }
 }

@@ -1,6 +1,17 @@
 export type StudyRating = 'AGAIN' | 'HARD' | 'GOOD' | 'EASY';
 
-export type StudyMode = 'DUE' | 'ALL';
+export type StudyMode =
+  | 'ALL'
+  | 'RANDOM'
+  | 'FAVORITES'
+  | 'DIFFICULT'
+  | 'WRONG_ONLY'
+  | 'NEW_ONLY'
+  | 'DUE_ONLY'
+  | 'FAVORITES_DUE'
+  | 'MARATHON'
+  | 'LIGHTNING'
+  | 'EXAM';
 
 export interface StartStudySessionRequest {
   setId: number;
@@ -21,6 +32,7 @@ export interface StudySessionResponse {
   sessionId: number;
   setId: number;
   setTitle: string;
+  mode: StudyMode;
   startedAt: string;
   totalCards: number;
   correctAnswers: number;
