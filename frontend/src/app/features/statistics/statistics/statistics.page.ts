@@ -79,33 +79,116 @@ export class StatisticsPage {
     );
   });
 
-  readonly chartPoints = computed(() => {
+  readonly selectedChartIndex = signal<number | null>(null);
+
+  readonly isChartPointerActive = signal(false);
+
+  /*
+   * Das SVG besitzt einen festen Koordinatenraum.
+   *
+   * Links bleiben 34 Einheiten für die Y-Skala frei.
+   * Rechts bleiben 8 Einheiten Abstand zur Kartenkante.
+   */
+  readonly chartWidth = 300;
+  readonly chartHeight = 150;
+
+  readonly chartPlotLeft = 34;
+  readonly chartPlotRight = 292;
+  readonly chartPlotTop = 54;
+  readonly chartPlotBottom = 126;
+
+  readonly chartMaximum = computed(() => {
+    const values = this.lastSevenDays().map((activity) => activity.reviews);
+
+    const rawMaximum = Math.max(0, ...values);
+
+    /*
+     * Die Skala verwendet gut lesbare Schritte:
+     * 0, 20, 40, 60, 80 ...
+     */
+    return Math.max(20, Math.ceil(rawMaximum / 20) * 20);
+  });
+
+  readonly chartYAxisTicks = computed(() => {
+    const maximum = this.chartMaximum();
+
+    return [1, 0.75, 0.5, 0.25, 0].map((factor) => {
+      const value = Math.round(maximum * factor);
+
+      const y =
+        this.chartPlotBottom -
+        factor * (this.chartPlotBottom - this.chartPlotTop);
+
+      return {
+        value,
+        y,
+      };
+    });
+  });
+
+  readonly chartData = computed(() => {
     const activities = this.lastSevenDays();
 
     if (activities.length === 0) {
+      return [];
+    }
+
+    const plotWidth = this.chartPlotRight - this.chartPlotLeft;
+
+    const plotHeight = this.chartPlotBottom - this.chartPlotTop;
+
+    const maximum = this.chartMaximum();
+
+    return activities.map((activity, index) => {
+      const x =
+        activities.length === 1
+          ? this.chartPlotLeft + plotWidth / 2
+          : this.chartPlotLeft + index * (plotWidth / (activities.length - 1));
+
+      const normalizedReviews = maximum > 0 ? activity.reviews / maximum : 0;
+
+      const y = this.chartPlotBottom - normalizedReviews * plotHeight;
+
+      return {
+        ...activity,
+        index,
+        x,
+        y,
+      };
+    });
+  });
+
+  readonly chartPoints = computed(() =>
+    this.chartData()
+      .map((point) => `${point.x},${point.y}`)
+      .join(' '),
+  );
+
+  readonly chartAreaPoints = computed(() => {
+    const points = this.chartData();
+
+    if (points.length === 0) {
       return '';
     }
 
-    const width = 300;
-    const height = 110;
+    const firstPoint = points[0];
+    const lastPoint = points[points.length - 1];
 
-    const maximum = Math.max(
-      1,
-      ...activities.map((activity) => activity.reviews),
-    );
+    return [
+      `${firstPoint.x},${this.chartPlotBottom}`,
+      ...points.map((point) => `${point.x},${point.y}`),
+      `${lastPoint.x},${this.chartPlotBottom}`,
+    ].join(' ');
+  });
 
-    return activities
-      .map((activity, index) => {
-        const x =
-          activities.length === 1
-            ? width / 2
-            : index * (width / (activities.length - 1));
+  readonly selectedChartPoint = computed(() => {
+    const index = this.selectedChartIndex();
 
-        const y = height - (activity.reviews / maximum) * 90 - 10;
+    if (index === null) {
+      return null;
+    }
 
-        return `${x},${y}`;
-      })
-      .join(' ');
+    return this.chartData()[index] ?? null;
   });
 
   readonly setAccuracies = this.statisticsStore.setAccuracies;
@@ -291,5 +374,129 @@ export class StatisticsPage {
 
   toggleAchievements(): void {
     this.showAllAchievements.update((currentValue) => !currentValue);
+  }
+
+  handleChartPointerDown(event: PointerEvent): void {
+    const element = event.currentTarget as HTMLElement;
+
+    this.isChartPointerActive.set(true);
+
+    element.setPointerCapture?.(event.pointerId);
+
+    this.updateChartSelection(event, element);
+  }
+
+  handleChartPointerMove(event: PointerEvent): void {
+    /*
+     * Eine Maus darf den Chart bereits durch
+     * Hover bedienen. Bei Touch reagieren wir
+     * nur, nachdem der Finger aufgelegt wurde.
+     */
+    if (event.pointerType !== 'mouse' && !this.isChartPointerActive()) {
+      return;
+    }
+
+    this.updateChartSelection(event, event.currentTarget as HTMLElement);
+  }
+
+  handleChartPointerUp(event: PointerEvent): void {
+    const element = event.currentTarget as HTMLElement;
+
+    this.updateChartSelection(event, element);
+
+    this.isChartPointerActive.set(false);
+
+    if (element.hasPointerCapture?.(event.pointerId)) {
+      element.releasePointerCapture(event.pointerId);
+    }
+  }
+
+  handleChartPointerCancel(): void {
+    this.isChartPointerActive.set(false);
+  }
+
+  handleChartPointerLeave(event: PointerEvent): void {
+    /*
+     * Auf Desktop verschwindet die Auswahl,
+     * sobald die Maus den Chart verlässt.
+     * Auf Touch bleibt der zuletzt gewählte
+     * Tageswert nach dem Loslassen sichtbar.
+     */
+    if (event.pointerType === 'mouse' && !this.isChartPointerActive()) {
+      this.selectedChartIndex.set(null);
+    }
+  }
+
+  selectChartPoint(index: number): void {
+    this.selectedChartIndex.set(index);
+  }
+
+  private updateChartSelection(
+    event: PointerEvent,
+    element: HTMLElement,
+  ): void {
+    const points = this.chartData();
+
+    if (points.length === 0) {
+      return;
+    }
+
+    const bounds = element.getBoundingClientRect();
+
+    /*
+     * Die SVG-Koordinaten werden auf die reale
+     * Breite des Elements übertragen.
+     */
+    const plotLeftPixels =
+      bounds.width * (this.chartPlotLeft / this.chartWidth);
+
+    const plotRightPixels =
+      bounds.width * (this.chartPlotRight / this.chartWidth);
+
+    const pointerX = event.clientX - bounds.left;
+
+    const clampedX = Math.min(
+      plotRightPixels,
+      Math.max(plotLeftPixels, pointerX),
+    );
+
+    const usableWidth = plotRightPixels - plotLeftPixels;
+
+    const normalizedX =
+      usableWidth > 0 ? (clampedX - plotLeftPixels) / usableWidth : 0;
+
+    const index = Math.min(
+      points.length - 1,
+      Math.max(0, Math.round(normalizedX * (points.length - 1))),
+    );
+
+    this.selectedChartIndex.set(index);
+  }
+
+  getFullDayLabel(dateValue: string): string {
+    const date = new Date(`${dateValue}T00:00:00`);
+
+    return new Intl.DateTimeFormat('de-DE', {
+      weekday: 'long',
+    }).format(date);
+  }
+
+  getLongDateLabel(dateValue: string): string {
+    const date = new Date(`${dateValue}T00:00:00`);
+
+    return new Intl.DateTimeFormat('de-DE', {
+      day: '2-digit',
+      month: 'short',
+    }).format(date);
+  }
+
+  getTooltipLeftPercent(pointX: number): number {
+    const rawPercent = (pointX / this.chartWidth) * 100;
+
+    /*
+     * Der Tooltip bleibt vollständig innerhalb
+     * des Chart-Bereichs.
+     */
+    return Math.min(76, Math.max(24, rawPercent));
   }
 }

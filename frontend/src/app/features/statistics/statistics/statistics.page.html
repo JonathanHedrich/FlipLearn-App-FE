@@ -102,22 +102,47 @@
         </div>
       </section>
 
-      <section class="line-chart-card">
-        <div class="chart-heading">
-          <h2>Cards per Day</h2>
-          <p>This week</p>
+      <section class="weekly-activity-card">
+        <div class="weekly-activity-heading">
+          <div>
+            <span class="section-eyebrow"> THIS WEEK </span>
+
+            <h2>Weekly Activity</h2>
+          </div>
+
+          <div class="weekly-activity-summary">
+            <div>
+              <strong> {{ reviewsThisWeek() }} </strong>
+
+              <span>cards studied</span>
+            </div>
+
+            <div>
+              <strong> {{ weeklyAccuracy() }}% </strong>
+
+              <span>accuracy</span>
+            </div>
+          </div>
         </div>
 
-        <div class="line-chart">
+        @if (lastSevenDays().length > 0) {
+        <div
+          class="weekly-activity-chart"
+          (pointerdown)="handleChartPointerDown($event)"
+          (pointermove)="handleChartPointerMove($event)"
+          (pointerup)="handleChartPointerUp($event)"
+          (pointercancel)="handleChartPointerCancel()"
+          (pointerleave)="handleChartPointerLeave($event)"
+        >
           <svg
-            viewBox="0 0 300 120"
+            viewBox="0 0 300 150"
             preserveAspectRatio="none"
             role="img"
-            aria-label="Cards studied per day"
+            aria-label="Weekly study activity"
           >
             <defs>
               <linearGradient
-                id="statisticsAreaGradient"
+                id="statisticsWeeklyGradient"
                 x1="0"
                 y1="0"
                 x2="0"
@@ -126,7 +151,7 @@
                 <stop
                   offset="0%"
                   stop-color="#2f6bff"
-                  stop-opacity="0.28"
+                  stop-opacity="0.25"
                 ></stop>
 
                 <stop
@@ -137,27 +162,141 @@
               </linearGradient>
             </defs>
 
+            <!-- Y-Achsen-Skala und horizontale Linien -->
+            @for ( tick of chartYAxisTicks(); track tick.value ) {
+            <line
+              class="weekly-chart-grid-line"
+              [attr.x1]="chartPlotLeft"
+              [attr.x2]="chartPlotRight"
+              [attr.y1]="tick.y"
+              [attr.y2]="tick.y"
+            ></line>
+
+            <text class="weekly-chart-y-label" x="2" [attr.y]="tick.y + 3">
+              {{ tick.value }}
+            </text>
+            }
+
+            <!-- Flächenfüllung -->
             <polyline
-              class="chart-area"
-              [attr.points]="
-                  '0,120 ' +
-                  chartPoints() +
-                  ' 300,120'
-                "
+              class="weekly-chart-area"
+              [attr.points]="chartAreaPoints()"
             ></polyline>
 
+            <!-- Linie -->
             <polyline
-              class="chart-line"
+              class="weekly-chart-line"
               [attr.points]="chartPoints()"
             ></polyline>
-          </svg>
-        </div>
 
-        <div class="chart-labels">
-          @for ( activity of lastSevenDays(); track activity.date ) {
-          <span> {{ getDayLabel(activity.date) }} </span>
+            <!-- Normale Datenpunkte -->
+            @for ( point of chartData(); track point.date ) {
+            <circle
+              class="weekly-chart-point-hitbox"
+              [attr.cx]="point.x"
+              [attr.cy]="point.y"
+              r="12"
+              tabindex="0"
+              role="button"
+              [attr.aria-label]="
+            getFullDayLabel(point.date) +
+            ': ' +
+            point.reviews +
+            ' Karten'
+          "
+              (focus)="selectChartPoint(point.index)"
+              (mouseenter)="selectChartPoint(point.index)"
+            ></circle>
+
+            <circle
+              class="weekly-chart-point"
+              [class.active]="
+            selectedChartIndex() ===
+            point.index
+          "
+              [attr.cx]="point.x"
+              [attr.cy]="point.y"
+              [attr.r]="
+            selectedChartIndex() ===
+            point.index
+              ? 5
+              : 3.5
+          "
+            ></circle>
+            }
+
+            <!-- Aktive Scan-Linie -->
+            @if (selectedChartPoint(); as point) {
+            <line
+              class="weekly-chart-scanner"
+              [attr.x1]="point.x"
+              [attr.x2]="point.x"
+              [attr.y1]="chartPlotTop"
+              [attr.y2]="chartPlotBottom"
+            ></line>
+
+            <circle
+              class="weekly-chart-active-halo"
+              [attr.cx]="point.x"
+              [attr.cy]="point.y"
+              r="9"
+            ></circle>
+
+            <circle
+              class="weekly-chart-active-point"
+              [attr.cx]="point.x"
+              [attr.cy]="point.y"
+              r="5"
+            ></circle>
+            }
+          </svg>
+
+          <!-- Tooltip bleibt immer oben innerhalb des Charts -->
+          @if (selectedChartPoint(); as point) {
+          <section
+            class="weekly-chart-tooltip"
+            [style.left.%]="
+          getTooltipLeftPercent(point.x)
+        "
+          >
+            <div class="tooltip-heading">
+              <strong> {{ getDayLabel(point.date) }} </strong>
+
+              <span> {{ getLongDateLabel(point.date) }} </span>
+            </div>
+
+            <div class="tooltip-stat primary">
+              <span class="tooltip-dot"></span>
+
+              <span>cards</span>
+
+              <strong> {{ point.reviews }} </strong>
+            </div>
+
+            <div class="tooltip-stat">
+              <span>correct</span>
+
+              <strong> {{ point.correctReviews }} </strong>
+            </div>
+
+            <div class="tooltip-stat">
+              <span>accuracy</span>
+
+              <strong> {{ point.accuracy }}% </strong>
+            </div>
+          </section>
           }
         </div>
+
+        <p class="weekly-chart-hint">
+          Bewege die Maus oder fahre mit dem Finger über den Chart, um genaue
+          Werte zu sehen.
+        </p>
+        } @else {
+        <p class="weekly-activity-empty">
+          Noch keine Lernaktivität in dieser Woche.
+        </p>
+        }
       </section>
 
       <section class="accuracy-card">

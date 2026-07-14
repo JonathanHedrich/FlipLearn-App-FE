@@ -100,6 +100,12 @@ export class StatisticsStore {
       this.achievements().filter((achievement) => achievement.earned).length,
   );
 
+  readonly dailyGoalProgress = computed(() => {
+    const goal = Number(localStorage.getItem('fliplearn.studyGoal')) || 30;
+
+    return Math.min(100, Math.round((this.reviewsToday() / goal) * 100));
+  });
+
   constructor(private readonly statisticsApi: StatisticsApi) {}
 
   async loadOverview(force = false): Promise<void> {

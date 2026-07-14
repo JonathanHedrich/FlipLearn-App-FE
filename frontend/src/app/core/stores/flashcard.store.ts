@@ -35,6 +35,24 @@ export class FlashcardStore {
 
   readonly isLoadingSets = this.loadingSetsState.asReadonly();
 
+  readonly recentSets = computed(() =>
+    [...this.sets()]
+      .sort(
+        (a, b) =>
+          new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
+      )
+      .slice(0, 5),
+  );
+
+  readonly continueSet = computed(() => {
+    return (
+      [...this.sets()].sort(
+        (a, b) =>
+          new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
+      )[0] ?? null
+    );
+  });
+
   readonly totalSets = computed(() => this.setsState().length);
 
   readonly totalCards = computed(() =>
@@ -271,7 +289,7 @@ export class FlashcardStore {
     });
   }
 
-  private updateCardCount(setId: number, cardCount: number): void {
+  updateCardCount(setId: number, cardCount: number): void {
     this.setsState.update((sets) =>
       sets.map((set) =>
         set.id === setId
