@@ -4,12 +4,19 @@
 }
 
 ion-content {
+  height: 100%;
+
+  --overflow: auto;
   --background: var(--fl-background);
 }
 
 .editor-page {
   min-height: 100%;
-  background: var(--fl-background);
+  padding-bottom: calc(110px + env(safe-area-inset-bottom));
+}
+
+.editor-content {
+  padding: 16px 16px calc(40px + env(safe-area-inset-bottom));
 }
 
 /* Header */
@@ -77,15 +84,6 @@ ion-content {
 }
 
 /* Inhalt */
-
-.editor-content {
-  width: 100%;
-  max-width: 430px;
-
-  margin: 0 auto;
-
-  padding: 16px 20px calc(32px + env(safe-area-inset-bottom));
-}
 
 .cards-list {
   display: flex;
@@ -399,19 +397,26 @@ ion-content {
     height: 844px;
     margin: 24px auto;
 
-    overflow: visible;
-  }
-
-  .editor-page {
-    height: 100%;
     overflow: hidden;
 
     border-radius: 34px;
     box-shadow: var(--fl-shadow-lg);
   }
 
-  .editor-header {
+  ion-content {
+    height: 100%;
+
+    --overflow: auto;
+  }
+
+  .editor-page {
+    min-height: 100%;
+
+    /* Kein height: 100% und kein overflow: hidden */
     overflow: visible;
+
+    border-radius: 0;
+    box-shadow: none;
   }
 }
 
@@ -576,4 +581,21 @@ ion-content {
 .editor-options-menu button.danger:hover,
 .editor-options-menu button.danger:active {
   background: rgba(220, 38, 38, 0.08);
+}
+
+@media (min-width: 600px) {
+  :host {
+    width: 390px;
+    height: 844px;
+    margin: 24px auto;
+
+    overflow: hidden;
+
+    border-radius: 34px;
+    box-shadow: var(--fl-shadow-lg);
+  }
+
+  ion-content {
+    height: 100%;
+  }
 }

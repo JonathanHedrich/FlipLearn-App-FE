@@ -183,7 +183,15 @@
 
             <span class="card-side-label"> Front </span>
 
-            <h2>{{ currentCard.front }}</h2>
+            <div class="card-text-box">
+              <h2
+                [flFitText]="currentCard.front"
+                [flFitTextMin]="12"
+                [flFitTextMax]="56"
+              >
+                {{ currentCard.front }}
+              </h2>
+            </div>
 
             <p>Tap to flip</p>
           </article>
@@ -206,7 +214,15 @@
 
             <span class="card-side-label"> Back </span>
 
-            <h2>{{ currentCard.back }}</h2>
+            <div class="card-text-box">
+              <h2
+                [flFitText]="currentCard.back"
+                [flFitTextMin]="12"
+                [flFitTextMax]="56"
+              >
+                {{ currentCard.back }}
+              </h2>
+            </div>
 
             <p>How well did you know it?</p>
           </article>

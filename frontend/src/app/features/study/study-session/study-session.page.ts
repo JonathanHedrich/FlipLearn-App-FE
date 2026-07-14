@@ -9,6 +9,7 @@ import { addIcons } from 'ionicons';
 import { StatisticsStore } from '../../../core/stores/statistics.store';
 import { AppNotificationService } from '../../../core/services/app-notification.service';
 import { StudyModeOption } from '../../../core/models/study-mode-option.model';
+import { FitTextDirective } from '../../../shared/directives/fit-text.directive';
 
 import {
   albumsOutline,
@@ -44,7 +45,7 @@ import { FlashcardStore } from '../../../core/stores/flashcard.store';
 @Component({
   selector: 'app-study-session',
   standalone: true,
-  imports: [IonContent, IonIcon],
+  imports: [IonContent, IonIcon, FitTextDirective],
   templateUrl: './study-session.page.html',
   styleUrls: ['./study-session.page.scss'],
 })

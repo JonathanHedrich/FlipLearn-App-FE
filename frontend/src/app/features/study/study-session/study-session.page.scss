@@ -244,13 +244,41 @@ ion-content {
   color: rgba(255, 255, 255, 0.72);
 }
 
-.card-face h2 {
-  margin: 0;
+.card-text-box {
+  position: absolute;
+  inset: 76px 24px 62px;
 
-  font-size: clamp(2.1rem, 10vw, 3.2rem);
-  font-weight: 800;
-  line-height: 1.1;
-  letter-spacing: -1px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  overflow: hidden;
+}
+
+.card-text-box h2 {
+  box-sizing: border-box;
+
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
+
+  overflow: visible;
+
+  color: inherit;
+
+  font-size: 1rem;
+  font-weight: 900;
+  line-height: 1.16;
+  letter-spacing: -0.025em;
+  text-align: center;
+
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+  word-break: normal;
+  hyphens: auto;
+
+  transition: font-size 120ms ease;
 }
 
 .card-face p {
