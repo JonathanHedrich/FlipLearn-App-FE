@@ -18,6 +18,7 @@ import { AppTheme, ThemeService } from '../../../core/services/theme.service';
 import { AuthStore } from '../../../core/stores/auth.store';
 import { FlashcardStore } from '../../../core/stores/flashcard.store';
 import { StatisticsStore } from '../../../core/stores/statistics.store';
+import { NotificationService } from '../../../core/services/notification.service';
 
 interface SettingsRow {
   label: string;
@@ -37,6 +38,10 @@ const MAX_STUDY_GOAL = 999;
 
 const STUDY_GOAL_STORAGE_KEY = 'fliplearn.studyGoal';
 
+const STUDY_REMINDERS_STORAGE_KEY = 'fliplearn.studyRemindersEnabled';
+
+const STREAK_ALERTS_STORAGE_KEY = 'fliplearn.streakAlertsEnabled';
+
 @Component({
   selector: 'app-settings',
   standalone: true,
@@ -45,9 +50,6 @@ const STUDY_GOAL_STORAGE_KEY = 'fliplearn.studyGoal';
   styleUrls: ['./settings.page.scss'],
 })
 export class SettingsPage {
-  studyRemindersEnabled = true;
-  streakAlertsEnabled = true;
-
   readonly studyPreferences: SettingsRow[] = [
     {
       label: 'Daily Study Goal',
@@ -102,6 +104,8 @@ export class SettingsPage {
 
   studyGoalMenuOpen = false;
 
+  notificationPermissionError = '';
+
   constructor(
     private readonly location: Location,
     private readonly router: Router,
@@ -109,6 +113,7 @@ export class SettingsPage {
     private readonly authStore: AuthStore,
     private readonly flashcardStore: FlashcardStore,
     private readonly statisticsStore: StatisticsStore,
+    private readonly notificationService: NotificationService,
     readonly themeService: ThemeService,
   ) {
     addIcons({
@@ -120,6 +125,16 @@ export class SettingsPage {
       radioButtonOnOutline,
     });
   }
+
+  studyRemindersEnabled = this.loadBooleanSetting(
+    STUDY_REMINDERS_STORAGE_KEY,
+    true,
+  );
+
+  streakAlertsEnabled = this.loadBooleanSetting(
+    STREAK_ALERTS_STORAGE_KEY,
+    true,
+  );
 
   get userName(): string {
     return (
@@ -282,5 +297,53 @@ export class SettingsPage {
     }
 
     return 'random';
+  }
+
+  async saveStudyReminders(): Promise<void> {
+    this.notificationPermissionError = '';
+
+    if (this.studyRemindersEnabled) {
+      const permission = await this.notificationService.requestPermission();
+
+      if (permission !== 'granted') {
+        this.studyRemindersEnabled = false;
+
+        this.notificationPermissionError =
+          'Benachrichtigungen wurden vom Browser nicht erlaubt.';
+      }
+    }
+
+    localStorage.setItem(
+      STUDY_REMINDERS_STORAGE_KEY,
+      String(this.studyRemindersEnabled),
+    );
+  }
+
+  saveStreakAlerts(): void {
+    localStorage.setItem(
+      STREAK_ALERTS_STORAGE_KEY,
+      String(this.streakAlertsEnabled),
+    );
+  }
+
+  private loadBooleanSetting(key: string, fallback: boolean): boolean {
+    const storedValue = localStorage.getItem(key);
+
+    if (storedValue === 'true') {
+      return true;
+    }
+
+    if (storedValue === 'false') {
+      return false;
+    }
+
+    return fallback;
+  }
+
+  sendTestNotification(): void {
+    this.notificationService.show('FlipLearn', {
+      body: 'Zeit für deine tägliche Lernsitzung 📚',
+      icon: '/assets/icon/favicon.png',
+    });
   }
 }

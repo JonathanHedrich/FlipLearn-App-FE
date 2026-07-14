@@ -113,11 +113,12 @@
 
         <div class="settings-list">
           <div class="settings-row toggle-row">
-            <span class="row-label"> Study Reminders </span>
+            <span class="row-label">Study Reminders</span>
 
             <ion-toggle
               aria-label="Lernerinnerungen"
               [(ngModel)]="studyRemindersEnabled"
+              (ionChange)="saveStudyReminders()"
             ></ion-toggle>
           </div>
 
@@ -127,12 +128,28 @@
             <ion-toggle
               aria-label="Lernserien-Benachrichtigungen"
               [(ngModel)]="streakAlertsEnabled"
+              (ionChange)="saveStreakAlerts()"
             ></ion-toggle>
           </div>
         </div>
       </section>
 
-      @if (studyGoalMenuOpen) {
+      <button
+        class="settings-row"
+        type="button"
+        [disabled]="!studyRemindersEnabled"
+        (click)="sendTestNotification()"
+      >
+        <span class="row-label"> Test Notification </span>
+
+        <span class="row-value"> Send </span>
+
+        <ion-icon class="row-chevron" name="chevron-forward-outline"></ion-icon>
+      </button>
+
+      @if (notificationPermissionError) {
+      <p class="notification-error">{{ notificationPermissionError }}</p>
+      } @if (studyGoalMenuOpen) {
       <div class="settings-modal-backdrop" (click)="closeStudyGoalMenu()">
         <section
           class="settings-modal"

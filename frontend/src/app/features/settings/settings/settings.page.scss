@@ -746,3 +746,21 @@ ion-toggle {
   font-size: 0.62rem;
   line-height: 1.4;
 }
+
+.notification-error {
+  margin: 10px 4px 0;
+  padding: 10px 12px;
+
+  border-radius: 12px;
+
+  color: var(--fl-danger);
+  background: rgba(220, 38, 38, 0.08);
+
+  font-size: 0.66rem;
+  line-height: 1.4;
+}
+
+.settings-row:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
