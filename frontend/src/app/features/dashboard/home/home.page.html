@@ -1,26 +1,25 @@
 <ion-content [fullscreen]="true">
   <main class="home-page">
     <header class="home-header">
-      <div class="header-row">
-        <div>
-          <p class="greeting">Good morning ☀️</p>
+      <div class="home-header-top">
+        <div class="greeting">
+          <span>{{ greeting }}</span>
           <h1>{{ userName }}</h1>
+          <p>Ready for today’s learning?</p>
         </div>
 
         <div class="header-actions">
           <button
-            class="header-icon-button"
+            class="header-action"
             type="button"
             aria-label="Benachrichtigungen"
             (click)="openNotifications()"
           >
             <ion-icon name="notifications-outline"></ion-icon>
-
-            <span class="badge">2</span>
           </button>
 
           <button
-            class="header-icon-button"
+            class="header-action"
             type="button"
             aria-label="Einstellungen"
             (click)="openSettings()"
@@ -30,43 +29,45 @@
         </div>
       </div>
 
-      <section class="goal-card">
-        <div class="goal-content">
-          <span class="goal-label"> TODAY'S GOAL </span>
+      <section class="daily-goal-card">
+        <div class="daily-goal-information">
+          <span class="daily-goal-eyebrow"> TODAY'S GOAL </span>
 
           <h2>Study {{ dailyStudyGoal }} cards</h2>
 
-          <div class="goal-meta">
-            <span>
-              <ion-icon name="flame-outline"></ion-icon>
+          <p>{{ reviewsToday() }} / {{ dailyStudyGoal }} completed</p>
 
-              14-day streak
-            </span>
-
-            <span> ⚡ {{ goalProgress }} / {{ dailyStudyGoal }} done </span>
+          <div class="goal-progress-track">
+            <div
+              class="goal-progress-value"
+              [style.width.%]="goalPercentage()"
+            ></div>
           </div>
         </div>
 
         <div
           class="goal-progress-ring"
-          [style.--goal-progress]="goalPercentage"
+          [style.--goal-progress]="goalPercentage()"
         >
           <div class="goal-progress-ring-inner">
-            <strong>{{ goalPercentage }}%</strong>
+            <strong> {{ goalPercentage() }}% </strong>
           </div>
         </div>
       </section>
     </header>
 
-    <section class="dashboard-content">
+    <section class="home-content">
       @if (isLoading()) {
-      <section class="home-loading">
-        <div class="home-spinner"></div>
+      <section class="dashboard-loading">
+        <div class="dashboard-spinner"></div>
         <p>Dashboard wird geladen …</p>
       </section>
-
       } @else if (loadError()) {
-      <section class="home-error">
+      <section class="dashboard-error">
+        <div class="dashboard-error-icon">
+          <ion-icon name="book-outline"></ion-icon>
+        </div>
+
         <h2>Laden fehlgeschlagen</h2>
         <p>{{ loadError() }}</p>
 
@@ -74,123 +75,212 @@
           Erneut versuchen
         </button>
       </section>
-
       } @else {
-      <section class="stats-grid">
-        <article class="stat-card">
-          <div class="stat-icon blue">
-            <ion-icon name="trophy-outline"></ion-icon>
+      <section class="dashboard-stats">
+        <article class="dashboard-stat-card">
+          <div class="dashboard-stat-icon flame">
+            <ion-icon name="flame-outline"></ion-icon>
           </div>
 
-          <strong>{{ learnedCards() }}</strong>
-          <span>Cards Learned</span>
-        </article>
-
-        <article class="stat-card">
-          <div class="stat-icon purple">
-            <ion-icon name="book-outline"></ion-icon>
+          <div>
+            <strong>{{ currentStreak() }}</strong>
+            <span>Day Streak</span>
           </div>
-
-          <strong>{{ totalCards() }}</strong>
-          <span>Total Cards</span>
         </article>
 
-        <article class="stat-card">
-          <div class="stat-icon green">
+        <article class="dashboard-stat-card">
+          <div class="dashboard-stat-icon accuracy">
             <ion-icon name="bar-chart-outline"></ion-icon>
           </div>
 
-          <strong> {{ averageAccuracy() }}% </strong>
+          <div>
+            <strong>{{ todayAccuracy() }}%</strong>
+            <span>Accuracy Today</span>
+          </div>
+        </article>
 
-          <span>Accuracy</span>
+        <article class="dashboard-stat-card">
+          <div class="dashboard-stat-icon time">
+            <ion-icon name="time-outline"></ion-icon>
+          </div>
+
+          <div>
+            <strong>{{ weeklyStudyTimeLabel }}</strong>
+            <span>This Week</span>
+          </div>
         </article>
       </section>
 
-      <section class="continue-section">
-        <div class="section-title-row">
-          <h2>Continue Studying</h2>
-
-          <a routerLink="/sets"> See All </a>
+      <section class="motivation-card">
+        <div class="motivation-icon">
+          <ion-icon name="sparkles-outline"></ion-icon>
         </div>
 
-        @if (recentSets().length > 0) {
-        <div class="study-scroll">
-          @for ( set of recentSets(); track set.id ) {
-          <button
-            class="study-card"
-            [ngClass]="
-                    getThemeClass(set.color)
-                  "
-            type="button"
-            (click)="openSet(set)"
-          >
-            <div class="study-icon">
-              <ion-icon name="book-outline"></ion-icon>
-            </div>
-
-            <div class="study-card-main">
-              <h3>{{ set.title }}</h3>
-
-              <p>{{ getCardLabel(set) }} · {{ set.progress }}% complete</p>
-            </div>
-
-            <div class="progress-label">
-              <span>Progress</span>
-              <strong> {{ set.progress }}% </strong>
-            </div>
-
-            <div class="progress-track">
-              <div
-                class="progress-value"
-                [style.width.%]="
-                        set.progress
-                      "
-              ></div>
-            </div>
-          </button>
-          }
+        <div>
+          <span>KEEP GOING</span>
+          <p>{{ motivationMessage() }}</p>
         </div>
-        } @else {
-        <a class="empty-home-card" routerLink="/sets/create">
-          <div>＋</div>
-
-          <strong> Create your first set </strong>
-
-          <span> Add flashcards and start learning. </span>
-        </a>
-        }
       </section>
 
-      <section class="activity-section">
-        <h2>Recent Activity</h2>
+      <section class="dashboard-section">
+        <div class="section-heading">
+          <div>
+            <span class="section-eyebrow"> YOUR SETS </span>
 
-        @if ( recentActivities().length > 0 ) {
-        <div class="activity-list">
-          @for ( activity of recentActivities(); track activity.id ) {
-          <article class="activity-card">
-            <div
-              class="activity-icon"
-              [ngClass]="
-                      getThemeClass(
-                        activity.color
-                      )
-                    "
-            >
-              <ion-icon name="book-outline"></ion-icon>
+            <h2>Continue Studying</h2>
+          </div>
+
+          <button type="button" (click)="openSets()">
+            View all
+
+            <ion-icon name="chevron-forward-outline"></ion-icon>
+          </button>
+        </div>
+
+        @if (continueStudyingSets().length > 0) {
+        <div class="continue-list">
+          @for ( set of continueStudyingSets(); track set.id ) {
+          <article
+            class="continue-card"
+            [ngClass]="getThemeClass(set.color)"
+            (click)="openSet(set)"
+          >
+            <div class="continue-accent"></div>
+
+            <div class="continue-card-content">
+              <div class="continue-heading">
+                <div>
+                  <h3>{{ set.title }}</h3>
+                  <span> {{ getCardLabel(set) }} </span>
+                </div>
+
+                <button
+                  class="continue-play"
+                  type="button"
+                  aria-label="Lernen starten"
+                  (click)="
+                          $event.stopPropagation();
+                          openSet(set)
+                        "
+                >
+                  <ion-icon name="play-outline"></ion-icon>
+                </button>
+              </div>
+
+              <div class="continue-progress-heading">
+                <span>Progress</span>
+                <strong>{{ set.progress }}%</strong>
+              </div>
+
+              <div class="continue-progress-track">
+                <div
+                  class="continue-progress-value"
+                  [style.width.%]="set.progress"
+                ></div>
+              </div>
             </div>
-
-            <div class="activity-content">
-              <h3>{{ activity.title }}</h3>
-
-              <p>{{ activity.description }}</p>
-            </div>
-
-            <strong> {{ activity.result }} </strong>
           </article>
           }
         </div>
         } @else {
-        <p class="empty-activity">Noch keine Lernaktivitäten vorhanden.</p>
+        <section class="empty-dashboard-card">
+          <div class="empty-dashboard-icon">
+            <ion-icon name="book-outline"></ion-icon>
+          </div>
+
+          <h3>Noch keine Lernsets</h3>
+
+          <p>Erstelle dein erstes Lernset und beginne direkt mit dem Lernen.</p>
+
+          <button type="button" (click)="openCreateSet()">
+            <ion-icon name="add-outline"></ion-icon>
+            New Set
+          </button>
+        </section>
+        }
+      </section>
+
+      <section class="dashboard-section">
+        <div class="section-heading">
+          <div>
+            <span class="section-eyebrow"> SHORTCUTS </span>
+
+            <h2>Quick Actions</h2>
+          </div>
+        </div>
+
+        <div class="quick-actions">
+          <button type="button" (click)="openCreateSet()">
+            <div class="quick-action-icon add">
+              <ion-icon name="add-outline"></ion-icon>
+            </div>
+
+            <span>New Set</span>
+          </button>
+
+          <button type="button" (click)="openSets()">
+            <div class="quick-action-icon sets">
+              <ion-icon name="book-outline"></ion-icon>
+            </div>
+
+            <span>My Sets</span>
+          </button>
+
+          <button type="button" (click)="openStatistics()">
+            <div class="quick-action-icon statistics">
+              <ion-icon name="bar-chart-outline"></ion-icon>
+            </div>
+
+            <span>Statistics</span>
+          </button>
+        </div>
+      </section>
+
+      <section class="dashboard-section">
+        <div class="section-heading">
+          <div>
+            <span class="section-eyebrow"> RECENT </span>
+
+            <h2>Achievements</h2>
+          </div>
+
+          <button type="button" (click)="openStatistics()">
+            View all
+
+            <ion-icon name="chevron-forward-outline"></ion-icon>
+          </button>
+        </div>
+
+        @if (recentAchievements().length > 0) {
+        <div class="recent-achievements">
+          @for ( achievement of recentAchievements(); track achievement.code ) {
+          <article class="recent-achievement-card">
+            <div class="recent-achievement-icon">
+              <ion-icon
+                [name]="
+                        getAchievementIcon(
+                          achievement
+                        )
+                      "
+              ></ion-icon>
+            </div>
+
+            <div>
+              <strong> {{ achievement.title }} </strong>
+
+              <span> {{ achievement.description }} </span>
+            </div>
+          </article>
+          }
+        </div>
+        } @else {
+        <section class="empty-achievements">
+          <div>
+            <ion-icon name="trophy-outline"></ion-icon>
+          </div>
+
+          <p>Deine freigeschalteten Achievements erscheinen hier.</p>
+        </section>
         }
       </section>
       }

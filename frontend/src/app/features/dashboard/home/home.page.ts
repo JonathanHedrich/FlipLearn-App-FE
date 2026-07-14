@@ -4,31 +4,30 @@ import { Router, RouterLink } from '@angular/router';
 import { IonContent, IonIcon } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
+  addOutline,
   barChartOutline,
   bookOutline,
+  chevronForwardOutline,
   flameOutline,
   notificationsOutline,
+  playOutline,
   settingsOutline,
+  sparklesOutline,
+  timeOutline,
   trophyOutline,
 } from 'ionicons/icons';
 
+import { AchievementResponse } from '../../../core/models/statistics-api.model';
 import {
   FlashcardSetColor,
   FlashcardSetResponse,
 } from '../../../core/models/flashcard-api.model';
-import { AuthApi } from '../../../core/services/auth-api';
+import { AuthStore } from '../../../core/stores/auth.store';
 import { FlashcardStore } from '../../../core/stores/flashcard.store';
+import { StatisticsStore } from '../../../core/stores/statistics.store';
 import { FlBottomNavComponent } from '../../../shared/components/fl-bottom-nav/fl-bottom-nav.component';
-import { AuthStore } from 'src/app/core/stores/auth.store';
-import { StatisticsStore } from 'src/app/core/stores/statistics.store';
 
-interface RecentActivity {
-  id: number;
-  title: string;
-  description: string;
-  result: string;
-  color: FlashcardSetColor;
-}
+const STUDY_GOAL_STORAGE_KEY = 'fliplearn.studyGoal';
 
 @Component({
   selector: 'app-home',
@@ -50,7 +49,15 @@ export class HomePage {
 
   readonly loadError = this.flashcardStore.error;
 
-  readonly totalCards = this.flashcardStore.totalCards;
+  readonly reviewsToday = this.statisticsStore.reviewsToday;
+
+  readonly todayAccuracy = this.statisticsStore.todayAccuracy;
+
+  readonly weeklyStudyMinutes = this.statisticsStore.weeklyStudyMinutes;
+
+  readonly currentStreak = this.statisticsStore.currentStreak;
+
+  readonly achievements = this.statisticsStore.achievements;
 
   readonly recentSets = computed(() =>
     [...this.sets()]
@@ -62,57 +69,80 @@ export class HomePage {
       .slice(0, 3),
   );
 
-  readonly learnedCards = computed(() =>
-    this.sets().reduce(
-      (total, set) => total + Math.round(set.cardCount * (set.progress / 100)),
-      0,
-    ),
+  readonly continueStudyingSets = computed(() =>
+    [...this.sets()]
+      .filter((set) => set.cardCount > 0)
+      .sort((first, second) => {
+        const progressDifference = first.progress - second.progress;
+
+        if (progressDifference !== 0) {
+          return progressDifference;
+        }
+
+        return (
+          new Date(second.updatedAt).getTime() -
+          new Date(first.updatedAt).getTime()
+        );
+      })
+      .slice(0, 3),
   );
 
-  readonly averageAccuracy = computed(() => {
-    const setsWithCards = this.sets().filter((set) => set.cardCount > 0);
+  readonly recentAchievements = computed(() =>
+    this.achievements()
+      .filter((achievement) => achievement.earned)
+      .slice(0, 3),
+  );
 
-    if (setsWithCards.length === 0) {
+  readonly remainingGoalCards = computed(() =>
+    Math.max(0, this.dailyStudyGoal - this.reviewsToday()),
+  );
+
+  readonly goalPercentage = computed(() => {
+    if (this.dailyStudyGoal <= 0) {
       return 0;
     }
 
-    const totalProgress = setsWithCards.reduce(
-      (total, set) => total + set.progress,
-      0,
+    return Math.min(
+      100,
+      Math.round((this.reviewsToday() / this.dailyStudyGoal) * 100),
     );
-
-    return Math.round(totalProgress / setsWithCards.length);
   });
 
-  readonly recentActivities = computed<RecentActivity[]>(() =>
-    this.recentSets()
-      .filter((set) => set.cardCount > 0)
-      .slice(0, 2)
-      .map((set) => ({
-        id: set.id,
-        title: set.title,
-        description:
-          `${set.cardCount} cards · ` + this.formatUpdatedAt(set.updatedAt),
-        result: `${set.progress}%`,
-        color: set.color,
-      })),
-  );
+  readonly motivationMessage = computed(() => {
+    const remaining = this.remainingGoalCards();
 
-  readonly reviewsToday = this.statisticsStore.reviewsToday;
+    if (remaining === 0) {
+      return 'Tagesziel erreicht – großartige Arbeit!';
+    }
+
+    if (this.reviewsToday() === 0) {
+      return 'Starte mit einer Karte. Der Rest kommt von allein.';
+    }
+
+    if (remaining <= 5) {
+      return `Nur noch ${remaining} Karten bis zu deinem Tagesziel.`;
+    }
+
+    return 'Jede Wiederholung bringt dich deinem Ziel näher.';
+  });
 
   constructor(
-    readonly authApi: AuthApi,
+    readonly authStore: AuthStore,
     readonly flashcardStore: FlashcardStore,
+    readonly statisticsStore: StatisticsStore,
     private readonly router: Router,
-    private readonly authStore: AuthStore,
-    private readonly statisticsStore: StatisticsStore,
   ) {
     addIcons({
+      addOutline,
       barChartOutline,
       bookOutline,
+      chevronForwardOutline,
       flameOutline,
       notificationsOutline,
+      playOutline,
       settingsOutline,
+      sparklesOutline,
+      timeOutline,
       trophyOutline,
     });
   }
@@ -121,38 +151,79 @@ export class HomePage {
     void this.loadDashboard();
   }
 
-  get userName(): string {
+  get displayName(): string {
     return this.authStore.displayName() || 'FlipLearn User';
   }
 
-  get goalProgress(): number {
-    return Math.min(this.reviewsToday(), this.dailyStudyGoal);
+  get userName(): string {
+    return this.authStore.username() || 'FlipLearn User';
   }
 
-  get goalPercentage(): number {
-    if (this.dailyStudyGoal <= 0) {
-      return 0;
+  get firstName(): string {
+    return this.userName.trim().split(/\s+/)[0] || 'Learner';
+  }
+
+  get greeting(): string {
+    const hour = new Date().getHours();
+
+    if (hour < 12) {
+      return 'Good morning';
     }
 
-    return Math.min(
-      100,
-      Math.max(0, Math.round((this.goalProgress / this.dailyStudyGoal) * 100)),
-    );
+    if (hour < 18) {
+      return 'Good afternoon';
+    }
+
+    return 'Good evening';
+  }
+
+  get dailyStudyGoal(): number {
+    const storedGoal = Number(localStorage.getItem(STUDY_GOAL_STORAGE_KEY));
+
+    if (Number.isInteger(storedGoal) && storedGoal > 0) {
+      return storedGoal;
+    }
+
+    return 30;
+  }
+
+  get weeklyStudyTimeLabel(): string {
+    const totalMinutes = this.weeklyStudyMinutes();
+
+    const hours = Math.floor(totalMinutes / 60);
+
+    const minutes = totalMinutes % 60;
+
+    if (hours === 0) {
+      return `${minutes}m`;
+    }
+
+    if (minutes === 0) {
+      return `${hours}h`;
+    }
+
+    return `${hours}h ${minutes}m`;
   }
 
   async loadDashboard(): Promise<void> {
     try {
-      await this.flashcardStore.loadSets();
+      await Promise.all([
+        this.flashcardStore.loadSets(),
+        this.statisticsStore.loadOverview(),
+      ]);
     } catch {
-      // Die Fehlermeldung liegt bereits im Store.
+      // Die Fehler werden bereits in den Stores gespeichert.
     }
   }
 
   async reloadDashboard(): Promise<void> {
     try {
-      await this.flashcardStore.loadSets(true);
+      await Promise.all([
+        this.flashcardStore.loadSets(true),
+        this.statisticsStore.loadOverview(true),
+      ]);
     } catch {
-      // Die Fehlermeldung liegt bereits im Store.
+      // Die Fehler werden bereits in den Stores gespeichert.
     }
   }
 
@@ -174,6 +245,18 @@ export class HomePage {
     void this.router.navigate(['/study', set.id]);
   }
 
+  openSets(): void {
+    void this.router.navigateByUrl('/sets');
+  }
+
+  openCreateSet(): void {
+    void this.router.navigateByUrl('/sets/create');
+  }
+
+  openStatistics(): void {
+    void this.router.navigateByUrl('/statistics');
+  }
+
   getThemeClass(color: FlashcardSetColor): string {
     return `theme-${color}`;
   }
@@ -182,35 +265,18 @@ export class HomePage {
     return set.cardCount === 1 ? '1 card' : `${set.cardCount} cards`;
   }
 
-  private formatUpdatedAt(value: string): string {
-    const updatedAt = new Date(value);
+  getAchievementIcon(achievement: AchievementResponse): string {
+    const iconMap: Record<string, string> = {
+      trophy: 'trophy-outline',
+      flame: 'flame-outline',
+      flash: 'sparkles-outline',
+      star: 'trophy-outline',
+      heart: 'sparkles-outline',
+      time: 'time-outline',
+      school: 'book-outline',
+      brain: 'book-outline',
+    };
 
-    const difference = Date.now() - updatedAt.getTime();
-
-    const minutes = Math.floor(difference / 60_000);
-
-    if (minutes < 1) {
-      return 'just now';
-    }
-
-    if (minutes < 60) {
-      return `${minutes}m ago`;
-    }
-
-    const hours = Math.floor(minutes / 60);
-
-    if (hours < 24) {
-      return `${hours}h ago`;
-    }
-
-    const days = Math.floor(hours / 24);
-
-    return `${days}d ago`;
-  }
-
-  get dailyStudyGoal(): number {
-    const storedGoal = Number(localStorage.getItem('fliplearn.studyGoal'));
-
-    return storedGoal > 0 ? storedGoal : 30;
+    return iconMap[achievement.icon] ?? 'trophy-outline';
   }
 }
