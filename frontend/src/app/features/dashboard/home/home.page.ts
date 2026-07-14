@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, computed, signal } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 import { IonContent, IonIcon } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
@@ -33,13 +33,7 @@ const STUDY_GOAL_STORAGE_KEY = 'fliplearn.studyGoal';
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [
-    CommonModule,
-    RouterLink,
-    IonContent,
-    IonIcon,
-    FlBottomNavComponent,
-  ],
+  imports: [CommonModule, IonContent, IonIcon, FlBottomNavComponent],
   templateUrl: './home.page.html',
   styleUrls: ['./home.page.scss'],
 })

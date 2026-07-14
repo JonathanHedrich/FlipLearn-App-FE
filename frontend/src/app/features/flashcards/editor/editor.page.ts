@@ -1,4 +1,4 @@
-import { Location, NgClass } from '@angular/common';
+import { Location } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
@@ -32,7 +32,7 @@ interface EditableFlashcard extends FlashcardResponse {
 @Component({
   selector: 'app-editor',
   standalone: true,
-  imports: [NgClass, FormsModule, IonContent, IonIcon],
+  imports: [FormsModule, IonContent, IonIcon],
   templateUrl: './editor.page.html',
   styleUrls: ['./editor.page.scss'],
 })

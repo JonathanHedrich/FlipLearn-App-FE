@@ -7,7 +7,6 @@ import { addIcons } from 'ionicons';
 import {
   arrowBackOutline,
   chevronForwardOutline,
-  layersOutline,
   logOutOutline,
   personOutline,
   radioButtonOnOutline,
@@ -23,14 +22,9 @@ import { AppNotificationService } from '../../../core/services/app-notification.
 
 interface SettingsRow {
   label: string;
-  value?: string;
   icon: string;
-  action: 'goal' | 'order';
+  action: 'goal';
 }
-
-type CardOrder = 'original' | 'random' | 'difficult' | 'favorites';
-
-const CARD_ORDER_STORAGE_KEY = 'fliplearn.cardOrder';
 
 type StudyGoal = number;
 
@@ -57,44 +51,7 @@ export class SettingsPage {
       icon: 'radio-button-on-outline',
       action: 'goal',
     },
-    {
-      label: 'Card Order',
-      value: 'Random',
-      icon: 'layers-outline',
-      action: 'order',
-    },
   ];
-
-  readonly cardOrderOptions: {
-    value: CardOrder;
-    label: string;
-    description: string;
-  }[] = [
-    {
-      value: 'original',
-      label: 'Original',
-      description: 'Karten in der Reihenfolge des Lernsets.',
-    },
-    {
-      value: 'random',
-      label: 'Random',
-      description: 'Karten bei jeder Sitzung neu mischen.',
-    },
-    {
-      value: 'difficult',
-      label: 'Difficult First',
-      description: 'Schwierige Karten zuerst anzeigen.',
-    },
-    {
-      value: 'favorites',
-      label: 'Favorites First',
-      description: 'Favorisierte Karten zuerst anzeigen.',
-    },
-  ];
-
-  selectedCardOrder: CardOrder = this.loadCardOrder();
-
-  cardOrderMenuOpen = false;
 
   readonly availableStudyGoals: StudyGoal[] = [10, 20, 30, 50, 100, 500];
 
@@ -121,7 +78,6 @@ export class SettingsPage {
     addIcons({
       arrowBackOutline,
       chevronForwardOutline,
-      layersOutline,
       logOutOutline,
       personOutline,
       radioButtonOnOutline,
@@ -184,11 +140,6 @@ export class SettingsPage {
   openSetting(action: SettingsRow['action']): void {
     if (action === 'goal') {
       this.studyGoalMenuOpen = true;
-      return;
-    }
-
-    if (action === 'order') {
-      this.cardOrderMenuOpen = true;
     }
   }
 
@@ -267,41 +218,6 @@ export class SettingsPage {
     }
 
     return 30;
-  }
-
-  get selectedCardOrderLabel(): string {
-    return (
-      this.cardOrderOptions.find(
-        (option) => option.value === this.selectedCardOrder,
-      )?.label ?? 'Original'
-    );
-  }
-
-  selectCardOrder(cardOrder: CardOrder): void {
-    this.selectedCardOrder = cardOrder;
-
-    localStorage.setItem(CARD_ORDER_STORAGE_KEY, cardOrder);
-
-    this.cardOrderMenuOpen = false;
-  }
-
-  closeCardOrderMenu(): void {
-    this.cardOrderMenuOpen = false;
-  }
-
-  private loadCardOrder(): CardOrder {
-    const storedValue = localStorage.getItem(CARD_ORDER_STORAGE_KEY);
-
-    if (
-      storedValue === 'original' ||
-      storedValue === 'random' ||
-      storedValue === 'difficult' ||
-      storedValue === 'favorites'
-    ) {
-      return storedValue;
-    }
-
-    return 'random';
   }
 
   async saveStudyReminders(): Promise<void> {

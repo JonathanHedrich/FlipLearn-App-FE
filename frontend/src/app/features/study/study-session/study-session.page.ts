@@ -41,10 +41,6 @@ import { FlashcardApi } from '../../../core/services/flashcard-api';
 import { StudyApi } from '../../../core/services/study-api';
 import { FlashcardStore } from '../../../core/stores/flashcard.store';
 
-type CardOrder = 'original' | 'random' | 'difficult' | 'favorites';
-
-const CARD_ORDER_STORAGE_KEY = 'fliplearn.cardOrder';
-
 @Component({
   selector: 'app-study-session',
   standalone: true,
@@ -68,6 +64,13 @@ export class StudySessionPage implements OnDestroy {
   isLoading = true;
   isSubmittingRating = false;
   loadError = '';
+
+  examAnsweredCards = 0;
+
+  marathonRound = 1;
+  marathonCorrectAnswers = 0;
+  marathonIncorrectAnswers = 0;
+  isPreparingMarathonRound = false;
 
   selectedStudyMode: StudyMode = 'ALL';
 
@@ -109,6 +112,7 @@ export class StudySessionPage implements OnDestroy {
       title: 'Difficult',
       description: 'Schwierige Karten zuerst lernen.',
       icon: 'flame-outline',
+      badge: 'SMART',
       available: true,
     },
     {
@@ -128,14 +132,16 @@ export class StudySessionPage implements OnDestroy {
     {
       value: 'DUE_ONLY',
       title: 'Due Cards Only',
-      description: 'Nur aktuell fällige Karten lernen.',
+      description:
+        'Nur Karten lernen, deren nächste Wiederholung jetzt fällig ist.',
       icon: 'time-outline',
       available: true,
     },
     {
       value: 'FAVORITES_DUE',
       title: 'Favorites + Due',
-      description: 'Nur favorisierte Karten, die aktuell fällig sind.',
+      description:
+        'Nur favorisierte Karten lernen, deren Wiederholung aktuell fällig ist.',
       icon: 'heart-circle-outline',
       available: true,
     },
@@ -232,13 +238,13 @@ export class StudySessionPage implements OnDestroy {
   }
 
   get accuracy(): number {
-    const answered = this.correctAnswers + this.incorrectAnswers;
+    const answered = this.totalAnsweredAttempts;
 
     if (answered === 0) {
       return 0;
     }
 
-    return Math.round((this.correctAnswers / answered) * 100);
+    return Math.round((this.displayedCorrectAnswers / answered) * 100);
   }
 
   async startSession(): Promise<void> {
@@ -252,6 +258,12 @@ export class StudySessionPage implements OnDestroy {
     this.loadError = '';
     this.resetLocalSession();
 
+    if (this.selectedStudyMode === 'MARATHON') {
+      this.marathonRound = 1;
+      this.marathonCorrectAnswers = 0;
+      this.marathonIncorrectAnswers = 0;
+    }
+
     try {
       const session = await firstValueFrom(
         this.studyApi.startSession({
@@ -262,7 +274,7 @@ export class StudySessionPage implements OnDestroy {
 
       this.session = session;
 
-      this.orderedCards = this.applyCardOrder(session.cards);
+      this.orderedCards = [...session.cards];
 
       this.correctAnswers = session.correctAnswers;
 
@@ -343,6 +355,18 @@ export class StudySessionPage implements OnDestroy {
         }),
       );
 
+      if (this.isExamMode) {
+        this.examAnsweredCards += 1;
+      }
+
+      if (this.isMarathonMode) {
+        if (response.answeredCorrectly) {
+          this.marathonCorrectAnswers += 1;
+        } else {
+          this.marathonIncorrectAnswers += 1;
+        }
+      }
+
       this.correctAnswers = response.correctAnswers;
 
       this.incorrectAnswers = response.incorrectAnswers;
@@ -355,6 +379,25 @@ export class StudySessionPage implements OnDestroy {
 
       if (response.sessionComplete) {
         this.stopLightningTimer();
+
+        if (this.isMarathonMode) {
+          /*
+           * response.incorrectAnswers betrifft nur
+           * die gerade abgeschlossene Runde.
+           */
+          if (response.incorrectAnswers > 0) {
+            await this.startNextMarathonRound();
+            return;
+          }
+
+          /*
+           * In dieser Runde wurde alles richtig
+           * beantwortet: Marathon abgeschlossen.
+           */
+          this.sessionComplete = true;
+          return;
+        }
+
         this.sessionComplete = true;
         return;
       }
@@ -389,10 +432,18 @@ export class StudySessionPage implements OnDestroy {
     this.session = null;
     this.orderedCards = [];
     this.currentIndex = 0;
+
     this.isFlipped = false;
     this.sessionComplete = false;
     this.correctAnswers = 0;
     this.incorrectAnswers = 0;
+
+    this.marathonRound = 1;
+    this.marathonCorrectAnswers = 0;
+    this.marathonIncorrectAnswers = 0;
+    this.isPreparingMarathonRound = false;
+
+    this.examAnsweredCards = 0;
   }
 
   private resolveSessionError(error: unknown): string {
@@ -428,66 +479,6 @@ export class StudySessionPage implements OnDestroy {
     return 'Die Bewertung konnte nicht gespeichert werden.';
   }
 
-  private applyCardOrder(cards: StudyCardResponse[]): StudyCardResponse[] {
-    const order = this.loadCardOrder();
-
-    const orderedCards = [...cards];
-
-    switch (order) {
-      case 'random':
-        return this.shuffleCards(orderedCards);
-
-      case 'difficult':
-        return orderedCards.sort((first, second) => {
-          const firstDifficulty =
-            first.repetitions === 0
-              ? Number.MAX_SAFE_INTEGER
-              : first.intervalDays;
-
-          const secondDifficulty =
-            second.repetitions === 0
-              ? Number.MAX_SAFE_INTEGER
-              : second.intervalDays;
-
-          return firstDifficulty - secondDifficulty;
-        });
-
-      case 'favorites':
-        return orderedCards.sort(
-          (first, second) => Number(second.favorite) - Number(first.favorite),
-        );
-
-      case 'original':
-      default:
-        return orderedCards;
-    }
-  }
-
-  private shuffleCards(cards: StudyCardResponse[]): StudyCardResponse[] {
-    for (let index = cards.length - 1; index > 0; index -= 1) {
-      const randomIndex = Math.floor(Math.random() * (index + 1));
-
-      [cards[index], cards[randomIndex]] = [cards[randomIndex], cards[index]];
-    }
-
-    return cards;
-  }
-
-  private loadCardOrder(): CardOrder {
-    const storedValue = localStorage.getItem(CARD_ORDER_STORAGE_KEY);
-
-    if (
-      storedValue === 'original' ||
-      storedValue === 'random' ||
-      storedValue === 'difficult' ||
-      storedValue === 'favorites'
-    ) {
-      return storedValue;
-    }
-
-    return 'random';
-  }
-
   openStudyModeMenu(): void {
     this.studyModeMenuOpen = true;
   }
@@ -509,14 +500,6 @@ export class StudySessionPage implements OnDestroy {
         (option) => option.value === this.selectedStudyMode,
       )?.title ?? 'All Cards'
     );
-  }
-
-  get activeStudyMode(): StudyMode {
-    return this.session?.mode ?? this.selectedStudyMode;
-  }
-
-  get isLightningMode(): boolean {
-    return this.activeStudyMode === 'LIGHTNING';
   }
 
   private startLightningTimer(): void {
@@ -586,5 +569,98 @@ export class StudySessionPage implements OnDestroy {
     this.isFlipped = true;
 
     await this.rateCard('AGAIN');
+  }
+
+  get isExamMode(): boolean {
+    return this.selectedStudyMode === 'EXAM';
+  }
+
+  get isMarathonMode(): boolean {
+    return this.selectedStudyMode === 'MARATHON';
+  }
+
+  get isLightningMode(): boolean {
+    return this.selectedStudyMode === 'LIGHTNING';
+  }
+
+  get activeStudyMode(): StudyMode {
+    return this.session?.mode ?? this.selectedStudyMode;
+  }
+
+  get displayedCorrectAnswers(): number {
+    if (this.isMarathonMode) {
+      return this.marathonCorrectAnswers;
+    }
+
+    return this.correctAnswers;
+  }
+
+  get displayedIncorrectAnswers(): number {
+    if (this.isMarathonMode) {
+      return this.marathonIncorrectAnswers;
+    }
+
+    return this.incorrectAnswers;
+  }
+
+  get totalAnsweredAttempts(): number {
+    return this.displayedCorrectAnswers + this.displayedIncorrectAnswers;
+  }
+
+  private async startNextMarathonRound(): Promise<void> {
+    if (this.isPreparingMarathonRound || !this.session) {
+      return;
+    }
+
+    this.isPreparingMarathonRound = true;
+    this.loadError = '';
+
+    /*
+     * Die aktuelle Session ist die gerade
+     * abgeschlossene Marathon-Runde.
+     */
+    const completedSessionId = this.session.sessionId;
+
+    try {
+      const nextSession = await firstValueFrom(
+        this.studyApi.startSession({
+          setId: this.setId,
+          mode: 'WRONG_ONLY',
+          sourceSessionId: completedSessionId,
+        }),
+      );
+
+      this.orderedCards = [...nextSession.cards];
+
+      this.currentIndex = 0;
+      this.isFlipped = false;
+      this.sessionComplete = false;
+
+      this.correctAnswers = nextSession.correctAnswers;
+
+      this.incorrectAnswers = nextSession.incorrectAnswers;
+
+      this.marathonRound += 1;
+    } catch (error: unknown) {
+      if (error instanceof HttpErrorResponse && error.status === 409) {
+        this.sessionComplete = true;
+        return;
+      }
+
+      this.loadError =
+        'Die nächste Marathon-Runde konnte nicht gestartet werden.';
+    } finally {
+      this.isPreparingMarathonRound = false;
+    }
+  }
+  get examProgressCount(): number {
+    if (!this.isExamMode) {
+      return 0;
+    }
+
+    return Math.min(
+      this.currentIndex + (this.isFlipped ? 1 : 0),
+      this.cards.length,
+    );
   }
 }

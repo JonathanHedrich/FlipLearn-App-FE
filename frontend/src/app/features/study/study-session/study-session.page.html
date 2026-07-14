@@ -66,6 +66,63 @@
       </button>
     </div>
 
+    @if ( isMarathonMode && !sessionComplete ) {
+    <section class="marathon-status">
+      <div class="marathon-status-icon">
+        <ion-icon name="fitness-outline"></ion-icon>
+      </div>
+
+      <div class="marathon-status-information">
+        <strong> Marathon · Runde {{ marathonRound }} </strong>
+
+        <span>
+          Schwierige Karten werden wiederholt, bis du alle richtig beantwortet
+          hast.
+        </span>
+      </div>
+
+      <div class="marathon-status-score">
+        <strong> {{ displayedCorrectAnswers }} </strong>
+
+        <span>correct</span>
+      </div>
+    </section>
+    } @if (isPreparingMarathonRound) {
+    <section class="marathon-round-loading">
+      <div class="marathon-round-spinner"></div>
+
+      <span> Nächste Runde wird vorbereitet … </span>
+    </section>
+    } @if (isExamMode) {
+    <section class="exam-status">
+      <div class="exam-status-icon">
+        <ion-icon name="school-outline"></ion-icon>
+      </div>
+
+      <div>
+        <strong>Exam Mode</strong>
+
+        <span>
+          {{ examAnsweredCards }} von {{ cards.length }} beantwortet
+        </span>
+      </div>
+    </section>
+    } @else {
+    <section class="session-status">
+      <div>
+        <span class="status-dot incorrect"></span>
+
+        {{ displayedIncorrectAnswers }} difficult
+      </div>
+
+      <div>
+        <span class="status-dot correct"></span>
+
+        {{ displayedCorrectAnswers }} correct
+      </div>
+    </section>
+    }
+
     <div class="lightning-mode-container">
       @if (isLightningMode && !sessionComplete) {
       <section class="lightning-timer">
@@ -93,7 +150,10 @@
     </div>
 
     <section class="study-content">
-      <p class="instruction">Tap the card to reveal the answer</p>
+      <p class="instruction">
+        {{ isExamMode ? 'Beantworte jede Karte – das Ergebnis siehst du erst am
+        Ende.' : 'Tap the card to reveal the answer' }}
+      </p>
 
       <div
         class="flip-card"
@@ -174,8 +234,6 @@
             <ion-icon name="refresh-outline"></ion-icon>
 
             <strong>Again</strong>
-
-            <span>1 min</span>
           </button>
 
           <button
@@ -187,8 +245,6 @@
             <ion-icon name="close-outline"></ion-icon>
 
             <strong>Hard</strong>
-
-            <span>Hard</span>
           </button>
 
           <button
@@ -200,8 +256,6 @@
             <ion-icon name="checkmark-outline"></ion-icon>
 
             <strong>Good</strong>
-
-            <span>Good</span>
           </button>
 
           <button
@@ -213,27 +267,11 @@
             <span class="easy-symbol">⚡</span>
 
             <strong>Easy</strong>
-
-            <span>Easy</span>
           </button>
         </div>
       </section>
 
       }
-
-      <section class="session-status">
-        <div>
-          <span class="status-dot incorrect"></span>
-
-          {{ incorrectAnswers }} difficult
-        </div>
-
-        <div>
-          <span class="status-dot correct"></span>
-
-          {{ correctAnswers }} correct
-        </div>
-      </section>
     </section>
 
     } @else {
@@ -243,9 +281,15 @@
         <ion-icon name="trophy-outline"></ion-icon>
       </div>
 
-      <span class="result-eyebrow"> Session complete </span>
+      <span class="result-eyebrow">
+        {{ isMarathonMode ? 'Marathon complete' : isExamMode ? 'Exam complete' :
+        'Session complete' }}
+      </span>
 
-      <h1>Great job!</h1>
+      <h1>
+        {{ isMarathonMode ? 'Marathon geschafft!' : isExamMode ? 'Prüfung
+        abgeschlossen' : 'Great job!' }}
+      </h1>
 
       <p>
         You finished all cards in
@@ -266,7 +310,7 @@
             <ion-icon name="checkmark-outline"></ion-icon>
           </div>
 
-          <strong>{{ correctAnswers }}</strong>
+          <strong>{{ displayedCorrectAnswers }}</strong>
 
           <span>Correct</span>
         </article>
@@ -276,7 +320,7 @@
             <ion-icon name="close-outline"></ion-icon>
           </div>
 
-          <strong>{{ incorrectAnswers }}</strong>
+          <strong>{{ displayedIncorrectAnswers }}</strong>
 
           <span>Difficult</span>
         </article>
@@ -284,9 +328,11 @@
         <article>
           <div class="result-stat-icon total">🃏</div>
 
-          <strong>{{ cards.length }}</strong>
+          <strong>
+            {{ isMarathonMode ? totalAnsweredAttempts : cards.length }}
+          </strong>
 
-          <span>Total Cards</span>
+          <span> {{ isMarathonMode ? 'Total Attempts' : 'Total Cards' }} </span>
         </article>
       </section>
 

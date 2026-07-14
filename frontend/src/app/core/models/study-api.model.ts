@@ -16,6 +16,7 @@ export type StudyMode =
 export interface StartStudySessionRequest {
   setId: number;
   mode: StudyMode;
+  sourceSessionId?: number;
 }
 
 export interface StudyCardResponse {

@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { RouterLink, RouterLinkActive } from '@angular/router';
+import { RouterLink } from '@angular/router';
 import { IonIcon } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
@@ -12,7 +12,7 @@ import {
 @Component({
   selector: 'fl-bottom-nav',
   standalone: true,
-  imports: [RouterLink, RouterLinkActive, IonIcon],
+  imports: [RouterLink, IonIcon],
   templateUrl: './fl-bottom-nav.component.html',
   styleUrls: ['./fl-bottom-nav.component.scss'],
 })

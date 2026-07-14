@@ -1060,3 +1060,194 @@ ion-content {
 
   background: rgba(245, 158, 11, 0.1);
 }
+
+/* =========================================================
+   EXAM MODE
+   ========================================================= */
+
+.exam-status {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  width: min(90%, 370px);
+
+  margin: 10px auto 0;
+  padding: 13px 14px;
+
+  border: 1px solid rgba(92, 72, 219, 0.18);
+  border-radius: 16px;
+
+  background: linear-gradient(135deg, #f4f1ff, #eef3ff);
+}
+
+.exam-status-icon {
+  display: grid;
+  place-items: center;
+
+  flex: 0 0 auto;
+
+  width: 40px;
+  height: 40px;
+
+  border-radius: 13px;
+
+  color: #5c48db;
+  background: #ffffff;
+
+  font-size: 1.05rem;
+}
+
+.exam-status > div:last-child {
+  min-width: 0;
+}
+
+.exam-status strong {
+  display: block;
+
+  color: var(--fl-text-primary);
+
+  font-size: 0.68rem;
+  font-weight: 850;
+}
+
+.exam-status span {
+  display: block;
+
+  margin-top: 3px;
+
+  color: var(--fl-text-secondary);
+
+  font-size: 0.58rem;
+}
+
+:host-context(body.dark) .exam-status {
+  border-color: var(--fl-border);
+  background: var(--fl-surface);
+}
+
+/* =========================================================
+   MARATHON MODE
+   ========================================================= */
+
+.marathon-status {
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 11px;
+
+  width: min(90%, 370px);
+  margin: 10px auto 0;
+  padding: 12px 13px;
+
+  border: 1px solid rgba(139, 69, 236, 0.2);
+  border-radius: 16px;
+
+  background: linear-gradient(135deg, #f7f1ff, #eff3ff);
+
+  box-shadow: 0 7px 18px rgba(99, 72, 190, 0.08);
+}
+
+.marathon-status-icon {
+  display: grid;
+  place-items: center;
+
+  width: 42px;
+  height: 42px;
+
+  border-radius: 13px;
+
+  color: #8244e5;
+  background: #ffffff;
+
+  font-size: 1.1rem;
+}
+
+.marathon-status-information {
+  min-width: 0;
+}
+
+.marathon-status-information strong {
+  display: block;
+
+  color: var(--fl-text-primary);
+
+  font-size: 0.68rem;
+  font-weight: 900;
+}
+
+.marathon-status-information span {
+  display: -webkit-box;
+  overflow: hidden;
+
+  margin-top: 3px;
+
+  color: var(--fl-text-secondary);
+
+  font-size: 0.55rem;
+  line-height: 1.35;
+
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.marathon-status-score {
+  display: grid;
+  justify-items: center;
+
+  min-width: 42px;
+}
+
+.marathon-status-score strong {
+  color: #8244e5;
+
+  font-size: 0.92rem;
+  font-weight: 900;
+}
+
+.marathon-status-score span {
+  margin-top: 2px;
+
+  color: var(--fl-text-muted);
+
+  font-size: 0.47rem;
+}
+
+.marathon-round-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  margin: 10px auto 0;
+
+  color: var(--fl-text-secondary);
+
+  font-size: 0.58rem;
+  font-weight: 700;
+}
+
+.marathon-round-spinner {
+  width: 16px;
+  height: 16px;
+
+  border: 2px solid rgba(139, 69, 236, 0.18);
+  border-top-color: #8244e5;
+  border-radius: 50%;
+
+  animation: marathon-round-loading 650ms linear infinite;
+}
+
+@keyframes marathon-round-loading {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+:host-context(body.dark) .marathon-status {
+  border-color: var(--fl-border);
+  background: var(--fl-surface);
+}
+
+:host-context(body.dark) .marathon-status-icon {
+  background: var(--fl-input-background);
+}
