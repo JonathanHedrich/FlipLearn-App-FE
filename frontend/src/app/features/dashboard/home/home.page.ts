@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed } from '@angular/core';
+import { Component, computed, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { IonContent, IonIcon } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
@@ -59,6 +59,8 @@ export class HomePage {
 
   readonly achievements = this.statisticsStore.achievements;
 
+  readonly dailyStudyGoal = signal(this.loadDailyStudyGoal());
+
   readonly recentSets = computed(() =>
     [...this.sets()]
       .sort(
@@ -73,10 +75,12 @@ export class HomePage {
     [...this.sets()]
       .filter((set) => set.cardCount > 0)
       .sort((first, second) => {
-        const progressDifference = first.progress - second.progress;
+        const firstUnfinished = first.progress < 100 ? 1 : 0;
 
-        if (progressDifference !== 0) {
-          return progressDifference;
+        const secondUnfinished = second.progress < 100 ? 1 : 0;
+
+        if (firstUnfinished !== secondUnfinished) {
+          return secondUnfinished - firstUnfinished;
         }
 
         return (
@@ -94,17 +98,19 @@ export class HomePage {
   );
 
   readonly remainingGoalCards = computed(() =>
-    Math.max(0, this.dailyStudyGoal - this.reviewsToday()),
+    Math.max(0, this.dailyStudyGoal() - this.reviewsToday()),
   );
 
   readonly goalPercentage = computed(() => {
-    if (this.dailyStudyGoal <= 0) {
+    const goal = this.dailyStudyGoal();
+
+    if (goal <= 0) {
       return 0;
     }
 
     return Math.min(
       100,
-      Math.round((this.reviewsToday() / this.dailyStudyGoal) * 100),
+      Math.max(0, Math.round((this.reviewsToday() / goal) * 100)),
     );
   });
 
@@ -148,6 +154,8 @@ export class HomePage {
   }
 
   ionViewWillEnter(): void {
+    this.dailyStudyGoal.set(this.loadDailyStudyGoal());
+
     void this.loadDashboard();
   }
 
@@ -177,7 +185,7 @@ export class HomePage {
     return 'Good evening';
   }
 
-  get dailyStudyGoal(): number {
+  private loadDailyStudyGoal(): number {
     const storedGoal = Number(localStorage.getItem(STUDY_GOAL_STORAGE_KEY));
 
     if (Number.isInteger(storedGoal) && storedGoal > 0) {
@@ -208,8 +216,8 @@ export class HomePage {
   async loadDashboard(): Promise<void> {
     try {
       await Promise.all([
-        this.flashcardStore.loadSets(),
-        this.statisticsStore.loadOverview(),
+        this.flashcardStore.loadSets(true),
+        this.statisticsStore.loadOverview(true),
       ]);
     } catch {
       // Die Fehler werden bereits in den Stores gespeichert.
