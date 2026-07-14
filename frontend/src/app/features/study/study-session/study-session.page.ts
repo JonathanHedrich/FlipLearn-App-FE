@@ -27,6 +27,10 @@ import { FlashcardApi } from '../../../core/services/flashcard-api';
 import { StudyApi } from '../../../core/services/study-api';
 import { FlashcardStore } from '../../../core/stores/flashcard.store';
 
+type CardOrder = 'original' | 'random' | 'difficult' | 'favorites';
+
+const CARD_ORDER_STORAGE_KEY = 'fliplearn.cardOrder';
+
 @Component({
   selector: 'app-study-session',
   standalone: true,
@@ -38,6 +42,7 @@ export class StudySessionPage {
   readonly setId: number;
 
   session: StudySessionResponse | null = null;
+  orderedCards: StudyCardResponse[] = [];
 
   currentIndex = 0;
   isFlipped = false;
@@ -77,7 +82,7 @@ export class StudySessionPage {
   }
 
   get cards(): StudyCardResponse[] {
-    return this.session?.cards ?? [];
+    return this.orderedCards;
   }
 
   get setTitle(): string {
@@ -122,16 +127,20 @@ export class StudySessionPage {
     this.resetLocalSession();
 
     try {
-      this.session = await firstValueFrom(
+      const session = await firstValueFrom(
         this.studyApi.startSession({
           setId: this.setId,
           mode: 'ALL',
         }),
       );
 
-      this.correctAnswers = this.session.correctAnswers;
+      this.session = session;
 
-      this.incorrectAnswers = this.session.incorrectAnswers;
+      this.orderedCards = this.applyCardOrder(session.cards);
+
+      this.correctAnswers = session.correctAnswers;
+
+      this.incorrectAnswers = session.incorrectAnswers;
     } catch (error: unknown) {
       this.loadError = this.resolveSessionError(error);
     } finally {
@@ -174,10 +183,14 @@ export class StudySessionPage {
         }),
       );
 
-      this.cards[this.currentIndex] = {
-        ...card,
-        favorite: updatedCard.favorite,
-      };
+      this.orderedCards = this.orderedCards.map((existingCard) =>
+        existingCard.id === card.id
+          ? {
+              ...existingCard,
+              favorite: updatedCard.favorite,
+            }
+          : existingCard,
+      );
     } catch {
       window.alert('Der Favoritenstatus konnte nicht gespeichert werden.');
     }
@@ -238,6 +251,7 @@ export class StudySessionPage {
 
   private resetLocalSession(): void {
     this.session = null;
+    this.orderedCards = [];
     this.currentIndex = 0;
     this.isFlipped = false;
     this.sessionComplete = false;
@@ -276,5 +290,65 @@ export class StudySessionPage {
     }
 
     return 'Die Bewertung konnte nicht gespeichert werden.';
+  }
+
+  private applyCardOrder(cards: StudyCardResponse[]): StudyCardResponse[] {
+    const order = this.loadCardOrder();
+
+    const orderedCards = [...cards];
+
+    switch (order) {
+      case 'random':
+        return this.shuffleCards(orderedCards);
+
+      case 'difficult':
+        return orderedCards.sort((first, second) => {
+          const firstDifficulty =
+            first.repetitions === 0
+              ? Number.MAX_SAFE_INTEGER
+              : first.intervalDays;
+
+          const secondDifficulty =
+            second.repetitions === 0
+              ? Number.MAX_SAFE_INTEGER
+              : second.intervalDays;
+
+          return firstDifficulty - secondDifficulty;
+        });
+
+      case 'favorites':
+        return orderedCards.sort(
+          (first, second) => Number(second.favorite) - Number(first.favorite),
+        );
+
+      case 'original':
+      default:
+        return orderedCards;
+    }
+  }
+
+  private shuffleCards(cards: StudyCardResponse[]): StudyCardResponse[] {
+    for (let index = cards.length - 1; index > 0; index -= 1) {
+      const randomIndex = Math.floor(Math.random() * (index + 1));
+
+      [cards[index], cards[randomIndex]] = [cards[randomIndex], cards[index]];
+    }
+
+    return cards;
+  }
+
+  private loadCardOrder(): CardOrder {
+    const storedValue = localStorage.getItem(CARD_ORDER_STORAGE_KEY);
+
+    if (
+      storedValue === 'original' ||
+      storedValue === 'random' ||
+      storedValue === 'difficult' ||
+      storedValue === 'favorites'
+    ) {
+      return storedValue;
+    }
+
+    return 'random';
   }
 }

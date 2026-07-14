@@ -226,22 +226,106 @@
         </div>
 
         <div class="achievements-grid">
-          @for ( achievement of achievements(); track achievement.code ) {
-          <article class="achievement-item" [class.earned]="achievement.earned">
+          @for ( achievement of visibleAchievements(); track achievement.code )
+          {
+          <button
+            class="achievement-item"
+            type="button"
+            [class.earned]="achievement.earned"
+            (click)="openAchievement(achievement)"
+          >
             <div class="achievement-icon">
               <ion-icon
-                [name]="
-              getAchievementIcon(
-                achievement.icon
-              )
-            "
+                [name]="getAchievementIcon(achievement.icon)"
               ></ion-icon>
             </div>
 
             <span>{{ achievement.title }}</span>
-          </article>
+
+            @if (!achievement.earned) {
+            <div class="achievement-mini-progress">
+              <div [style.width.%]="achievement.progress"></div>
+            </div>
+            }
+          </button>
           }
         </div>
+
+        @if (achievements().length > 12) {
+        <button
+          class="achievements-toggle"
+          type="button"
+          (click)="toggleAchievements()"
+        >
+          {{ showAllAchievements() ? 'Weniger anzeigen' : 'Alle Achievements
+          anzeigen' }}
+
+          <span> {{ achievements().length }} </span>
+        </button>
+        } @if (selectedAchievement) {
+        <div class="achievement-modal-backdrop" (click)="closeAchievement()">
+          <section
+            class="achievement-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="achievement-dialog-title"
+            (click)="$event.stopPropagation()"
+          >
+            <button
+              class="achievement-modal-close"
+              type="button"
+              aria-label="Schließen"
+              (click)="closeAchievement()"
+            >
+              ×
+            </button>
+
+            <div
+              class="achievement-modal-icon"
+              [class.earned]="selectedAchievement.earned"
+            >
+              <ion-icon
+                [name]="
+            getAchievementIcon(
+              selectedAchievement.icon
+            )
+          "
+              ></ion-icon>
+            </div>
+
+            <span class="achievement-modal-status">
+              {{ selectedAchievement.earned ? 'ACHIEVEMENT UNLOCKED' : 'IN
+              PROGRESS' }}
+            </span>
+
+            <h2 id="achievement-dialog-title">
+              {{ selectedAchievement.title }}
+            </h2>
+
+            <p>{{ selectedAchievement.description }}</p>
+
+            <div class="achievement-detail-progress">
+              <div class="achievement-detail-heading">
+                <span>Fortschritt</span>
+
+                <strong>
+                  {{ getAchievementProgressLabel( selectedAchievement ) }}
+                </strong>
+              </div>
+
+              <div class="achievement-detail-track">
+                <div
+                  [style.width.%]="
+              selectedAchievement.progress
+            "
+                ></div>
+              </div>
+
+              <small> {{ selectedAchievement.progress }}% </small>
+            </div>
+          </section>
+        </div>
+        }
       </section>
       }
     </section>

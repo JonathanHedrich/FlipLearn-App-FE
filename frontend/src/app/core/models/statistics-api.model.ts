@@ -17,10 +17,12 @@ export interface SetAccuracyResponse {
 export interface AchievementResponse {
   code: string;
   title: string;
+  description: string;
   icon: string;
   earned: boolean;
   currentValue: number;
   targetValue: number;
+  progress: number;
 }
 
 export interface StatisticsOverviewResponse {

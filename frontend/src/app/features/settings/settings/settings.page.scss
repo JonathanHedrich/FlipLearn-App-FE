@@ -679,3 +679,70 @@ ion-toggle {
   font-size: 0.63rem;
   line-height: 1.4;
 }
+
+.card-order-options {
+  display: grid;
+  gap: 10px;
+
+  margin-top: 18px;
+}
+
+.card-order-options > button {
+  display: grid;
+  grid-template-columns: 20px minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+
+  width: 100%;
+  min-height: 68px;
+  padding: 12px 14px;
+
+  border: 1px solid var(--fl-border);
+  border-radius: 15px;
+
+  color: var(--fl-text-primary);
+  background: var(--fl-background);
+
+  text-align: left;
+}
+
+.card-order-options > button.active {
+  border-color: var(--fl-primary);
+  background: var(--fl-primary-light);
+
+  box-shadow: 0 0 0 3px rgba(47, 107, 255, 0.08);
+}
+
+.card-order-radio {
+  display: block;
+
+  width: 18px;
+  height: 18px;
+
+  border: 2px solid var(--fl-border);
+  border-radius: 50%;
+}
+
+.card-order-options > button.active .card-order-radio {
+  border: 5px solid var(--fl-primary);
+  background: #ffffff;
+}
+
+.card-order-options strong,
+.card-order-options small {
+  display: block;
+}
+
+.card-order-options strong {
+  font-size: 0.78rem;
+  font-weight: 850;
+}
+
+.card-order-options small {
+  margin-top: 4px;
+
+  color: var(--fl-text-secondary);
+
+  font-size: 0.62rem;
+  line-height: 1.4;
+}

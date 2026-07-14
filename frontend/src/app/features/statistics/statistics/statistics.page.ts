@@ -1,23 +1,34 @@
 import { CommonModule, Location } from '@angular/common';
-import { Component, computed } from '@angular/core';
+import { Component, computed, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { IonContent, IonIcon } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
+  albumsOutline,
   arrowBackOutline,
   barChartOutline,
   bookOutline,
   calendarOutline,
   checkmarkCircleOutline,
   closeCircleOutline,
+  diamondOutline,
+  fitnessOutline,
   flameOutline,
   flashOutline,
+  hardwareChipOutline,
   heartOutline,
+  layersOutline,
+  libraryOutline,
+  locateOutline,
+  medalOutline,
   notificationsOutline,
+  playOutline,
   radioButtonOnOutline,
   refreshOutline,
   ribbonOutline,
+  rocketOutline,
   schoolOutline,
+  searchOutline,
   starOutline,
   timeOutline,
   trophyOutline,
@@ -25,6 +36,7 @@ import {
 
 import { StatisticsStore } from '../../../core/stores/statistics.store';
 import { FlBottomNavComponent } from '../../../shared/components/fl-bottom-nav/fl-bottom-nav.component';
+import { AchievementResponse } from '../../../core/models/statistics-api.model';
 
 @Component({
   selector: 'app-statistics',
@@ -103,26 +115,51 @@ export class StatisticsPage {
 
   readonly earnedAchievements = this.statisticsStore.earnedAchievements;
 
+  readonly showAllAchievements = signal(false);
+
+  readonly visibleAchievements = computed(() => {
+    const achievements = this.achievements();
+
+    if (this.showAllAchievements()) {
+      return achievements;
+    }
+
+    return achievements.slice(0, 12);
+  });
+
+  selectedAchievement: AchievementResponse | null = null;
+
   constructor(
     readonly statisticsStore: StatisticsStore,
     private readonly location: Location,
     private readonly router: Router,
   ) {
     addIcons({
+      albumsOutline,
       arrowBackOutline,
       barChartOutline,
       bookOutline,
       calendarOutline,
       checkmarkCircleOutline,
       closeCircleOutline,
+      diamondOutline,
+      fitnessOutline,
       flameOutline,
       flashOutline,
+      hardwareChipOutline,
       heartOutline,
+      layersOutline,
+      libraryOutline,
+      locateOutline,
+      medalOutline,
       notificationsOutline,
+      playOutline,
       radioButtonOnOutline,
       refreshOutline,
       ribbonOutline,
+      rocketOutline,
       schoolOutline,
+      searchOutline,
       starOutline,
       timeOutline,
       trophyOutline,
@@ -205,14 +242,48 @@ export class StatisticsPage {
     const iconMap: Record<string, string> = {
       trophy: 'trophy-outline',
       flame: 'flame-outline',
-      brain: 'school-outline',
+      brain: 'hardware-chip-outline',
       flash: 'flash-outline',
       ribbon: 'ribbon-outline',
-      target: 'radio-button-on-outline',
+      target: 'locate-outline',
+      radio: 'radio-button-on-outline',
       star: 'star-outline',
       heart: 'heart-outline',
+      layers: 'layers-outline',
+      library: 'library-outline',
+      card: 'albums-outline',
+      play: 'play-outline',
+      school: 'school-outline',
+      medal: 'medal-outline',
+      rocket: 'rocket-outline',
+      check: 'checkmark-circle-outline',
+      search: 'search-outline',
+      fitness: 'fitness-outline',
+      diamond: 'diamond-outline',
+      calendar: 'calendar-outline',
+      time: 'time-outline',
     };
 
     return iconMap[icon] ?? 'trophy-outline';
+  }
+
+  openAchievement(achievement: AchievementResponse): void {
+    this.selectedAchievement = achievement;
+  }
+
+  closeAchievement(): void {
+    this.selectedAchievement = null;
+  }
+
+  getAchievementProgressLabel(achievement: AchievementResponse): string {
+    if (achievement.earned) {
+      return 'Freigeschaltet';
+    }
+
+    return `${achievement.currentValue}` + ` / ${achievement.targetValue}`;
+  }
+
+  toggleAchievements(): void {
+    this.showAllAchievements.update((currentValue) => !currentValue);
   }
 }
