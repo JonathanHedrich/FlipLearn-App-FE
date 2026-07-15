@@ -76,23 +76,27 @@
       </fieldset>
 
       <div class="form-group">
-        <label for="folder"> Folder </label>
+        <label for="categoryId"> Kategorie </label>
 
         <div class="select-wrapper">
           <ion-icon name="folder-outline"></ion-icon>
 
-          <select id="folder" formControlName="folder">
-            <option value="">Select folder...</option>
+          <select id="categoryId" formControlName="categoryId">
+            <option [ngValue]="null">Keine Kategorie</option>
 
-            <option value="languages">Languages</option>
-
-            <option value="science">Science</option>
-
-            <option value="programming">Programming</option>
+            @for ( category of categories; track category.id ) {
+            <option [ngValue]="category.id">{{ category.name }}</option>
+            }
           </select>
 
           <ion-icon class="select-arrow" name="chevron-down-outline"></ion-icon>
         </div>
+
+        @if (isLoadingCategories) {
+        <p class="category-hint">Kategorien werden geladen …</p>
+        } @if (categoryError) {
+        <p class="validation-message">{{ categoryError }}</p>
+        }
       </div>
 
       <section class="preview-card" [style.--preview-color]="selectedColorHex">

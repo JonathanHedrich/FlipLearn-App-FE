@@ -157,7 +157,7 @@ export class FlashcardStore {
     await this.updateSet(setId, {
       title: set.title,
       description: set.description,
-      folder: set.folder,
+      categoryId: set.categoryId ?? null,
       color: set.color,
       favorite: !set.favorite,
     });

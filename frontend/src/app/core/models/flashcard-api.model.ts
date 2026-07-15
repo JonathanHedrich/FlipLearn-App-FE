@@ -10,11 +10,14 @@ export interface FlashcardSetResponse {
   id: number;
   title: string;
   description: string | null;
-  folder: string | null;
+
+  categoryId: number | null;
+  categoryName: string | null;
+
   color: FlashcardSetColor;
   favorite: boolean;
-  progress: number;
   cardCount: number;
+  progress: number;
   createdAt: string;
   updatedAt: string;
 }
@@ -22,14 +25,14 @@ export interface FlashcardSetResponse {
 export interface CreateFlashcardSetRequest {
   title: string;
   description: string | null;
-  folder: string | null;
+  categoryId: number | null;
   color: FlashcardSetColor;
 }
 
 export interface UpdateFlashcardSetRequest {
   title: string;
   description: string | null;
-  folder: string | null;
+  categoryId: number | null;
   color: FlashcardSetColor;
   favorite: boolean;
 }

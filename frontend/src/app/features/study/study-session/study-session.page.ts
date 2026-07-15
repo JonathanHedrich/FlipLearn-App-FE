@@ -300,7 +300,12 @@ export class StudySessionPage implements OnDestroy {
   }
 
   flipCard(): void {
-    if (!this.currentCard || this.isSubmittingRating) {
+    if (
+      !this.currentCard ||
+      this.isSubmittingRating ||
+      this.isPreparingMarathonRound ||
+      this.sessionComplete
+    ) {
       return;
     }
 
@@ -340,21 +345,46 @@ export class StudySessionPage implements OnDestroy {
 
   async rateCard(rating: StudyRating): Promise<void> {
     const card = this.currentCard;
+    const session = this.session;
 
-    if (!this.isFlipped || !card || !this.session || this.isSubmittingRating) {
+    if (
+      !this.isFlipped ||
+      !card ||
+      !session ||
+      this.isSubmittingRating ||
+      this.isPreparingMarathonRound ||
+      this.sessionComplete
+    ) {
       return;
     }
 
     this.stopLightningTimer();
     this.isSubmittingRating = true;
 
+    /*
+     * Session und Karte werden für diesen Request
+     * festgehalten. Dadurch kann ein alter Request
+     * keine neue Marathon-Runde überschreiben.
+     */
+    const submittedSessionId = session.sessionId;
+
+    const submittedCardId = card.id;
+
     try {
       const response = await firstValueFrom(
-        this.studyApi.submitReview(this.session.sessionId, {
-          cardId: card.id,
+        this.studyApi.submitReview(submittedSessionId, {
+          cardId: submittedCardId,
           rating,
         }),
       );
+
+      /*
+       * Wurde inzwischen eine neue Session gestartet,
+       * gehört diese Antwort noch zur alten Runde.
+       */
+      if (this.session?.sessionId !== submittedSessionId) {
+        return;
+      }
 
       if (this.isExamMode) {
         this.examAnsweredCards += 1;
@@ -382,19 +412,11 @@ export class StudySessionPage implements OnDestroy {
         this.stopLightningTimer();
 
         if (this.isMarathonMode) {
-          /*
-           * response.incorrectAnswers betrifft nur
-           * die gerade abgeschlossene Runde.
-           */
           if (response.incorrectAnswers > 0) {
             await this.startNextMarathonRound();
             return;
           }
 
-          /*
-           * In dieser Runde wurde alles richtig
-           * beantwortet: Marathon abgeschlossen.
-           */
           this.sessionComplete = true;
           return;
         }
@@ -405,8 +427,18 @@ export class StudySessionPage implements OnDestroy {
 
       this.currentIndex += 1;
       this.isFlipped = false;
+
       this.startLightningTimer();
     } catch (error: unknown) {
+      /*
+       * Falls inzwischen bereits eine andere
+       * Marathon-Runde aktiv ist, ignorieren wir
+       * den verspäteten Fehler der alten Runde.
+       */
+      if (this.session?.sessionId !== submittedSessionId) {
+        return;
+      }
+
       window.alert(this.resolveReviewError(error));
     } finally {
       this.isSubmittingRating = false;
@@ -558,15 +590,12 @@ export class StudySessionPage implements OnDestroy {
       !this.currentCard ||
       !this.session ||
       this.sessionComplete ||
-      this.isSubmittingRating
+      this.isSubmittingRating ||
+      this.isPreparingMarathonRound
     ) {
       return;
     }
 
-    /*
-     * Die Rückseite wird bei Ablauf kurz sichtbar,
-     * bevor die Karte als falsch bewertet wird.
-     */
     this.isFlipped = true;
 
     await this.rateCard('AGAIN');
@@ -614,6 +643,7 @@ export class StudySessionPage implements OnDestroy {
     }
 
     this.isPreparingMarathonRound = true;
+    this.stopLightningTimer();
     this.loadError = '';
 
     /*
@@ -631,6 +661,13 @@ export class StudySessionPage implements OnDestroy {
         }),
       );
 
+      /*
+       * Entscheidend:
+       * Ab jetzt muss jede weitere Bewertung
+       * an die neue Session gesendet werden.
+       */
+      this.session = nextSession;
+
       this.orderedCards = [...nextSession.cards];
 
       this.currentIndex = 0;
@@ -642,18 +679,24 @@ export class StudySessionPage implements OnDestroy {
       this.incorrectAnswers = nextSession.incorrectAnswers;
 
       this.marathonRound += 1;
+
+      this.startLightningTimer();
     } catch (error: unknown) {
       if (error instanceof HttpErrorResponse && error.status === 409) {
+        /*
+         * Keine falschen Karten mehr vorhanden:
+         * Marathon erfolgreich abgeschlossen.
+         */
         this.sessionComplete = true;
         return;
       }
 
-      this.loadError =
-        'Die nächste Marathon-Runde konnte nicht gestartet werden.';
+      this.loadError = this.resolveSessionError(error);
     } finally {
       this.isPreparingMarathonRound = false;
     }
   }
+
   get examProgressCount(): number {
     if (!this.isExamMode) {
       return 0;

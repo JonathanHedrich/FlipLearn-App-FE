@@ -34,7 +34,9 @@
       <div class="main-filters">
         <button
           type="button"
-          [class.active]="activeFilter() === 'all'"
+          [class.active]="
+            activeFilter() === 'all'
+          "
           (click)="setMainFilter('all')"
         >
           All Sets
@@ -42,62 +44,94 @@
 
         <button
           type="button"
-          [class.active]="activeFilter() === 'favorites'"
-          (click)="setMainFilter('favorites')"
+          [class.active]="
+            activeFilter() === 'favorites'
+          "
+          (click)="
+            setMainFilter('favorites')
+          "
         >
-          <span>⭐</span>
+          <span aria-hidden="true">⭐</span>
+
           Favorites
         </button>
 
         <button
           type="button"
-          [class.active]="activeFilter() === 'recent'"
+          [class.active]="
+            activeFilter() === 'recent'
+          "
           (click)="setMainFilter('recent')"
         >
           <ion-icon name="time-outline"></ion-icon>
+
           Recent
         </button>
       </div>
 
-      <div class="category-scroll">
-        <button
-          type="button"
-          [class.active]="activeCategory() === 'all'"
-          (click)="setCategory('all')"
-        >
-          <ion-icon name="folder-outline"></ion-icon>
-          All
-        </button>
+      <section class="categories-section">
+        <div class="category-header">
+          <span>Kategorien</span>
 
-        <button
-          type="button"
-          [class.active]="activeCategory() === 'languages'"
-          (click)="setCategory('languages')"
-        >
-          <ion-icon name="folder-outline"></ion-icon>
-          Languages
-        </button>
+          <button
+            type="button"
+            class="expand-button"
+            [attr.aria-expanded]="categoriesExpanded"
+            (click)="categoriesExpanded = !categoriesExpanded"
+          >
+            {{ categoriesExpanded ? 'Weniger' : 'Alle' }}
+          </button>
+        </div>
 
-        <button
-          type="button"
-          [class.active]="activeCategory() === 'science'"
-          (click)="setCategory('science')"
-        >
-          <ion-icon name="folder-outline"></ion-icon>
-          Science
-        </button>
+        <div class="category-controls">
+          <div class="category-scroll" [class.expanded]="categoriesExpanded">
+            @if (!categoriesExpanded) { @if (activeCategory() === 'all') {
+            <button class="active">
+              <ion-icon name="folder-outline"></ion-icon>
+              All
+            </button>
+            } @else {
+            <button class="active">
+              <ion-icon name="folder-outline"></ion-icon>
+              {{ activeCategory() }}
+            </button>
+            } } @else {
 
-        <button
-          type="button"
-          [class.active]="activeCategory() === 'programming'"
-          (click)="setCategory('programming')"
-        >
-          <ion-icon name="folder-outline"></ion-icon>
-          Coding
-        </button>
-      </div>
+            <button
+              type="button"
+              [class.active]="activeCategory() === 'all'"
+              (click)="setCategory('all')"
+            >
+              <ion-icon name="folder-outline"></ion-icon>
+              All
+            </button>
 
-      @if (isLoading()) {
+            @for (category of categories; track category.id) {
+            <button
+              type="button"
+              [class.active]="activeCategory() === category.name"
+              (click)="setCategory(category.name)"
+            >
+              <ion-icon name="folder-outline"></ion-icon>
+              {{ category.name }}
+            </button>
+            } }
+          </div>
+
+          <button
+            class="manage-categories-button"
+            type="button"
+            aria-label="Kategorien verwalten"
+            (click)="openCategoryManager()"
+          >
+            <ion-icon name="create-outline"></ion-icon>
+          </button>
+        </div>
+      </section>
+
+      @if (categoryError && !categoryMenuOpen) {
+      <p class="category-inline-error">{{ categoryError }}</p>
+      } @if (isLoading()) {
       <section class="loading-state">
         <div class="loading-spinner"></div>
 
@@ -115,12 +149,14 @@
 
         <button type="button" (click)="reloadSets()">Erneut versuchen</button>
       </section>
-      } @else if (filteredSets().length > 0) {
+      } @else if ( filteredSets().length > 0 ) {
       <section class="sets-grid">
-        @for (set of filteredSets(); track set.id) {
+        @for ( set of filteredSets(); track set.id ) {
         <article
           class="set-card"
-          [ngClass]="getThemeClass(set.color)"
+          [ngClass]="
+            getThemeClass(set.color)
+          "
           (click)="openEditor(set.id)"
         >
           <div class="set-card-accent"></div>
@@ -132,31 +168,41 @@
               <p>
                 {{ set.cardCount }} {{ set.cardCount === 1 ? 'card' : 'cards' }}
               </p>
+
+              @if (set.categoryName) {
+              <span class="set-category-label"> {{ set.categoryName }} </span>
+              }
             </div>
 
             <button
               class="favorite-button"
               type="button"
               [attr.aria-label]="
-                    set.favorite
-                      ? 'Aus Favoriten entfernen'
-                      : 'Zu Favoriten hinzufügen'
-                  "
-              (click)="toggleFavorite(set, $event)"
+                set.favorite
+                  ? 'Aus Favoriten entfernen'
+                  : 'Zu Favoriten hinzufügen'
+              "
+              (click)="
+                toggleFavorite(
+                  set,
+                  $event
+                )
+              "
             >
               <ion-icon
                 [name]="
-                      set.favorite
-                        ? 'heart-sharp'
-                        : 'heart-outline'
-                    "
+                  set.favorite
+                    ? 'heart-sharp'
+                    : 'heart-outline'
+                "
               ></ion-icon>
             </button>
           </div>
 
           <div class="progress-heading">
             <span>Progress</span>
-            <strong>{{ set.progress }}%</strong>
+
+            <strong> {{ set.progress }}% </strong>
           </div>
 
           <div class="progress-track">
@@ -167,7 +213,12 @@
             <button
               class="study-button"
               type="button"
-              (click)="startStudy(set, $event)"
+              (click)="
+                startStudy(
+                  set,
+                  $event
+                )
+              "
             >
               Study
             </button>
@@ -176,7 +227,12 @@
               class="edit-button"
               type="button"
               aria-label="Lernset bearbeiten"
-              (click)="openEditor(set.id, $event)"
+              (click)="
+                openEditor(
+                  set.id,
+                  $event
+                )
+              "
             >
               <ion-icon name="create-outline"></ion-icon>
             </button>
@@ -210,3 +266,134 @@
 </ion-content>
 
 <fl-bottom-nav activePage="sets"></fl-bottom-nav>
+
+@if (categoryMenuOpen) {
+<div class="category-modal-backdrop" (click)="closeCategoryManager()">
+  <section
+    class="category-modal"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="category-modal-title"
+    (click)="$event.stopPropagation()"
+  >
+    <header class="category-modal-header">
+      <div>
+        <span>CATEGORIES</span>
+
+        <h2 id="category-modal-title">Kategorien verwalten</h2>
+
+        <p>Erstelle, benenne oder lösche deine persönlichen Kategorien.</p>
+      </div>
+
+      <button
+        type="button"
+        aria-label="Schließen"
+        [disabled]="
+          isSavingCategory ||
+          deletingCategoryId !== null
+        "
+        (click)="closeCategoryManager()"
+      >
+        <ion-icon name="close-outline"></ion-icon>
+      </button>
+    </header>
+
+    <form class="category-form" (ngSubmit)="saveCategory()">
+      <label for="categoryName">
+        {{ editingCategory ? 'Kategorie umbenennen' : 'Neue Kategorie' }}
+      </label>
+
+      <div class="category-input-row">
+        <input
+          id="categoryName"
+          name="categoryName"
+          type="text"
+          maxlength="80"
+          autocomplete="off"
+          [placeholder]="
+            editingCategory
+              ? 'Neuer Kategoriename'
+              : 'z. B. Mathematik'
+          "
+          [(ngModel)]="categoryName"
+        />
+
+        <button
+          type="submit"
+          [disabled]="
+            isSavingCategory ||
+            !categoryName.trim()
+          "
+        >
+          {{ isSavingCategory ? 'Speichert …' : editingCategory ? 'Ändern' :
+          'Hinzufügen' }}
+        </button>
+      </div>
+
+      @if (editingCategory) {
+      <button
+        class="cancel-category-edit"
+        type="button"
+        [disabled]="isSavingCategory"
+        (click)="cancelCategoryEdit()"
+      >
+        Umbenennen abbrechen
+      </button>
+      } @if (categoryError) {
+      <p class="category-error">{{ categoryError }}</p>
+      }
+    </form>
+
+    <div class="category-list">
+      @if (isLoadingCategories) {
+      <div class="category-loading">
+        <div class="loading-spinner"></div>
+
+        <span> Kategorien werden geladen … </span>
+      </div>
+      } @else if ( categories.length === 0 ) {
+      <p class="category-empty">
+        Du hast noch keine eigenen Kategorien erstellt.
+      </p>
+      } @else { @for ( category of categories; track category.id ) {
+      <article class="category-row">
+        <div class="category-row-icon">
+          <ion-icon name="folder-outline"></ion-icon>
+        </div>
+
+        <strong> {{ category.name }} </strong>
+
+        <button
+          type="button"
+          aria-label="Kategorie umbenennen"
+          [disabled]="
+            isSavingCategory ||
+            deletingCategoryId !== null
+          "
+          (click)="
+            startRenameCategory(category)
+          "
+        >
+          <ion-icon name="pencil-outline"></ion-icon>
+        </button>
+
+        <button
+          class="danger"
+          type="button"
+          aria-label="Kategorie löschen"
+          [disabled]="
+            isSavingCategory ||
+            deletingCategoryId !== null
+          "
+          (click)="
+            deleteCategory(category)
+          "
+        >
+          <ion-icon name="trash-outline"></ion-icon>
+        </button>
+      </article>
+      } }
+    </div>
+  </section>
+</div>
+}

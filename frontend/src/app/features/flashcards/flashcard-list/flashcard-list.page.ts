@@ -1,28 +1,37 @@
 import { CommonModule } from '@angular/common';
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component, computed, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { IonContent, IonIcon } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-
-import { FlashcardStore } from '../../../core/stores/flashcard.store';
-import { FlBottomNavComponent } from '../../../shared/components/fl-bottom-nav/fl-bottom-nav.component';
-import { AppNotificationService } from '../../../core/services/app-notification.service';
+import { firstValueFrom } from 'rxjs';
 
 import {
   addOutline,
+  closeOutline,
   createOutline,
   folderOutline,
   heartOutline,
   heartSharp,
+  pencilOutline,
   searchOutline,
   timeOutline,
+  trashOutline,
 } from 'ionicons/icons';
 
 import {
   FlashcardSetColor,
   FlashcardSetResponse,
 } from '../../../core/models/flashcard-api.model';
+import { CategoryResponse } from '../../../core/models/category.model';
+
+import { AppNotificationService } from '../../../core/services/app-notification.service';
+import { CategoryApi } from '../../../core/services/category-api';
+
+import { FlashcardStore } from '../../../core/stores/flashcard.store';
+
+import { FlBottomNavComponent } from '../../../shared/components/fl-bottom-nav/fl-bottom-nav.component';
 
 type MainFilter = 'all' | 'favorites' | 'recent';
 
@@ -42,14 +51,32 @@ type MainFilter = 'all' | 'favorites' | 'recent';
 export class FlashcardListPage {
   searchTerm = '';
 
+  categories: CategoryResponse[] = [];
+
+  categoryMenuOpen = false;
+
+  editingCategory: CategoryResponse | null = null;
+
+  categoryName = '';
+
+  categoryError = '';
+
+  categoriesExpanded = false;
+
+  isLoadingCategories = false;
+
+  isSavingCategory = false;
+
+  deletingCategoryId: number | null = null;
+
   readonly activeFilter = signal<MainFilter>('all');
 
+  /*
+   * Solange das Set-Modell noch set.folder verwendet,
+   * speichern wir hier den Kategorienamen.
+   */
   readonly activeCategory = signal<string>('all');
 
-  /*
-   * Öffentliche Signals des zentralen Stores.
-   * Diese werden im Template gelesen, aber nicht direkt verändert.
-   */
   readonly sets = this.flashcardStore.sets;
 
   readonly isLoading = this.flashcardStore.isLoadingSets;
@@ -79,7 +106,13 @@ export class FlashcardListPage {
         (filter === 'favorites' && set.favorite) ||
         filter === 'recent';
 
-      const matchesCategory = category === 'all' || set.folder === category;
+      const setCategory = (set.categoryName ?? '').trim();
+
+      const matchesCategory =
+        category === 'all' ||
+        setCategory.localeCompare(category, undefined, {
+          sensitivity: 'accent',
+        }) === 0;
 
       return matchesSearch && matchesFilter && matchesCategory;
     });
@@ -99,20 +132,28 @@ export class FlashcardListPage {
     readonly flashcardStore: FlashcardStore,
     private readonly router: Router,
     private readonly appNotificationService: AppNotificationService,
+    private readonly categoryApi: CategoryApi,
   ) {
     addIcons({
       addOutline,
+      closeOutline,
       createOutline,
       folderOutline,
       heartOutline,
       heartSharp,
+      pencilOutline,
       searchOutline,
       timeOutline,
+      trashOutline,
     });
   }
 
   ionViewWillEnter(): void {
-    void this.reloadSets();
+    void this.reloadPageData();
+  }
+
+  async reloadPageData(): Promise<void> {
+    await Promise.all([this.reloadSets(), this.loadCategories()]);
   }
 
   async loadSets(): Promise<void> {
@@ -120,8 +161,7 @@ export class FlashcardListPage {
       await this.flashcardStore.loadSets();
     } catch {
       /*
-       * Der Store speichert die Fehlermeldung bereits
-       * in flashcardStore.error.
+       * Der Store speichert den Fehler selbst.
        */
     }
   }
@@ -131,8 +171,41 @@ export class FlashcardListPage {
       await this.flashcardStore.loadSets(true);
     } catch {
       /*
-       * Der Fehler wird über loadError im Template angezeigt.
+       * Der Fehler wird über loadError angezeigt.
        */
+    }
+  }
+
+  async loadCategories(): Promise<void> {
+    if (this.isLoadingCategories) {
+      return;
+    }
+
+    this.isLoadingCategories = true;
+    this.categoryError = '';
+
+    try {
+      this.categories = await firstValueFrom(this.categoryApi.getCategories());
+
+      /*
+       * Falls eine ausgewählte Kategorie extern
+       * gelöscht wurde, springen wir auf "All".
+       */
+      const selectedCategory = this.activeCategory();
+
+      if (
+        selectedCategory !== 'all' &&
+        !this.categories.some((category) => category.name === selectedCategory)
+      ) {
+        this.activeCategory.set('all');
+      }
+    } catch (error: unknown) {
+      this.categoryError = this.resolveCategoryError(
+        error,
+        'Die Kategorien konnten nicht geladen werden.',
+      );
+    } finally {
+      this.isLoadingCategories = false;
     }
   }
 
@@ -140,8 +213,8 @@ export class FlashcardListPage {
     this.activeFilter.set(filter);
   }
 
-  setCategory(category: string): void {
-    this.activeCategory.set(category);
+  setCategory(categoryName: string): void {
+    this.activeCategory.set(categoryName);
   }
 
   getThemeClass(color: FlashcardSetColor): string {
@@ -199,5 +272,180 @@ export class FlashcardListPage {
     } catch {
       window.alert('Das Lernset konnte nicht gelöscht werden.');
     }
+  }
+
+  openCategoryManager(): void {
+    this.categoryError = '';
+    this.categoryName = '';
+    this.editingCategory = null;
+    this.categoryMenuOpen = true;
+  }
+
+  closeCategoryManager(): void {
+    if (this.isSavingCategory || this.deletingCategoryId !== null) {
+      return;
+    }
+
+    this.categoryMenuOpen = false;
+    this.categoryName = '';
+    this.editingCategory = null;
+    this.categoryError = '';
+  }
+
+  startCreateCategory(): void {
+    this.editingCategory = null;
+    this.categoryName = '';
+    this.categoryError = '';
+  }
+
+  startRenameCategory(category: CategoryResponse): void {
+    this.editingCategory = category;
+    this.categoryName = category.name;
+    this.categoryError = '';
+  }
+
+  cancelCategoryEdit(): void {
+    this.editingCategory = null;
+    this.categoryName = '';
+    this.categoryError = '';
+  }
+
+  async saveCategory(): Promise<void> {
+    if (this.isSavingCategory) {
+      return;
+    }
+
+    const name = this.categoryName.trim();
+
+    this.categoryError = '';
+
+    if (!name) {
+      this.categoryError = 'Bitte gib einen Kategorienamen ein.';
+      return;
+    }
+
+    if (name.length > 80) {
+      this.categoryError =
+        'Der Kategoriename darf höchstens 80 Zeichen lang sein.';
+      return;
+    }
+
+    this.isSavingCategory = true;
+
+    try {
+      if (this.editingCategory) {
+        const previousName = this.editingCategory.name;
+
+        const updatedCategory = await firstValueFrom(
+          this.categoryApi.updateCategory(this.editingCategory.id, {
+            name,
+          }),
+        );
+
+        this.categories = this.categories
+          .map((category) =>
+            category.id === updatedCategory.id ? updatedCategory : category,
+          )
+          .sort((first, second) => first.name.localeCompare(second.name, 'de'));
+
+        if (this.activeCategory() === previousName) {
+          this.activeCategory.set(updatedCategory.name);
+        }
+      } else {
+        const createdCategory = await firstValueFrom(
+          this.categoryApi.createCategory({
+            name,
+          }),
+        );
+
+        this.categories = [...this.categories, createdCategory].sort(
+          (first, second) => first.name.localeCompare(second.name, 'de'),
+        );
+      }
+
+      this.categoryName = '';
+      this.editingCategory = null;
+    } catch (error: unknown) {
+      this.categoryError = this.resolveCategoryError(
+        error,
+        this.editingCategory
+          ? 'Die Kategorie konnte nicht umbenannt werden.'
+          : 'Die Kategorie konnte nicht erstellt werden.',
+      );
+    } finally {
+      this.isSavingCategory = false;
+    }
+  }
+
+  async deleteCategory(category: CategoryResponse): Promise<void> {
+    if (this.deletingCategoryId !== null || this.isSavingCategory) {
+      return;
+    }
+
+    const confirmed = window.confirm(
+      `Möchtest du die Kategorie „${category.name}“ wirklich löschen? Die Lernsets bleiben erhalten und werden danach ohne Kategorie angezeigt.`,
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    this.deletingCategoryId = category.id;
+
+    this.categoryError = '';
+
+    try {
+      await firstValueFrom(this.categoryApi.deleteCategory(category.id));
+
+      this.categories = this.categories.filter(
+        (existingCategory) => existingCategory.id !== category.id,
+      );
+
+      if (this.activeCategory() === category.name) {
+        this.activeCategory.set('all');
+      }
+
+      if (this.editingCategory?.id === category.id) {
+        this.cancelCategoryEdit();
+      }
+
+      /*
+       * Sets neu laden, weil das Backend die
+       * Kategorie-Zuordnung beim Löschen entfernt.
+       */
+      await this.reloadSets();
+    } catch (error: unknown) {
+      this.categoryError = this.resolveCategoryError(
+        error,
+        'Die Kategorie konnte nicht gelöscht werden.',
+      );
+    } finally {
+      this.deletingCategoryId = null;
+    }
+  }
+
+  trackCategory(_index: number, category: CategoryResponse): number {
+    return category.id;
+  }
+
+  private resolveCategoryError(error: unknown, fallback: string): string {
+    if (!(error instanceof HttpErrorResponse)) {
+      return fallback;
+    }
+
+    if (error.status === 0) {
+      return 'Das Backend ist nicht erreichbar.';
+    }
+
+    if (
+      typeof error.error === 'object' &&
+      error.error !== null &&
+      'message' in error.error &&
+      typeof error.error.message === 'string'
+    ) {
+      return error.error.message;
+    }
+
+    return fallback;
   }
 }

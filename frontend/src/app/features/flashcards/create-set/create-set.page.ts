@@ -4,9 +4,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { IonContent, IonIcon } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-
-import { FlButtonComponent } from '../../../shared/components/fl-button/fl-button.component';
-import { FlashcardStore } from '../../../core/stores/flashcard.store';
+import { firstValueFrom } from 'rxjs';
 
 import {
   arrowBackOutline,
@@ -20,6 +18,12 @@ import {
   CreateFlashcardSetRequest,
   FlashcardSetColor,
 } from '../../../core/models/flashcard-api.model';
+import { CategoryResponse } from '../../../core/models/category.model';
+
+import { CategoryApi } from '../../../core/services/category-api';
+import { FlashcardStore } from '../../../core/stores/flashcard.store';
+
+import { FlButtonComponent } from '../../../shared/components/fl-button/fl-button.component';
 
 interface ColorOption {
   value: FlashcardSetColor;
@@ -37,7 +41,12 @@ interface ColorOption {
 export class CreateSetPage {
   submitted = false;
   isSubmitting = false;
+  isLoadingCategories = false;
+
   createError = '';
+  categoryError = '';
+
+  categories: CategoryResponse[] = [];
 
   selectedColor: FlashcardSetColor = 'blue';
 
@@ -74,19 +83,25 @@ export class CreateSetPage {
     },
   ];
 
-  readonly createSetForm = this.formBuilder.nonNullable.group({
-    title: [
-      '',
-      [Validators.required, Validators.minLength(2), Validators.maxLength(100)],
-    ],
-    description: ['', [Validators.maxLength(500)]],
-    folder: [''],
+  readonly createSetForm = this.formBuilder.group({
+    title: this.formBuilder.nonNullable.control('', [
+      Validators.required,
+      Validators.minLength(2),
+      Validators.maxLength(100),
+    ]),
+
+    description: this.formBuilder.nonNullable.control('', [
+      Validators.maxLength(500),
+    ]),
+
+    categoryId: this.formBuilder.control<number | null>(null),
   });
 
   constructor(
     private readonly formBuilder: FormBuilder,
     private readonly router: Router,
     private readonly flashcardStore: FlashcardStore,
+    private readonly categoryApi: CategoryApi,
   ) {
     addIcons({
       arrowBackOutline,
@@ -95,6 +110,10 @@ export class CreateSetPage {
       chevronDownOutline,
       folderOutline,
     });
+  }
+
+  ionViewWillEnter(): void {
+    void this.loadCategories();
   }
 
   get titleInvalid(): boolean {
@@ -114,6 +133,23 @@ export class CreateSetPage {
       this.colorOptions.find((option) => option.value === this.selectedColor)
         ?.hex ?? '#2868f7'
     );
+  }
+
+  async loadCategories(): Promise<void> {
+    if (this.isLoadingCategories) {
+      return;
+    }
+
+    this.isLoadingCategories = true;
+    this.categoryError = '';
+
+    try {
+      this.categories = await firstValueFrom(this.categoryApi.getCategories());
+    } catch (error: unknown) {
+      this.categoryError = this.resolveCreateError(error);
+    } finally {
+      this.isLoadingCategories = false;
+    }
   }
 
   selectColor(color: FlashcardSetColor): void {
@@ -136,6 +172,7 @@ export class CreateSetPage {
 
     this.submitted = true;
     this.createError = '';
+
     this.createSetForm.markAllAsTouched();
 
     if (this.createSetForm.invalid) {
@@ -149,8 +186,11 @@ export class CreateSetPage {
 
       const request: CreateFlashcardSetRequest = {
         title: formValue.title.trim(),
+
         description: formValue.description.trim() || null,
-        folder: formValue.folder.trim() || null,
+
+        categoryId: formValue.categoryId,
+
         color: this.selectedColor,
       };
 

@@ -53,17 +53,30 @@
         </label>
 
         <label class="form-group">
-          <span>Ordner</span>
+          <span>Kategorie</span>
 
           <div class="input-with-icon">
             <ion-icon name="folder-outline"></ion-icon>
 
-            <input
-              type="text"
-              formControlName="folder"
-              placeholder="z. B. languages"
-            />
+            <select formControlName="categoryId">
+              <option [ngValue]="null">Keine Kategorie</option>
+
+              @for ( category of categories; track category.id ) {
+              <option [ngValue]="category.id">{{ category.name }}</option>
+              }
+            </select>
+
+            <ion-icon
+              class="select-arrow"
+              name="chevron-down-outline"
+            ></ion-icon>
           </div>
+
+          @if (isLoadingCategories) {
+          <small> Kategorien werden geladen … </small>
+          } @if (categoryError) {
+          <p class="validation-message">{{ categoryError }}</p>
+          }
         </label>
 
         <section class="color-section">

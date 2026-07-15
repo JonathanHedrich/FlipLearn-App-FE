@@ -90,7 +90,7 @@ ion-content {
 .header-progress-value {
   height: 100%;
   border-radius: inherit;
-  background: var(--fl-surface);
+  background: var(--fl-text-on-primary);
   transition: width 300ms ease;
 }
 
@@ -448,7 +448,7 @@ ion-content {
   padding: calc(52px + env(safe-area-inset-top)) 20px
     calc(36px + env(safe-area-inset-bottom));
 
-  background: linear-gradient(180deg, #eef4ff 0%, #f8faff 100%);
+  background: var(--fl-background);
 
   text-align: center;
 }
@@ -769,7 +769,7 @@ ion-content {
 
   box-shadow: 0 18px 44px rgba(35, 67, 130, 0.16);
 
-  color: rgb(16, 32, 71);
+  color: var(--fl-text-on-primary);
   background: var(--fl-surface);
 
   font-size: 0.65rem;

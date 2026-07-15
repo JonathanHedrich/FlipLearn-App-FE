@@ -305,6 +305,14 @@
   --fl-shadow-popup: 0 12px 30px rgba(0, 0, 0, 0.12);
 
   --fl-shadow-drop: drop-shadow(0 2px 3px rgba(47, 107, 255, 0.17));
+
+  --fl-danger-border: rgba(220, 38, 38, 0.2);
+
+  --fl-danger-soft: rgba(239, 68, 68, 0.1);
+
+  --fl-focus-ring: rgba(47, 107, 255, 0.1);
+
+  --fl-backdrop: rgba(15, 23, 42, 0.55);
 }
 
 /*
@@ -400,6 +408,14 @@ body.dark {
   --fl-set-orange-soft: rgba(232, 129, 0, 0.17);
   --fl-set-red-soft: rgba(233, 41, 41, 0.17);
   --fl-set-cyan-soft: rgba(20, 149, 181, 0.17);
+
+  --fl-danger-border: rgba(239, 68, 68, 0.3);
+
+  --fl-danger-soft: rgba(239, 68, 68, 0.16);
+
+  --fl-focus-ring: rgba(74, 128, 255, 0.22);
+
+  --fl-backdrop: rgba(0, 0, 0, 0.62);
 }
 
 body.dark ion-toggle {
