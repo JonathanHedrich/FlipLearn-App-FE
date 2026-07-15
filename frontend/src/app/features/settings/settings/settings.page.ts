@@ -19,6 +19,7 @@ import { FlashcardStore } from '../../../core/stores/flashcard.store';
 import { StatisticsStore } from '../../../core/stores/statistics.store';
 import { NotificationService } from '../../../core/services/notification.service';
 import { AppNotificationService } from '../../../core/services/app-notification.service';
+import { StreakAlertService } from '../../../core/services/streak-alert.service';
 
 interface SettingsRow {
   label: string;
@@ -74,6 +75,7 @@ export class SettingsPage {
     private readonly notificationService: NotificationService,
     readonly themeService: ThemeService,
     private readonly appNotificationService: AppNotificationService,
+    private readonly streakAlertService: StreakAlertService,
   ) {
     addIcons({
       arrowBackOutline,
@@ -240,11 +242,30 @@ export class SettingsPage {
     );
   }
 
-  saveStreakAlerts(): void {
+  async saveStreakAlerts(): Promise<void> {
+    this.notificationPermissionError = '';
+
+    if (this.streakAlertsEnabled) {
+      const permission = await this.notificationService.requestPermission();
+
+      if (permission !== 'granted') {
+        this.streakAlertsEnabled = false;
+
+        this.notificationPermissionError =
+          'Benachrichtigungen wurden vom Browser nicht erlaubt.';
+      }
+    }
+
     localStorage.setItem(
       STREAK_ALERTS_STORAGE_KEY,
       String(this.streakAlertsEnabled),
     );
+
+    if (this.streakAlertsEnabled) {
+      void this.streakAlertService.checkAndNotify();
+    } else {
+      this.streakAlertService.clearLastAlert();
+    }
   }
 
   private loadBooleanSetting(key: string, fallback: boolean): boolean {
