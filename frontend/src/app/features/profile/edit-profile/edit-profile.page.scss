@@ -22,7 +22,7 @@ ion-content {
 
   padding: calc(env(safe-area-inset-top) + 18px) 18px 22px;
 
-  color: #ffffff;
+  color: var(--fl-text-on-primary);
   background: var(--fl-gradient-primary);
 }
 
@@ -45,8 +45,8 @@ ion-content {
   border: 1px solid rgba(255, 255, 255, 0.25);
   border-radius: 50%;
 
-  color: #ffffff;
-  background: rgba(255, 255, 255, 0.12);
+  color: var(--fl-text-on-primary);
+  background: var(--fl-overlay);
 }
 
 .edit-profile-content {
@@ -136,7 +136,7 @@ form {
 
 .form-group input:focus {
   border-color: var(--fl-primary);
-  box-shadow: 0 0 0 4px rgba(47, 107, 255, 0.1);
+  box-shadow: 0 0 0 4px var(--fl-primary-soft-medium);
 }
 
 .save-button {
@@ -150,7 +150,7 @@ form {
   border: 0;
   border-radius: 15px;
 
-  color: #ffffff;
+  color: var(--fl-text-on-primary);
   background: var(--fl-gradient-button);
 
   font-weight: 850;
@@ -175,12 +175,12 @@ form {
 .validation-message,
 .form-error {
   color: var(--fl-danger);
-  background: rgba(220, 38, 38, 0.08);
+  background: var(--fl-danger-soft);
 }
 
 .form-success {
   color: #087f5b;
-  background: rgba(6, 159, 120, 0.1);
+  background: var(--fl-success-soft);
 }
 
 @media (min-width: 600px) {

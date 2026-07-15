@@ -34,8 +34,8 @@
 
 .input-wrapper:focus-within {
   border-color: var(--fl-primary);
-  background: #ffffff;
-  box-shadow: 0 0 0 3px rgba(47, 107, 255, 0.1);
+  background: var(--fl-surface);
+  box-shadow: 0 0 0 3px var(--fl-primary-soft-medium);
 }
 
 .input-wrapper.input-invalid {
@@ -80,7 +80,7 @@ ion-input {
 }
 
 .password-toggle:active {
-  background: rgba(47, 107, 255, 0.08);
+  background: var(--fl-primary-soft);
 }
 
 .password-toggle ion-icon {

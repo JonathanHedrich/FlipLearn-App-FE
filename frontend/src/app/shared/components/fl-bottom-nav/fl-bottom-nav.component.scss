@@ -14,8 +14,8 @@
 
   border-top: 1px solid var(--fl-border);
 
-  background: rgba(255, 255, 255, 0.96);
-  box-shadow: 0 -8px 24px rgba(35, 67, 130, 0.08);
+  background: var(--fl-surface-elevated);
+  box-shadow: 0 -8px 24px var(--fl-shadow-header);
 
   backdrop-filter: blur(18px);
 }
@@ -52,7 +52,7 @@
 
 .nav-item.active {
   color: var(--fl-primary);
-  background: rgba(47, 107, 255, 0.08);
+  background: var(--fl-primary-soft);
 }
 
 .nav-item.active::before {

@@ -17,7 +17,7 @@ ion-content {
 .study-header {
   padding: calc(24px + env(safe-area-inset-top)) 20px 20px;
 
-  color: #ffffff;
+  color: var(--fl-text-on-primary);
   background: var(--fl-gradient-primary);
 }
 
@@ -36,11 +36,11 @@ ion-content {
   height: 42px;
   padding: 0;
 
-  border: 1px solid rgba(255, 255, 255, 0.18);
+  border: 1px solid var(--fl-overlay-strong);
   border-radius: 50%;
 
-  color: #ffffff;
-  background: rgba(255, 255, 255, 0.14);
+  color: var(--fl-text-on-primary);
+  background: var(--fl-overlay);
 
   cursor: pointer;
 }
@@ -67,13 +67,13 @@ ion-content {
 .header-title p {
   margin: 3px 0 0;
 
-  color: rgba(255, 255, 255, 0.78);
+  color: var(--fl-text-on-primary-soft);
 
   font-size: 0.7rem;
 }
 
 .progress-percentage {
-  color: #ffffff;
+  color: var(--fl-text-on-primary);
   font-size: 0.78rem;
   font-weight: 800;
 }
@@ -84,13 +84,13 @@ ion-content {
   overflow: hidden;
 
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.18);
+  background: var(--fl-overlay-strong);
 }
 
 .header-progress-value {
   height: 100%;
   border-radius: inherit;
-  background: #ffffff;
+  background: var(--fl-surface);
   transition: width 300ms ease;
 }
 
@@ -124,7 +124,7 @@ ion-content {
 }
 
 .flip-card:focus-visible {
-  outline: 3px solid rgba(47, 107, 255, 0.22);
+  outline: 3px solid var(--fl-shadow-primary-lg);
   outline-offset: 4px;
   border-radius: 28px;
 }
@@ -169,11 +169,11 @@ ion-content {
 .card-front {
   border: 1px solid #d9e4fa;
   color: var(--fl-text-primary);
-  background: #ffffff;
+  background: var(--fl-surface);
 }
 
 .card-back {
-  color: #ffffff;
+  color: var(--fl-text-on-primary);
   background: var(--fl-gradient-primary);
   transform: rotateY(180deg);
 }
@@ -220,7 +220,7 @@ ion-content {
 
 .card-back .favorite-button {
   color: #ffe082;
-  background: rgba(255, 255, 255, 0.13);
+  background: var(--fl-overlay);
 }
 
 .favorite-button ion-icon {
@@ -241,7 +241,7 @@ ion-content {
 }
 
 .card-back .card-side-label {
-  color: rgba(255, 255, 255, 0.72);
+  color: var(--fl-text-on-primary-muted);
 }
 
 .card-text-box {
@@ -311,7 +311,7 @@ ion-content {
   border-radius: 20px;
 
   color: var(--fl-text-muted);
-  background: rgba(255, 255, 255, 0.6);
+  background: var(--fl-surface);
 
   font-size: 0.78rem;
   text-align: center;
@@ -528,7 +528,7 @@ ion-content {
   height: 126px;
 
   border-radius: 50%;
-  background: #ffffff;
+  background: var(--fl-surface);
 }
 
 .accuracy-ring-inner strong {
@@ -559,7 +559,7 @@ ion-content {
   border: 1px solid var(--fl-border);
   border-radius: 18px;
 
-  background: #ffffff;
+  background: var(--fl-surface);
   box-shadow: var(--fl-shadow-sm);
 }
 
@@ -631,7 +631,7 @@ ion-content {
 
 .primary-action {
   border: 0;
-  color: #ffffff;
+  color: var(--fl-text-on-primary);
   background: var(--fl-gradient-button);
   box-shadow: var(--fl-shadow-primary);
 }
@@ -639,7 +639,7 @@ ion-content {
 .secondary-action {
   border: 1px solid var(--fl-border);
   color: var(--fl-primary);
-  background: #ffffff;
+  background: var(--fl-surface);
 }
 
 @media (max-width: 350px) {
@@ -770,7 +770,7 @@ ion-content {
   box-shadow: 0 18px 44px rgba(35, 67, 130, 0.16);
 
   color: rgb(16, 32, 71);
-  background: #ffffff;
+  background: var(--fl-surface);
 
   font-size: 0.65rem;
   font-weight: 800;
@@ -913,7 +913,7 @@ ion-content {
 
   background: var(--fl-primary-light);
 
-  box-shadow: 0 0 0 3px rgba(47, 107, 255, 0.08);
+  box-shadow: 0 0 0 3px var(--fl-primary-soft);
 }
 
 .study-mode-option:disabled {
@@ -989,7 +989,7 @@ ion-content {
 
 .study-mode-option.active .study-mode-radio {
   border: 5px solid var(--fl-primary);
-  background: #ffffff;
+  background: var(--fl-surface);
 }
 
 /* =========================================================
@@ -1120,7 +1120,7 @@ ion-content {
   border-radius: 13px;
 
   color: #5c48db;
-  background: #ffffff;
+  background: var(--fl-surface);
 
   font-size: 1.05rem;
 }
@@ -1185,7 +1185,7 @@ ion-content {
   border-radius: 13px;
 
   color: #8244e5;
-  background: #ffffff;
+  background: var(--fl-surface);
 
   font-size: 1.1rem;
 }

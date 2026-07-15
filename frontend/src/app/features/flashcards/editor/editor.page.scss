@@ -35,7 +35,7 @@ ion-content {
 
   padding: calc(24px + env(safe-area-inset-top)) 20px 20px;
 
-  color: #ffffff;
+  color: var(--fl-text-on-primary);
   background: var(--fl-gradient-primary);
 }
 
@@ -47,11 +47,11 @@ ion-content {
   height: 42px;
   padding: 0;
 
-  border: 1px solid rgba(255, 255, 255, 0.18);
+  border: 1px solid var(--fl-overlay-strong);
   border-radius: 50%;
 
-  color: #ffffff;
-  background: rgba(255, 255, 255, 0.14);
+  color: var(--fl-text-on-primary);
+  background: var(--fl-overlay);
 
   cursor: pointer;
 }
@@ -82,7 +82,7 @@ ion-content {
 .header-title p {
   margin: 3px 0 0;
 
-  color: rgba(255, 255, 255, 0.82);
+  color: var(--fl-text-on-primary-medium);
 
   font-size: 0.76rem;
 }
@@ -103,7 +103,7 @@ ion-content {
   border: 1px solid var(--fl-border);
   border-radius: 17px;
 
-  background: #ffffff;
+  background: var(--fl-surface);
   box-shadow: var(--fl-shadow-sm);
 
   transition:
@@ -113,7 +113,7 @@ ion-content {
 
 .flashcard-editor.editing {
   border-color: var(--fl-primary);
-  box-shadow: 0 8px 24px rgba(47, 107, 255, 0.14);
+  box-shadow: 0 8px 24px var(--fl-shadow-primary-md);
 }
 
 .card-header {
@@ -126,7 +126,7 @@ ion-content {
 
   border-bottom: 1px solid var(--fl-border);
 
-  background: #f5f8ff;
+  background: var(--fl-surface-soft);
 }
 
 .card-header span {
@@ -156,7 +156,7 @@ ion-content {
 }
 
 .delete-button:active {
-  background: rgba(239, 68, 68, 0.1);
+  background: var(--fl-danger-soft);
 }
 
 .delete-button ion-icon {
@@ -177,7 +177,7 @@ ion-content {
   border: 0;
 
   color: inherit;
-  background: #ffffff;
+  background: var(--fl-surface);
 
   text-align: left;
   cursor: pointer;
@@ -260,8 +260,8 @@ ion-content {
 
 .card-fields textarea:focus {
   border-color: var(--fl-primary);
-  background: #ffffff;
-  box-shadow: 0 0 0 3px rgba(47, 107, 255, 0.1);
+  background: var(--fl-surface);
+  box-shadow: 0 0 0 3px var(--fl-primary-soft-medium);
 }
 
 .done-button {
@@ -275,7 +275,7 @@ ion-content {
   border: 0;
   border-radius: 12px;
 
-  color: #ffffff;
+  color: var(--fl-text-on-primary);
   background: var(--fl-gradient-button);
 
   font-size: 0.76rem;
@@ -301,7 +301,7 @@ ion-content {
   border-radius: 18px;
 
   color: var(--fl-primary);
-  background: rgba(255, 255, 255, 0.72);
+  background: var(--fl-surface);
 
   cursor: pointer;
 }
@@ -353,7 +353,7 @@ ion-content {
   border: 0;
   border-radius: 16px;
 
-  color: #ffffff;
+  color: var(--fl-text-on-primary);
   background: var(--fl-gradient-button);
 
   box-shadow: var(--fl-shadow-primary);
@@ -467,7 +467,7 @@ ion-content {
   border: 0;
   border-radius: 14px;
 
-  color: #ffffff;
+  color: var(--fl-text-on-primary);
   background: var(--fl-gradient-button);
 
   font-weight: 800;
@@ -495,12 +495,12 @@ ion-content {
 .cancel-button {
   border: 1px solid var(--fl-border);
   color: var(--fl-text-secondary);
-  background: #ffffff;
+  background: var(--fl-surface);
 }
 
 .done-button {
   border: 0;
-  color: #ffffff;
+  color: var(--fl-text-on-primary);
   background: var(--fl-gradient-button);
 }
 
@@ -537,8 +537,8 @@ ion-content {
   border: 1px solid var(--fl-border);
   border-radius: 16px;
 
-  background: #ffffff;
-  box-shadow: 0 12px 30px rgba(16, 36, 80, 0.18);
+  background: var(--fl-surface);
+  box-shadow: 0 12px 30px var(--fl-shadow-surface-lg);
 }
 
 .editor-options-menu button {
@@ -578,7 +578,7 @@ ion-content {
 
 .editor-options-menu button.danger:hover,
 .editor-options-menu button.danger:active {
-  background: rgba(220, 38, 38, 0.08);
+  background: var(--fl-danger-soft);
 }
 
 @media (min-width: 600px) {

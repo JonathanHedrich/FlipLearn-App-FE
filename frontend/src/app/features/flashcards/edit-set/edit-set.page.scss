@@ -22,7 +22,7 @@ ion-content {
 
   padding: calc(env(safe-area-inset-top) + 18px) 18px 22px;
 
-  color: #ffffff;
+  color: var(--fl-text-on-primary);
   background: var(--fl-gradient-primary);
 }
 
@@ -43,8 +43,8 @@ ion-content {
   border: 1px solid rgba(255, 255, 255, 0.25);
   border-radius: 50%;
 
-  color: #ffffff;
-  background: rgba(255, 255, 255, 0.12);
+  color: var(--fl-text-on-primary);
+  background: var(--fl-overlay);
 }
 
 .edit-set-content {
@@ -87,7 +87,7 @@ textarea {
 input:focus,
 textarea:focus {
   border-color: var(--fl-primary);
-  background: #ffffff;
+  background: var(--fl-surface);
 }
 
 .input-with-icon {
@@ -130,11 +130,11 @@ textarea:focus {
   border: 3px solid transparent;
   border-radius: 50%;
 
-  color: #ffffff;
+  color: var(--fl-text-on-primary);
 }
 
 .color-button.selected {
-  border-color: #ffffff;
+  border-color: var(--fl-text-on-primary);
   box-shadow: 0 0 0 2px var(--fl-primary);
 }
 
@@ -144,7 +144,7 @@ textarea:focus {
   border: 0;
   border-radius: 16px;
 
-  color: #ffffff;
+  color: var(--fl-text-on-primary);
   background: var(--fl-gradient-button);
   box-shadow: var(--fl-shadow-primary);
 

@@ -219,6 +219,92 @@
   );
 
   --fl-gradient-button: linear-gradient(90deg, #2168ff 0%, #5438f5 100%);
+
+  --fl-success-soft: #e4f7f0;
+  --fl-warning-soft: #fff3dc;
+  --fl-danger-soft: #fff0f0;
+  --fl-info-soft: #eaf1ff;
+
+  --fl-set-blue-soft: #e8efff;
+  --fl-set-purple-soft: #f1e9ff;
+  --fl-set-green-soft: #e2f6ef;
+  --fl-set-orange-soft: #fff0dc;
+  --fl-set-red-soft: #ffe8e8;
+  --fl-set-cyan-soft: #e4f6fa;
+
+  /* Overlays */
+
+  --fl-overlay: var(--fl-overlay);
+  --fl-overlay-medium: rgba(255, 255, 255, 0.16);
+  --fl-overlay-strong: rgba(255, 255, 255, 0.19);
+  --fl-overlay-heavy: rgba(255, 255, 255, 0.22);
+
+  /* Backdrops */
+
+  --fl-backdrop-light: rgba(15, 23, 42, 0.45);
+  --fl-backdrop: rgba(15, 23, 42, 0.55);
+
+  /* Surface */
+
+  --fl-surface-elevated: rgba(255, 255, 255, 0.97);
+
+  /* Text */
+
+  --fl-text-on-primary-muted: rgba(255, 255, 255, 0.72);
+
+  /* Status */
+
+  --fl-danger-soft: rgba(239, 68, 68, 0.1);
+  --fl-success-soft: rgba(8, 167, 122, 0.1);
+
+  --fl-primary-soft: rgba(47, 107, 255, 0.08);
+  --fl-primary-soft-medium: rgba(47, 107, 255, 0.1);
+  --fl-primary-soft-strong: rgba(47, 107, 255, 0.12);
+  --fl-primary-soft-heavy: rgba(47, 107, 255, 0.16);
+  --fl-primary-soft-active: rgba(47, 107, 255, 0.2);
+  --fl-primary-border: rgba(47, 107, 255, 0.28);
+
+  --fl-overlay-light: rgba(255, 255, 255, 0.24);
+  --fl-overlay: rgba(255, 255, 255, 0.14);
+  --fl-overlay-medium: rgba(255, 255, 255, 0.18);
+  --fl-overlay-heavy: rgba(255, 255, 255, 0.42);
+  --fl-overlay-inset: rgba(255, 255, 255, 0.7);
+
+  --fl-text-on-primary-subtle: rgba(255, 255, 255, 0.68);
+  --fl-text-on-primary-muted: rgba(255, 255, 255, 0.74);
+  --fl-text-on-primary-soft: rgba(255, 255, 255, 0.78);
+  --fl-text-on-primary-medium: rgba(255, 255, 255, 0.82);
+  --fl-text-on-primary-strong: rgba(255, 255, 255, 0.88);
+  --fl-text-on-primary-max: rgba(255, 255, 255, 0.92);
+
+  --fl-danger-border: rgba(220, 38, 38, 0.2);
+
+  --fl-warning-border: rgba(255, 128, 0, 0.25);
+
+  --fl-warning-shadow: rgba(243, 154, 38, 0.16);
+  --fl-warning-shadow-strong: rgba(244, 111, 0, 0.22);
+
+  --fl-backdrop: rgba(31, 41, 55, 0.97);
+
+  --fl-stroke: var(--fl-stroke);
+
+  --fl-shadow-primary-sm: 0 6px 14px rgba(47, 107, 255, 0.11);
+  --fl-shadow-primary-md: 0 8px 24px rgba(47, 107, 255, 0.14);
+  --fl-shadow-primary-lg: 0 12px 30px rgba(47, 107, 255, 0.22);
+
+  --fl-shadow-surface-sm: 0 8px 20px rgba(30, 55, 105, 0.15);
+  --fl-shadow-surface-md: 0 10px 24px rgba(16, 32, 71, 0.16);
+  --fl-shadow-surface-lg: 0 12px 30px rgba(16, 36, 80, 0.18);
+
+  --fl-shadow-header: 0 -8px 24px rgba(35, 67, 130, 0.08);
+
+  --fl-shadow-avatar: 0 12px 28px rgba(20, 31, 93, 0.14);
+
+  --fl-shadow-card: 0 8px 24px rgba(26, 50, 100, 0.065);
+
+  --fl-shadow-popup: 0 12px 30px rgba(0, 0, 0, 0.12);
+
+  --fl-shadow-drop: drop-shadow(0 2px 3px rgba(47, 107, 255, 0.17));
 }
 
 /*
@@ -251,4 +337,92 @@
   --ion-color-contrast-rgb: 255, 255, 255;
   --ion-color-shade: #cc7200;
   --ion-color-tint: #ea8e1a;
+}
+
+/* =========================================================
+   DARK THEME
+   ========================================================= */
+
+body.dark {
+  color-scheme: dark;
+
+  /* Ionic */
+  --ion-background-color: #0d1525;
+  --ion-background-color-rgb: 13, 21, 37;
+
+  --ion-text-color: #f4f7ff;
+  --ion-text-color-rgb: 244, 247, 255;
+
+  --ion-card-background: #172238;
+  --ion-item-background: transparent;
+
+  /* Grundflächen */
+  --fl-background: #0d1525;
+  --fl-surface: #172238;
+  --fl-surface-soft: #1c2941;
+  --fl-input-background: #202e48;
+
+  /* Texte */
+  --fl-text-primary: #f4f7ff;
+  --fl-text-secondary: #abb8d2;
+  --fl-text-muted: #7788a9;
+  --fl-text-on-primary: #ffffff;
+
+  /* Linien */
+  --fl-border: #30405e;
+  --fl-border-strong: #435676;
+
+  /* Primärfarben */
+  --fl-primary: #5d86ff;
+  --fl-primary-dark: #4772f5;
+  --fl-primary-light: rgba(93, 134, 255, 0.16);
+
+  --fl-secondary: #816cff;
+  --fl-secondary-dark: #6854ea;
+  --fl-secondary-light: rgba(129, 108, 255, 0.16);
+
+  /* Schatten */
+  --fl-shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.2);
+  --fl-shadow-md: 0 8px 22px rgba(0, 0, 0, 0.28);
+  --fl-shadow-lg: 0 18px 42px rgba(0, 0, 0, 0.35);
+  --fl-shadow-primary: 0 10px 28px rgba(36, 82, 210, 0.32);
+
+  /* Statusflächen */
+  --fl-success-soft: rgba(8, 167, 122, 0.15);
+  --fl-warning-soft: rgba(245, 158, 11, 0.15);
+  --fl-danger-soft: rgba(239, 68, 68, 0.14);
+  --fl-info-soft: rgba(93, 134, 255, 0.15);
+
+  /* Lernset-Flächen */
+  --fl-set-blue-soft: rgba(40, 104, 247, 0.17);
+  --fl-set-purple-soft: rgba(135, 53, 239, 0.17);
+  --fl-set-green-soft: rgba(6, 159, 120, 0.17);
+  --fl-set-orange-soft: rgba(232, 129, 0, 0.17);
+  --fl-set-red-soft: rgba(233, 41, 41, 0.17);
+  --fl-set-cyan-soft: rgba(20, 149, 181, 0.17);
+}
+
+body.dark ion-toggle {
+  --track-background: #3b4967;
+  --track-background-checked: var(--fl-primary);
+
+  --handle-background: #dce5f7;
+  --handle-background-checked: #ffffff;
+}
+
+body.dark {
+  --fl-overlay: rgba(255, 255, 255, 0.08);
+  --fl-overlay-medium: rgba(255, 255, 255, 0.11);
+  --fl-overlay-strong: rgba(255, 255, 255, 0.15);
+  --fl-overlay-heavy: rgba(255, 255, 255, 0.18);
+
+  --fl-backdrop-light: rgba(0, 0, 0, 0.45);
+  --fl-backdrop: rgba(0, 0, 0, 0.6);
+
+  --fl-surface-elevated: rgba(24, 34, 56, 0.98);
+
+  --fl-text-on-primary-muted: rgba(255, 255, 255, 0.82);
+
+  --fl-danger-soft: rgba(239, 68, 68, 0.16);
+  --fl-success-soft: rgba(8, 167, 122, 0.16);
 }

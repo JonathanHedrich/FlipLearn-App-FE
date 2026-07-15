@@ -52,7 +52,7 @@ fl-logo {
 .login-hero p {
   margin-top: 10px;
 
-  color: rgba(255, 255, 255, 0.88);
+  color: var(--fl-text-on-primary-strong);
 
   font-size: 16px;
 }
@@ -104,7 +104,7 @@ fl-logo {
 
   letter-spacing: 0.4px;
 
-  color: #6578a7;
+  color: var(--fl-text-secondary);
 }
 
 .password-heading a {
@@ -144,7 +144,7 @@ fl-logo {
 
   height: 1px;
 
-  background: #d9e3f7;
+  background: var(--fl-border);
 }
 
 .divider p {
@@ -152,7 +152,7 @@ fl-logo {
 
   font-size: 13px;
 
-  color: #7d8fb8;
+  color: var(--fl-text-secondary);
 }
 
 /* ===========================
@@ -164,7 +164,7 @@ fl-logo {
 
   text-align: center;
 
-  color: #7d8fb8;
+  color: var(--fl-text-secondary);
 
   font-size: 15px;
 }
@@ -201,11 +201,11 @@ fl-logo {
   margin: 16px 0 0;
   padding: 12px 14px;
 
-  border: 1px solid rgba(220, 38, 38, 0.2);
+  border: 1px solid var(--fl-danger-border);
   border-radius: 14px;
 
   color: var(--fl-danger);
-  background: rgba(220, 38, 38, 0.08);
+  background: var(--fl-danger-soft);
 
   font-size: 0.8rem;
   line-height: 1.45;

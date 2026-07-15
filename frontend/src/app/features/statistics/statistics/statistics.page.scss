@@ -27,7 +27,7 @@ ion-content {
   top: 0;
   z-index: 100;
 
-  color: #ffffff;
+  color: var(--fl-text-on-primary);
   background: linear-gradient(145deg, #6a55f5 0%, #4258ed 48%, #2678f3 100%);
 }
 
@@ -46,11 +46,11 @@ ion-content {
   height: 42px;
   padding: 0;
 
-  border: 1px solid rgba(255, 255, 255, 0.24);
+  border: 1px solid var(--fl-overlay-light);
   border-radius: 50%;
 
-  color: #ffffff;
-  background: rgba(255, 255, 255, 0.12);
+  color: var(--fl-text-on-primary);
+  background: var(--fl-overlay);
 
   cursor: pointer;
 
@@ -61,7 +61,7 @@ ion-content {
 
 .header-button:active {
   transform: scale(0.94);
-  background: rgba(255, 255, 255, 0.2);
+  background: var(--fl-overlay-strong);
 }
 
 .header-button ion-icon {
@@ -88,7 +88,7 @@ ion-content {
 .header-title p {
   margin: 4px 0 0;
 
-  color: rgba(255, 255, 255, 0.74);
+  color: var(--fl-text-on-primary-muted);
 
   font-size: 0.72rem;
   font-weight: 500;
@@ -110,16 +110,16 @@ ion-content {
   min-height: 34px;
   padding: 0 15px;
 
-  border: 1px solid rgba(255, 255, 255, 0.22);
+  border: 1px solid var(--fl-overlay-heavy);
   border-radius: 999px;
 
-  background: rgba(255, 255, 255, 0.13);
+  background: var(--fl-overlay);
   backdrop-filter: blur(10px);
 
   font-size: 0.72rem;
   font-weight: 800;
 
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  box-shadow: inset 0 1px 0 var(--fl-overlay);
 }
 
 /* =========================================================
@@ -147,8 +147,8 @@ ion-content {
   border: 1px solid rgba(30, 60, 120, 0.08);
   border-radius: 21px;
 
-  background: #ffffff;
-  box-shadow: 0 8px 24px rgba(26, 50, 100, 0.065);
+  background: var(--fl-surface);
+  box-shadow: 0 8px 24px var(--fl-shadow-card);
 }
 
 .section-eyebrow {
@@ -408,7 +408,7 @@ ion-content {
 
   font-size: 0.88rem;
 
-  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.7);
+  box-shadow: inset 0 1px 1px var(--fl-overlay-inset);
 
   transition:
     transform 150ms ease,
@@ -416,23 +416,16 @@ ion-content {
 }
 
 .calendar-circle.active {
-  border-color: rgba(255, 128, 0, 0.25);
+  border-color: var(--fl-warning-border);
 
-  color: #ffffff;
+  color: var(--fl-text-on-primary);
   background: linear-gradient(145deg, #ffad29 0%, #ff7a00 52%, #f05e00 100%);
 
-  box-shadow: 0 7px 14px rgba(244, 111, 0, 0.22);
+  box-shadow: 0 7px 14px var(--fl-warning-shadow-strong);
 }
 
 .calendar-circle.active:active {
   transform: scale(0.94);
-}
-
-.calendar-day small {
-  color: var(--fl-text-muted);
-
-  font-size: 0.53rem;
-  font-weight: 700;
 }
 
 /* =========================================================
@@ -640,7 +633,7 @@ ion-content {
   border: 0;
   border-radius: 13px;
 
-  color: #ffffff;
+  color: var(--fl-text-on-primary);
   background: var(--fl-gradient-button);
 
   font-size: 0.73rem;
@@ -732,7 +725,7 @@ fl-bottom-nav {
 
   padding: 22px;
 
-  background: rgba(15, 23, 42, 0.55);
+  background: var(--fl-backdrop);
   backdrop-filter: blur(5px);
 }
 
@@ -794,7 +787,7 @@ fl-bottom-nav {
   color: #f39a26;
   background: #fff6e7;
 
-  box-shadow: 0 12px 24px rgba(243, 154, 38, 0.16);
+  box-shadow: 0 12px 24px var(--fl-warning-shadow);
 }
 
 .achievement-modal-status {
@@ -903,7 +896,7 @@ fl-bottom-nav {
 
   border-radius: 999px;
 
-  color: #ffffff;
+  color: var(--fl-text-on-primary);
   background: var(--fl-primary);
 
   font-size: 0.58rem;
@@ -928,7 +921,7 @@ fl-bottom-nav {
   border: 2px solid #5362ed;
   border-radius: 999px;
 
-  color: #ffffff;
+  color: var(--fl-text-on-primary);
   background: #ef3f4b;
 
   font-size: 0.52rem;
@@ -1039,7 +1032,7 @@ fl-bottom-nav {
 /* Achse und Raster */
 
 .weekly-chart-grid-line {
-  stroke: rgba(82, 111, 169, 0.13);
+  stroke: var(--fl-stroke);
   stroke-width: 0.8;
   stroke-dasharray: 2 2;
 
@@ -1074,7 +1067,7 @@ fl-bottom-nav {
 
   pointer-events: none;
 
-  filter: drop-shadow(0 2px 3px rgba(47, 107, 255, 0.17));
+  filter: drop-shadow(0 2px 3px var(--fl-shadow-drop));
 }
 
 /* Datenpunkte */
@@ -1116,7 +1109,7 @@ fl-bottom-nav {
 }
 
 .weekly-chart-active-halo {
-  fill: rgba(47, 107, 255, 0.16);
+  fill: var(--fl-primary-soft-heavy);
 
   pointer-events: none;
 
@@ -1144,13 +1137,13 @@ fl-bottom-nav {
   width: 112px;
   padding: 9px 10px;
 
-  border: 1px solid rgba(47, 107, 255, 0.16);
+  border: 1px solid var(--fl-primary-soft-heavy);
   border-radius: 12px;
 
   color: var(--fl-text-primary);
-  background: rgba(255, 255, 255, 0.97);
+  background: var(--fl-surface-elevated);
 
-  box-shadow: 0 8px 20px rgba(30, 55, 105, 0.15);
+  box-shadow: 0 8px 20px var(--fl-shadow-surface-sm);
 
   pointer-events: none;
 
@@ -1304,7 +1297,7 @@ fl-bottom-nav {
 :host-context(body.dark) .weekly-chart-tooltip {
   border-color: var(--fl-border);
 
-  background: rgba(31, 41, 55, 0.97);
+  background: var(--fl-backdrop);
 }
 
 /* Animations */

@@ -22,7 +22,7 @@ ion-content {
   top: 0;
   z-index: 100;
 
-  color: #ffffff;
+  color: var(--fl-text-on-primary);
   background: var(--fl-gradient-primary);
 }
 
@@ -40,7 +40,7 @@ ion-content {
 
   .title-row > div > p {
     margin: 4px 0 0;
-    color: rgba(255, 255, 255, 0.78);
+    color: var(--fl-text-on-primary-soft);
     font-size: 0.7rem;
   }
 }
@@ -53,11 +53,11 @@ ion-content {
   height: 42px;
   padding: 0;
 
-  border: 1px solid rgba(255, 255, 255, 0.18);
+  border: 1px solid var(--fl-overlay-strong);
   border-radius: 50%;
 
-  color: #ffffff;
-  background: rgba(255, 255, 255, 0.14);
+  color: var(--fl-text-on-primary);
+  background: var(--fl-overlay);
 
   cursor: pointer;
 }
@@ -75,15 +75,15 @@ ion-content {
   margin-top: 14px;
   padding: 0 14px;
 
-  border: 1px solid rgba(255, 255, 255, 0.22);
+  border: 1px solid var(--fl-overlay-heavy);
   border-radius: 16px;
 
-  background: rgba(255, 255, 255, 0.14);
+  background: var(--fl-overlay);
 }
 
 .search-field ion-icon {
   flex: 0 0 auto;
-  color: rgba(255, 255, 255, 0.78);
+  color: var(--fl-text-on-primary-soft);
   font-size: 1.1rem;
 }
 
@@ -92,13 +92,13 @@ ion-content {
   min-width: 0;
   border: 0;
   outline: 0;
-  color: #ffffff;
+  color: var(--fl-text-on-primary);
   background: transparent;
   font-size: 0.9rem;
 }
 
 .search-field input::placeholder {
-  color: rgba(255, 255, 255, 0.68);
+  color: var(--fl-text-on-primary-subtle);
 }
 
 /* Inhalt */
@@ -123,11 +123,11 @@ ion-content {
   min-height: 32px;
   padding: 0 14px;
 
-  border: 0;
+  border: 1px solid var(--fl-border);
   border-radius: 999px;
 
-  color: var(--fl-text-secondary);
-  background: #e5edfb;
+  color: var(--fl-text-primary);
+  background: var(--fl-surface);
 
   font-size: 0.72rem;
   font-weight: 700;
@@ -138,7 +138,7 @@ ion-content {
 
 .main-filters button.active,
 .category-scroll button.active {
-  color: #ffffff;
+  color: var(--fl-text-on-primary);
   background: var(--fl-primary);
 }
 
@@ -165,7 +165,7 @@ ion-content {
 .category-scroll button {
   border: 1px solid var(--fl-border);
   color: var(--fl-text-primary);
-  background: #ffffff;
+  background: var(--fl-surface);
 }
 
 .category-scroll button.active {
@@ -192,7 +192,7 @@ ion-content {
   border: 1px solid var(--fl-border);
   border-radius: 17px;
 
-  background: #ffffff;
+  background: var(--fl-surface);
   box-shadow: var(--fl-shadow-sm);
 }
 
@@ -330,7 +330,7 @@ ion-content {
   border: 0;
   border-radius: 999px;
 
-  color: #ffffff;
+  color: var(--fl-text-on-primary);
   background: var(--card-color);
 
   font-size: 0.72rem;
@@ -347,11 +347,11 @@ ion-content {
   height: 32px;
   padding: 0;
 
-  border: 0;
+  border: 1px solid var(--fl-border);
   border-radius: 999px;
 
-  color: var(--fl-text-secondary);
-  background: var(--card-soft-color);
+  color: var(--fl-text-primary);
+  background: var(--fl-surface);
 
   cursor: pointer;
 }
@@ -376,7 +376,7 @@ ion-content {
   border-radius: 17px;
 
   color: var(--fl-primary);
-  background: rgba(255, 255, 255, 0.72);
+  background: var(--fl-surface);
 
   cursor: pointer;
 }
@@ -453,7 +453,7 @@ ion-content {
   border: 0;
   border-radius: 14px;
 
-  color: #ffffff;
+  color: var(--fl-text-on-primary);
   background: var(--fl-gradient-button);
 
   font-weight: 800;

@@ -45,7 +45,7 @@
 }
 
 .social-button:focus-visible {
-  outline: 3px solid rgba(47, 107, 255, 0.2);
+  outline: 3px solid var(--fl-primary-soft-active);
   outline-offset: 2px;
 }
 

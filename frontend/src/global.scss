@@ -304,7 +304,7 @@ ion-button.fl-ion-button {
 
 .fl-input-wrapper:focus-within {
   border-color: var(--fl-primary);
-  box-shadow: 0 0 0 3px rgba(47, 107, 255, 0.12);
+  box-shadow: 0 0 0 3px var(--fl-primary-soft-strong);
 }
 
 .fl-input-wrapper ion-icon {
@@ -641,4 +641,50 @@ body.dark .profile-summary article,
 body.dark .stat-card {
   border-color: var(--fl-border);
   background: var(--fl-surface);
+}
+
+/* =========================================================
+   GLOBAL DARK MODE NORMALIZATION
+   ========================================================= */
+
+body.dark {
+  background: var(--fl-background);
+}
+
+body.dark ion-app,
+body.dark ion-content {
+  --background: var(--fl-background);
+  --color: var(--fl-text-primary);
+}
+
+body.dark input,
+body.dark textarea,
+body.dark select {
+  color: var(--fl-text-primary);
+  caret-color: var(--fl-primary);
+}
+
+body.dark input::placeholder,
+body.dark textarea::placeholder {
+  color: var(--fl-text-muted);
+}
+
+body.dark select option {
+  color: var(--fl-text-primary);
+  background: var(--fl-surface);
+}
+
+body.dark button {
+  color: inherit;
+}
+
+/*
+ * Native Autofill-Farbe verhindern.
+ */
+body.dark input:-webkit-autofill,
+body.dark input:-webkit-autofill:hover,
+body.dark input:-webkit-autofill:focus {
+  -webkit-text-fill-color: var(--fl-text-primary);
+  box-shadow: 0 0 0 1000px var(--fl-input-background) inset;
+  transition: background-color 9999s ease-out;
 }

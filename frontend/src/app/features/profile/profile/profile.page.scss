@@ -22,7 +22,7 @@ ion-content {
   top: 0;
   z-index: 100;
 
-  color: #ffffff;
+  color: var(--fl-text-on-primary);
   background: var(--fl-gradient-primary);
 }
 
@@ -55,11 +55,11 @@ ion-content {
   height: 42px;
   padding: 0;
 
-  border: 1px solid rgba(255, 255, 255, 0.18);
+  border: 1px solid var(--fl-overlay-strong);
   border-radius: 50%;
 
-  color: #ffffff;
-  background: rgba(255, 255, 255, 0.14);
+  color: var(--fl-text-on-primary);
+  background: var(--fl-overlay);
 
   cursor: pointer;
 }
@@ -87,7 +87,7 @@ ion-content {
   border: 2px solid #4560ef;
   border-radius: 999px;
 
-  color: #ffffff;
+  color: var(--fl-text-on-primary);
   background: #ff4057;
 
   font-size: 0.6rem;
@@ -113,13 +113,13 @@ ion-content {
   width: 82px;
   height: 82px;
 
-  border: 4px solid rgba(255, 255, 255, 0.42);
+  border: 4px solid var(--fl-overlay-heavy);
   border-radius: 50%;
 
-  color: #ffffff;
-  background: rgba(255, 255, 255, 0.15);
+  color: var(--fl-text-on-primary);
+  background: var(--fl-overlay-medium);
 
-  box-shadow: 0 12px 28px rgba(20, 31, 93, 0.14);
+  box-shadow: 0 12px 28px var(--fl-shadow-avatar);
 
   font-size: 1.55rem;
   font-weight: 800;
@@ -135,7 +135,7 @@ ion-content {
 .profile-identity p {
   margin: 5px 0 0;
 
-  color: rgba(255, 255, 255, 0.82);
+  color: var(--fl-text-on-primary-medium);
 
   font-size: 0.82rem;
 }
@@ -149,11 +149,11 @@ ion-content {
   margin-top: 10px;
   padding: 0 12px;
 
-  border: 1px solid rgba(255, 255, 255, 0.18);
+  border: 1px solid var(--fl-overlay-strong);
   border-radius: 999px;
 
-  color: rgba(255, 255, 255, 0.92);
-  background: rgba(255, 255, 255, 0.13);
+  color: var(--fl-text-on-primary-max);
+  background: var(--fl-overlay);
 
   font-size: 0.68rem;
   font-weight: 600;
@@ -193,7 +193,7 @@ ion-content {
   border: 1px solid var(--fl-border);
   border-radius: 16px;
 
-  background: #ffffff;
+  background: var(--fl-surface);
   box-shadow: var(--fl-shadow-sm);
 
   text-align: center;
@@ -257,7 +257,7 @@ ion-content {
   border-radius: 16px;
 
   color: inherit;
-  background: #ffffff;
+  background: var(--fl-surface);
   box-shadow: var(--fl-shadow-sm);
 
   text-align: left;
@@ -417,7 +417,7 @@ fl-bottom-nav {
   border: 0;
   border-radius: 14px;
 
-  color: #ffffff;
+  color: var(--fl-text-on-primary);
   background: var(--fl-gradient-button);
 
   font-weight: 800;
@@ -440,7 +440,7 @@ fl-bottom-nav {
   border: 1px solid var(--fl-border);
   border-radius: 16px;
 
-  background: #ffffff;
+  background: var(--fl-surface);
   box-shadow: var(--fl-shadow-sm);
 }
 
@@ -494,7 +494,7 @@ fl-bottom-nav {
   border-radius: 16px;
 
   color: var(--fl-text-secondary);
-  background: #ffffff;
+  background: var(--fl-surface);
 
   font-size: 0.78rem;
   text-align: center;

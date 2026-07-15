@@ -25,7 +25,7 @@ ion-content {
 
   padding: calc(env(safe-area-inset-top) + 24px) 24px 36px;
 
-  color: #ffffff;
+  color: var(--fl-text-on-primary);
   text-align: center;
   background: var(--fl-gradient-primary);
 }
@@ -146,11 +146,11 @@ ion-content {
     margin: 0;
     padding: 12px 14px;
 
-    border: 1px solid rgba(220, 38, 38, 0.2);
+    border: 1px solid var(--fl-danger-border);
     border-radius: 14px;
 
     color: var(--fl-danger);
-    background: rgba(220, 38, 38, 0.08);
+    background: var(--fl-danger-soft);
 
     font-size: 0.8rem;
     line-height: 1.45;

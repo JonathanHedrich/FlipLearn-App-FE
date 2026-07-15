@@ -27,7 +27,7 @@ ion-content {
 
   padding: calc(24px + env(safe-area-inset-top)) 20px 20px;
 
-  color: #ffffff;
+  color: var(--fl-text-on-primary);
   background: var(--fl-gradient-primary);
 }
 
@@ -46,11 +46,11 @@ ion-content {
   height: 42px;
   padding: 0;
 
-  border: 1px solid rgba(255, 255, 255, 0.18);
+  border: 1px solid var(--fl-overlay-strong);
   border-radius: 50%;
 
-  color: #ffffff;
-  background: rgba(255, 255, 255, 0.14);
+  color: var(--fl-text-on-primary);
+  background: var(--fl-overlay);
 
   cursor: pointer;
 }
@@ -93,7 +93,7 @@ ion-content {
   border-radius: 18px;
 
   color: inherit;
-  background: #ffffff;
+  background: var(--fl-surface);
   box-shadow: var(--fl-shadow-sm);
 
   text-align: left;
@@ -111,7 +111,7 @@ ion-content {
 
   border-radius: 16px;
 
-  color: #ffffff;
+  color: var(--fl-text-on-primary);
   background: var(--fl-gradient-button);
 
   font-size: 1.2rem;
@@ -167,7 +167,7 @@ ion-content {
   border: 1px solid var(--fl-border);
   border-radius: 18px;
 
-  background: #ffffff;
+  background: var(--fl-surface);
   box-shadow: var(--fl-shadow-sm);
 }
 
@@ -178,7 +178,7 @@ ion-content {
   border-bottom: 1px solid var(--fl-border);
 
   color: var(--fl-text-secondary);
-  background: #f5f8ff;
+  background: var(--fl-surface-soft);
 
   font-size: 0.66rem;
   font-weight: 800;
@@ -204,7 +204,7 @@ ion-content {
   border-bottom: 1px solid var(--fl-border);
 
   color: inherit;
-  background: #ffffff;
+  background: var(--fl-surface);
 
   text-align: left;
 }
@@ -258,7 +258,7 @@ button.settings-row {
   padding: 8px 16px;
 
   color: var(--fl-text-muted);
-  background: #ffffff;
+  background: var(--fl-surface);
 
   font-size: 0.7rem;
 }
@@ -276,7 +276,7 @@ button.settings-row {
 ion-toggle {
   flex: 0 0 auto;
 
-  --handle-background: #ffffff;
+  --handle-background: var(--fl-surface);
   --handle-background-checked: #ffffff;
   --track-background: #cbd7eb;
   --track-background-checked: var(--fl-primary);
@@ -451,7 +451,7 @@ ion-toggle {
 
 .password-card input:focus {
   border-color: var(--fl-primary);
-  box-shadow: 0 0 0 4px rgba(47, 107, 255, 0.1);
+  box-shadow: 0 0 0 4px var(--fl-primary-soft-medium);
 }
 
 .password-submit {
@@ -460,7 +460,7 @@ ion-toggle {
   border: 0;
   border-radius: 14px;
 
-  color: #ffffff;
+  color: var(--fl-text-on-primary);
   background: var(--fl-gradient-button);
 
   font-weight: 800;
@@ -483,12 +483,12 @@ ion-toggle {
 
 .settings-error {
   color: var(--fl-danger);
-  background: rgba(220, 38, 38, 0.08);
+  background: var(--fl-danger-soft);
 }
 
 .settings-success {
   color: #087f5b;
-  background: rgba(6, 159, 120, 0.1);
+  background: var(--fl-success-soft);
 }
 
 .settings-modal-backdrop {
@@ -501,7 +501,7 @@ ion-toggle {
 
   padding: 16px;
 
-  background: rgba(15, 23, 42, 0.45);
+  background: var(--fl-backdrop-light);
   backdrop-filter: blur(4px);
 }
 
@@ -585,7 +585,7 @@ ion-toggle {
   color: var(--fl-primary);
   background: var(--fl-primary-light);
 
-  box-shadow: 0 0 0 3px rgba(47, 107, 255, 0.08);
+  box-shadow: 0 0 0 3px var(--fl-primary-soft);
 }
 
 .goal-options strong {
@@ -654,7 +654,7 @@ ion-toggle {
 .custom-goal-input input:focus {
   border-color: var(--fl-primary);
 
-  box-shadow: 0 0 0 3px rgba(47, 107, 255, 0.1);
+  box-shadow: 0 0 0 3px var(--fl-primary-soft-medium);
 }
 
 .custom-goal-input button {
@@ -664,7 +664,7 @@ ion-toggle {
   border: 0;
   border-radius: 13px;
 
-  color: #ffffff;
+  color: var(--fl-text-on-primary);
   background: var(--fl-gradient-button);
 
   font-size: 0.7rem;
@@ -678,7 +678,7 @@ ion-toggle {
   border-radius: 11px;
 
   color: var(--fl-danger);
-  background: rgba(220, 38, 38, 0.08);
+  background: var(--fl-danger-soft);
 
   font-size: 0.63rem;
   line-height: 1.4;
@@ -714,7 +714,7 @@ ion-toggle {
   border-color: var(--fl-primary);
   background: var(--fl-primary-light);
 
-  box-shadow: 0 0 0 3px rgba(47, 107, 255, 0.08);
+  box-shadow: 0 0 0 3px var(--fl-primary-soft-medium);
 }
 
 .card-order-radio {
@@ -729,7 +729,7 @@ ion-toggle {
 
 .card-order-options > button.active .card-order-radio {
   border: 5px solid var(--fl-primary);
-  background: #ffffff;
+  background: var(--fl-surface);
 }
 
 .card-order-options strong,
@@ -758,7 +758,7 @@ ion-toggle {
   border-radius: 12px;
 
   color: var(--fl-danger);
-  background: rgba(220, 38, 38, 0.08);
+  background: var(--fl-danger-soft);
 
   font-size: 0.66rem;
   line-height: 1.4;
