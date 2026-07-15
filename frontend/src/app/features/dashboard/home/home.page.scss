@@ -200,8 +200,6 @@ ion-content {
     var(--fl-overlay-heavy) calc(var(--goal-progress) * 3.6deg),
     var(--fl-overlay-heavy) 360deg
   );
-
-  transform: rotate(-90deg);
 }
 
 .goal-progress-ring-inner {
@@ -214,8 +212,6 @@ ion-content {
   border-radius: 50%;
 
   background: linear-gradient(145deg, #5763eb, #4968ec);
-
-  transform: rotate(90deg);
 }
 
 .goal-progress-ring-inner strong {
