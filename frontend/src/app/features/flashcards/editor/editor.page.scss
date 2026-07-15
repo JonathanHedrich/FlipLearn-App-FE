@@ -27,6 +27,10 @@ ion-content {
   align-items: center;
   gap: 12px;
 
+  position: sticky;
+  top: 0;
+  z-index: 100;
+
   min-height: 114px;
 
   padding: calc(24px + env(safe-area-inset-top)) 20px 20px;
@@ -511,12 +515,6 @@ ion-content {
   to {
     transform: rotate(360deg);
   }
-}
-
-.editor-header {
-  position: relative;
-  z-index: 20;
-  overflow: visible;
 }
 
 .editor-options {

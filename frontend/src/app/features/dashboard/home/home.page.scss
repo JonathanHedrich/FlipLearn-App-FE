@@ -25,6 +25,10 @@ ion-content {
 
   color: #ffffff;
   background: linear-gradient(145deg, #6b54f3 0%, #4b5cef 48%, #2e78f5 100%);
+
+  position: sticky;
+  top: 0;
+  z-index: 100;
 }
 
 .home-header-top {

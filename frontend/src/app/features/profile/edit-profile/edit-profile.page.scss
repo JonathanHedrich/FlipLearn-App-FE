@@ -16,6 +16,10 @@ ion-content {
   grid-template-columns: 44px 1fr 44px;
   align-items: center;
 
+  position: sticky;
+  top: 0;
+  z-index: 100;
+
   padding: calc(env(safe-area-inset-top) + 18px) 18px 22px;
 
   color: #ffffff;

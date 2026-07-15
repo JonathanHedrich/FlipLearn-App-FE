@@ -17,6 +17,10 @@ ion-content {
   align-items: center;
   gap: 12px;
 
+  position: sticky;
+  top: 0;
+  z-index: 100;
+
   padding: calc(env(safe-area-inset-top) + 18px) 18px 22px;
 
   color: #ffffff;
