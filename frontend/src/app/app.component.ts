@@ -1,11 +1,14 @@
 import { Component } from '@angular/core';
 import { IonApp, IonRouterOutlet } from '@ionic/angular/standalone';
 
+import { ThemeService } from './core/services/theme.service';
+
 @Component({
   selector: 'app-root',
-  templateUrl: 'app.component.html',
+  standalone: true,
   imports: [IonApp, IonRouterOutlet],
+  templateUrl: 'app.component.html',
 })
 export class AppComponent {
-  constructor() {}
+  constructor(private readonly themeService: ThemeService) {}
 }

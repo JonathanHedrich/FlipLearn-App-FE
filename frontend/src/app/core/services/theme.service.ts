@@ -1,5 +1,4 @@
-import { DOCUMENT, isPlatformBrowser } from '@angular/common';
-import { Inject, Injectable, PLATFORM_ID, signal } from '@angular/core';
+import { Injectable, signal } from '@angular/core';
 
 export type AppTheme = 'light' | 'dark' | 'system';
 
@@ -9,55 +8,59 @@ const THEME_STORAGE_KEY = 'fliplearn.theme';
   providedIn: 'root',
 })
 export class ThemeService {
-  private readonly themeState = signal<AppTheme>('system');
+  private readonly themeState = signal<AppTheme>(this.loadStoredTheme());
 
   readonly theme = this.themeState.asReadonly();
 
-  constructor(
-    @Inject(DOCUMENT)
-    private readonly document: Document,
+  private readonly systemThemeQuery = window.matchMedia(
+    '(prefers-color-scheme: dark)',
+  );
 
-    @Inject(PLATFORM_ID)
-    private readonly platformId: object,
-  ) {
-    if (!isPlatformBrowser(this.platformId)) {
-      return;
-    }
+  constructor() {
+    this.applyTheme(this.themeState());
 
-    const storedTheme = localStorage.getItem(
-      THEME_STORAGE_KEY,
-    ) as AppTheme | null;
-
-    this.setTheme(storedTheme ?? 'system', false);
+    this.systemThemeQuery.addEventListener(
+      'change',
+      this.handleSystemThemeChange,
+    );
   }
 
-  setTheme(theme: AppTheme, persist = true): void {
+  setTheme(theme: AppTheme): void {
     this.themeState.set(theme);
 
-    if (persist && isPlatformBrowser(this.platformId)) {
-      localStorage.setItem(THEME_STORAGE_KEY, theme);
-    }
+    localStorage.setItem(THEME_STORAGE_KEY, theme);
 
     this.applyTheme(theme);
   }
 
-  private applyTheme(theme: AppTheme): void {
-    const body = this.document.body;
+  private loadStoredTheme(): AppTheme {
+    const storedTheme = localStorage.getItem(THEME_STORAGE_KEY);
 
-    body.classList.remove('theme-light', 'theme-dark', 'theme-system');
-
-    body.classList.add(`theme-${theme}`);
-
-    if (theme === 'system') {
-      const prefersDark = window.matchMedia(
-        '(prefers-color-scheme: dark)',
-      ).matches;
-
-      body.classList.toggle('dark', prefersDark);
-
-      return;
+    if (
+      storedTheme === 'light' ||
+      storedTheme === 'dark' ||
+      storedTheme === 'system'
+    ) {
+      return storedTheme;
     }
 
-    body.classList.toggle('dark', theme === 'dark');
+    return 'system';
   }
+
+  private applyTheme(theme: AppTheme): void {
+    const useDarkTheme =
+      theme === 'dark' || (theme === 'system' && this.systemThemeQuery.matches);
+
+    document.body.classList.toggle('dark', useDarkTheme);
+
+    document.documentElement.style.colorScheme = useDarkTheme
+      ? 'dark'
+      : 'light';
+  }
+
+  private readonly handleSystemThemeChange = (): void => {
+    if (this.themeState() === 'system') {
+      this.applyTheme('system');
+    }
+  };
 }
