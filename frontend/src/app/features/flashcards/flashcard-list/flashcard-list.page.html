@@ -3,15 +3,18 @@
     <header class="sets-header">
       <div class="title-row">
         <div>
-          <h1>My Sets</h1>
+          <h1>{{ 'sets.title' | translate }}</h1>
 
-          <p>{{ sets().length }} Lernsets · {{ totalCards() }} Karten</p>
+          <p>
+            {{ 'sets.summary' | translate : { sets: sets().length, cards:
+            totalCards() } }}
+          </p>
         </div>
 
         <button
           class="add-button"
           type="button"
-          aria-label="Neues Lernset erstellen"
+          [attr.aria-label]="'sets.actions.create' | translate"
           (click)="openCreateSet()"
         >
           <ion-icon name="add-outline"></ion-icon>
@@ -23,8 +26,8 @@
 
         <input
           type="search"
-          placeholder="Search sets..."
-          aria-label="Lernsets durchsuchen"
+          [placeholder]="'sets.search.placeholder' | translate"
+          [attr.aria-label]="'sets.search.aria' | translate"
           [(ngModel)]="searchTerm"
         />
       </label>
@@ -34,44 +37,36 @@
       <div class="main-filters">
         <button
           type="button"
-          [class.active]="
-            activeFilter() === 'all'
-          "
+          [class.active]="activeFilter() === 'all'"
           (click)="setMainFilter('all')"
         >
-          All Sets
+          {{ 'sets.filters.all' | translate }}
         </button>
 
         <button
           type="button"
-          [class.active]="
-            activeFilter() === 'favorites'
-          "
-          (click)="
-            setMainFilter('favorites')
-          "
+          [class.active]="activeFilter() === 'favorites'"
+          (click)="setMainFilter('favorites')"
         >
           <span aria-hidden="true">⭐</span>
 
-          Favorites
+          {{ 'sets.filters.favorites' | translate }}
         </button>
 
         <button
           type="button"
-          [class.active]="
-            activeFilter() === 'recent'
-          "
+          [class.active]="activeFilter() === 'recent'"
           (click)="setMainFilter('recent')"
         >
           <ion-icon name="time-outline"></ion-icon>
 
-          Recent
+          {{ 'sets.filters.recent' | translate }}
         </button>
       </div>
 
       <section class="categories-section">
         <div class="category-header">
-          <span>Kategorien</span>
+          <span>{{ 'sets.categories.title' | translate }}</span>
 
           <button
             type="button"
@@ -79,7 +74,8 @@
             [attr.aria-expanded]="categoriesExpanded"
             (click)="categoriesExpanded = !categoriesExpanded"
           >
-            {{ categoriesExpanded ? 'Weniger' : 'Alle' }}
+            {{ categoriesExpanded ? ('sets.categories.less' | translate) :
+            ('sets.categories.all' | translate) }}
           </button>
         </div>
 
@@ -88,7 +84,7 @@
             @if (!categoriesExpanded) { @if (activeCategory() === 'all') {
             <button class="active">
               <ion-icon name="folder-outline"></ion-icon>
-              All
+              {{ 'sets.categories.all' | translate }}
             </button>
             } @else {
             <button class="active">
@@ -103,7 +99,7 @@
               (click)="setCategory('all')"
             >
               <ion-icon name="folder-outline"></ion-icon>
-              All
+              {{ 'sets.categories.all' | translate }}
             </button>
 
             @for (category of categories; track category.id) {
@@ -121,7 +117,7 @@
           <button
             class="manage-categories-button"
             type="button"
-            aria-label="Kategorien verwalten"
+            [attr.aria-label]="'sets.categories.manage' | translate"
             (click)="openCategoryManager()"
           >
             <ion-icon name="create-outline"></ion-icon>
@@ -132,31 +128,37 @@
       @if (categoryError && !categoryMenuOpen) {
       <p class="category-inline-error">{{ categoryError }}</p>
       } @if (isLoading()) {
+
       <section class="loading-state">
         <div class="loading-spinner"></div>
 
-        <p>Lernsets werden geladen …</p>
+        <p>{{ 'sets.loading' | translate }}</p>
       </section>
+
       } @else if (loadError()) {
+
       <section class="empty-state">
         <div class="empty-icon">
           <ion-icon name="folder-outline"></ion-icon>
         </div>
 
-        <h2>Laden fehlgeschlagen</h2>
+        <h2>{{ 'sets.error.title' | translate }}</h2>
 
         <p>{{ loadError() }}</p>
 
-        <button type="button" (click)="reloadSets()">Erneut versuchen</button>
+        <button type="button" (click)="reloadSets()">
+          {{ 'common.retry' | translate }}
+        </button>
       </section>
-      } @else if ( filteredSets().length > 0 ) {
+
+      } @else if (filteredSets().length > 0) {
+
       <section class="sets-grid">
-        @for ( set of filteredSets(); track set.id ) {
+        @for (set of filteredSets(); track set.id) {
+
         <article
           class="set-card"
-          [ngClass]="
-            getThemeClass(set.color)
-          "
+          [ngClass]="getThemeClass(set.color)"
           (click)="openEditor(set.id)"
         >
           <div class="set-card-accent"></div>
@@ -166,7 +168,9 @@
               <h2>{{ set.title }}</h2>
 
               <p>
-                {{ set.cardCount }} {{ set.cardCount === 1 ? 'card' : 'cards' }}
+                {{ set.cardCount === 1 ? ('sets.cards.single' |
+                translate:{count:set.cardCount}) : ('sets.cards.multiple' |
+                translate:{count:set.cardCount}) }}
               </p>
 
               @if (set.categoryName) {
@@ -179,15 +183,10 @@
               type="button"
               [attr.aria-label]="
                 set.favorite
-                  ? 'Aus Favoriten entfernen'
-                  : 'Zu Favoriten hinzufügen'
+                  ? ('sets.actions.removeFavorite' | translate)
+                  : ('sets.actions.addFavorite' | translate)
               "
-              (click)="
-                toggleFavorite(
-                  set,
-                  $event
-                )
-              "
+              (click)="toggleFavorite(set, $event)"
             >
               <ion-icon
                 [name]="
@@ -200,9 +199,9 @@
           </div>
 
           <div class="progress-heading">
-            <span>Progress</span>
+            <span>{{ 'sets.progress' | translate }}</span>
 
-            <strong> {{ set.progress }}% </strong>
+            <strong>{{ set.progress }}%</strong>
           </div>
 
           <div class="progress-track">
@@ -213,26 +212,16 @@
             <button
               class="study-button"
               type="button"
-              (click)="
-                startStudy(
-                  set,
-                  $event
-                )
-              "
+              (click)="startStudy(set, $event)"
             >
-              Study
+              {{ 'sets.actions.study' | translate }}
             </button>
 
             <button
               class="edit-button"
               type="button"
-              aria-label="Lernset bearbeiten"
-              (click)="
-                openEditor(
-                  set.id,
-                  $event
-                )
-              "
+              [attr.aria-label]="'sets.actions.edit' | translate"
+              (click)="openEditor(set.id, $event)"
             >
               <ion-icon name="create-outline"></ion-icon>
             </button>
@@ -245,21 +234,26 @@
             <ion-icon name="add-outline"></ion-icon>
           </span>
 
-          <strong>New Set</strong>
+          <strong>{{ 'sets.actions.newSet' | translate }}</strong>
         </button>
       </section>
+
       } @else {
+
       <section class="empty-state">
         <div class="empty-icon">
           <ion-icon name="folder-outline"></ion-icon>
         </div>
 
-        <h2>No sets found</h2>
+        <h2>{{ 'sets.empty.title' | translate }}</h2>
 
-        <p>Ändere deine Suche oder erstelle ein neues Lernset.</p>
+        <p>{{ 'sets.empty.description' | translate }}</p>
 
-        <button type="button" (click)="openCreateSet()">Create Set</button>
+        <button type="button" (click)="openCreateSet()">
+          {{ 'sets.actions.create' | translate }}
+        </button>
       </section>
+
       }
     </section>
   </main>
@@ -278,16 +272,18 @@
   >
     <header class="category-modal-header">
       <div>
-        <span>CATEGORIES</span>
+        <span>{{ 'sets.categoryManager.badge' | translate }}</span>
 
-        <h2 id="category-modal-title">Kategorien verwalten</h2>
+        <h2 id="category-modal-title">
+          {{ 'sets.categoryManager.title' | translate }}
+        </h2>
 
-        <p>Erstelle, benenne oder lösche deine persönlichen Kategorien.</p>
+        <p>{{ 'sets.categoryManager.description' | translate }}</p>
       </div>
 
       <button
         type="button"
-        aria-label="Schließen"
+        [attr.aria-label]="'common.close' | translate"
         [disabled]="
           isSavingCategory ||
           deletingCategoryId !== null
@@ -300,7 +296,8 @@
 
     <form class="category-form" (ngSubmit)="saveCategory()">
       <label for="categoryName">
-        {{ editingCategory ? 'Kategorie umbenennen' : 'Neue Kategorie' }}
+        {{ editingCategory ? ('sets.categoryManager.rename' | translate) :
+        ('sets.categoryManager.new' | translate) }}
       </label>
 
       <div class="category-input-row">
@@ -312,8 +309,8 @@
           autocomplete="off"
           [placeholder]="
             editingCategory
-              ? 'Neuer Kategoriename'
-              : 'z. B. Mathematik'
+              ? ('sets.categoryManager.renamePlaceholder' | translate)
+              : ('sets.categoryManager.placeholder' | translate)
           "
           [(ngModel)]="categoryName"
         />
@@ -325,8 +322,9 @@
             !categoryName.trim()
           "
         >
-          {{ isSavingCategory ? 'Speichert …' : editingCategory ? 'Ändern' :
-          'Hinzufügen' }}
+          {{ isSavingCategory ? ('sets.categoryManager.saving' | translate) :
+          editingCategory ? ('sets.categoryManager.renameButton' | translate) :
+          ('sets.categoryManager.addButton' | translate) }}
         </button>
       </div>
 
@@ -337,7 +335,7 @@
         [disabled]="isSavingCategory"
         (click)="cancelCategoryEdit()"
       >
-        Umbenennen abbrechen
+        {{ 'sets.categoryManager.cancelRename' | translate }}
       </button>
       } @if (categoryError) {
       <p class="category-error">{{ categoryError }}</p>
@@ -346,33 +344,36 @@
 
     <div class="category-list">
       @if (isLoadingCategories) {
+
       <div class="category-loading">
         <div class="loading-spinner"></div>
 
-        <span> Kategorien werden geladen … </span>
+        <span> {{ 'sets.categoryManager.loading' | translate }} </span>
       </div>
-      } @else if ( categories.length === 0 ) {
+
+      } @else if (categories.length === 0) {
+
       <p class="category-empty">
-        Du hast noch keine eigenen Kategorien erstellt.
+        {{ 'sets.categoryManager.empty' | translate }}
       </p>
-      } @else { @for ( category of categories; track category.id ) {
+
+      } @else { @for (category of categories; track category.id) {
+
       <article class="category-row">
         <div class="category-row-icon">
           <ion-icon name="folder-outline"></ion-icon>
         </div>
 
-        <strong> {{ category.name }} </strong>
+        <strong>{{ category.name }}</strong>
 
         <button
           type="button"
-          aria-label="Kategorie umbenennen"
+          [attr.aria-label]="'sets.categoryManager.rename' | translate"
           [disabled]="
             isSavingCategory ||
             deletingCategoryId !== null
           "
-          (click)="
-            startRenameCategory(category)
-          "
+          (click)="startRenameCategory(category)"
         >
           <ion-icon name="pencil-outline"></ion-icon>
         </button>
@@ -380,18 +381,17 @@
         <button
           class="danger"
           type="button"
-          aria-label="Kategorie löschen"
+          [attr.aria-label]="'sets.categoryManager.delete' | translate"
           [disabled]="
             isSavingCategory ||
             deletingCategoryId !== null
           "
-          (click)="
-            deleteCategory(category)
-          "
+          (click)="deleteCategory(category)"
         >
           <ion-icon name="trash-outline"></ion-icon>
         </button>
       </article>
+
       } }
     </div>
   </section>

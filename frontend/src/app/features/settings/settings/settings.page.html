@@ -4,13 +4,13 @@
       <button
         class="back-button"
         type="button"
-        aria-label="Zurück"
+        [attr.aria-label]="'common.back' | translate"
         (click)="goBack()"
       >
         <ion-icon name="arrow-back-outline"></ion-icon>
       </button>
 
-      <h1>Settings</h1>
+      <h1>{{ 'settings.title' | translate }}</h1>
 
       <span></span>
     </header>
@@ -22,20 +22,25 @@
         <div class="profile-information">
           <strong>{{ userName }}</strong>
           <span>{{ userEmail }}</span>
-          <small>Edit Profile</small>
+          <small> {{ 'settings.profile.edit' | translate }} </small>
         </div>
 
         <ion-icon class="row-chevron" name="chevron-forward-outline"></ion-icon>
       </button>
 
       <section class="settings-group">
-        <h2>Appearance</h2>
+        <h2>{{ 'settings.appearance.title' | translate }}</h2>
 
         <div class="settings-list">
           <label class="theme-option">
             <div>
-              <strong>Light</strong>
-              <span>Immer helles Design</span>
+              <strong>
+                {{ 'settings.appearance.light.title' | translate }}
+              </strong>
+
+              <span>
+                {{ 'settings.appearance.light.description' | translate }}
+              </span>
             </div>
 
             <input
@@ -49,8 +54,13 @@
 
           <label class="theme-option">
             <div>
-              <strong>Dark</strong>
-              <span>Immer dunkles Design</span>
+              <strong>
+                {{ 'settings.appearance.dark.title' | translate }}
+              </strong>
+
+              <span>
+                {{ 'settings.appearance.dark.description' | translate }}
+              </span>
             </div>
 
             <input
@@ -64,8 +74,13 @@
 
           <label class="theme-option">
             <div>
-              <strong>System</strong>
-              <span>Geräteeinstellung übernehmen</span>
+              <strong>
+                {{ 'settings.appearance.system.title' | translate }}
+              </strong>
+
+              <span>
+                {{ 'settings.appearance.system.description' | translate }}
+              </span>
             </div>
 
             <input
@@ -80,10 +95,34 @@
       </section>
 
       <section class="settings-group">
-        <h2>Study Preferences</h2>
+        <h2>{{ 'settings.language.title' | translate }}</h2>
 
         <div class="settings-list">
-          @for (setting of studyPreferences; track setting.action) {
+          @for ( option of languageOptions; track option.value ) {
+          <label class="theme-option">
+            <div>
+              <strong> {{ option.labelKey | translate }} </strong>
+
+              <span> {{ option.descriptionKey | translate }} </span>
+            </div>
+
+            <input
+              type="radio"
+              name="language"
+              [value]="option.value"
+              [checked]="currentLanguage === option.value"
+              (change)="changeLanguage(option.value)"
+            />
+          </label>
+          }
+        </div>
+      </section>
+
+      <section class="settings-group">
+        <h2>{{ 'settings.study.title' | translate }}</h2>
+
+        <div class="settings-list">
+          @for ( setting of studyPreferences; track setting.action ) {
           <button
             class="settings-row"
             type="button"
@@ -91,9 +130,12 @@
           >
             <ion-icon class="row-icon" [name]="setting.icon"></ion-icon>
 
-            <span class="row-label"> {{ setting.label }} </span>
+            <span class="row-label"> {{ setting.labelKey | translate }} </span>
 
-            <span class="row-value"> {{ selectedStudyGoal }} cards </span>
+            <span class="row-value">
+              {{ 'settings.study.cardCount' | translate: { count:
+              selectedStudyGoal } }}
+            </span>
 
             <ion-icon
               class="row-chevron"
@@ -105,24 +147,34 @@
       </section>
 
       <section class="settings-group">
-        <h2>Notifications</h2>
+        <h2>{{ 'settings.notifications.title' | translate }}</h2>
 
         <div class="settings-list">
           <div class="settings-row toggle-row">
-            <span class="row-label">Study Reminders</span>
+            <span class="row-label">
+              {{ 'settings.notifications.studyReminders' | translate }}
+            </span>
 
             <ion-toggle
-              aria-label="Lernerinnerungen"
+              [attr.aria-label]="
+                'settings.notifications.studyReminders'
+                  | translate
+              "
               [(ngModel)]="studyRemindersEnabled"
               (ionChange)="saveStudyReminders()"
             ></ion-toggle>
           </div>
 
           <div class="settings-row toggle-row">
-            <span class="row-label"> Streak Alerts </span>
+            <span class="row-label">
+              {{ 'settings.notifications.streakAlerts' | translate }}
+            </span>
 
             <ion-toggle
-              aria-label="Lernserien-Benachrichtigungen"
+              [attr.aria-label]="
+                'settings.notifications.streakAlerts'
+                  | translate
+              "
               [(ngModel)]="streakAlertsEnabled"
               (ionChange)="saveStreakAlerts()"
             ></ion-toggle>
@@ -131,7 +183,9 @@
       </section>
 
       @if (notificationPermissionError) {
-      <p class="notification-error">{{ notificationPermissionError }}</p>
+      <p class="notification-error" role="alert">
+        {{ notificationPermissionError }}
+      </p>
       } @if (studyGoalMenuOpen) {
       <div class="settings-modal-backdrop" (click)="closeStudyGoalMenu()">
         <section
@@ -143,14 +197,16 @@
         >
           <div class="settings-modal-header">
             <div>
-              <h2 id="study-goal-title">Daily Study Goal</h2>
+              <h2 id="study-goal-title">
+                {{ 'settings.study.goalDialog.title' | translate }}
+              </h2>
 
-              <p>Wie viele Karten möchtest du täglich lernen?</p>
+              <p>{{ 'settings.study.goalDialog.description' | translate }}</p>
             </div>
 
             <button
               type="button"
-              aria-label="Schließen"
+              [attr.aria-label]="'common.close' | translate"
               (click)="closeStudyGoalMenu()"
             >
               ×
@@ -162,22 +218,22 @@
             <button
               type="button"
               [class.active]="
-              selectedStudyGoal === goal
-            "
+                    selectedStudyGoal === goal
+                  "
               (click)="selectStudyGoal(goal)"
             >
               <strong>{{ goal }}</strong>
-              <span>cards per day</span>
+
+              <span> {{ 'settings.study.cardsPerDay' | translate }} </span>
             </button>
             }
           </div>
+
           <section class="custom-goal-section">
             <div>
-              <h3>Eigenes Ziel</h3>
+              <h3>{{ 'settings.study.customGoal.title' | translate }}</h3>
 
-              <p>
-                Lege selbst fest, wie viele Karten du täglich lernen möchtest.
-              </p>
+              <p>{{ 'settings.study.customGoal.description' | translate }}</p>
             </div>
 
             <div class="custom-goal-input">
@@ -188,17 +244,22 @@
                 max="999"
                 step="1"
                 inputmode="numeric"
-                placeholder="z. B. 75"
+                [placeholder]="
+                    'settings.study.customGoal.placeholder'
+                      | translate
+                  "
                 [(ngModel)]="customStudyGoal"
               />
 
               <button type="button" (click)="saveCustomStudyGoal()">
-                Speichern
+                {{ 'common.save' | translate }}
               </button>
             </div>
 
             @if (customStudyGoalError) {
-            <p class="custom-goal-error">{{ customStudyGoalError }}</p>
+            <p class="custom-goal-error" role="alert">
+              {{ customStudyGoalError }}
+            </p>
             }
           </section>
         </section>
@@ -207,11 +268,12 @@
 
       <button class="logout-button" type="button" (click)="logout()">
         <ion-icon name="log-out-outline"></ion-icon>
-        Log Out
+
+        {{ 'settings.actions.logout' | translate }}
       </button>
 
       <footer class="settings-footer">
-        FlipLearn v2.4.1 · Privacy · Terms
+        {{ 'settings.footer' | translate: { version: '2.4.1' } }}
       </footer>
     </section>
   </main>

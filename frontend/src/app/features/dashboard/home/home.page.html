@@ -4,15 +4,19 @@
       <div class="home-header-top">
         <div class="greeting">
           <span>{{ greeting }}</span>
+
           <h1>{{ userName }}</h1>
-          <p>Ready for today’s learning?</p>
+
+          <p>{{ 'home.header.readyToLearn' | translate }}</p>
         </div>
 
         <div class="header-actions">
           <button
             class="header-action notification-action"
             type="button"
-            aria-label="Benachrichtigungen"
+            [attr.aria-label]="
+              'home.actions.notifications' | translate
+            "
             (click)="openNotifications()"
           >
             <ion-icon name="notifications-outline"></ion-icon>
@@ -27,7 +31,9 @@
           <button
             class="header-action"
             type="button"
-            aria-label="Einstellungen"
+            [attr.aria-label]="
+              'home.actions.settings' | translate
+            "
             (click)="openSettings()"
           >
             <ion-icon name="settings-outline"></ion-icon>
@@ -37,11 +43,19 @@
 
       <section class="daily-goal-card">
         <div class="daily-goal-information">
-          <span class="daily-goal-eyebrow"> TODAY'S GOAL </span>
+          <span class="daily-goal-eyebrow">
+            {{ 'home.goal.eyebrow' | translate }}
+          </span>
 
-          <h2>Study {{ dailyStudyGoal() }} cards</h2>
+          <h2>
+            {{ 'home.goal.studyCards' | translate : { count: dailyStudyGoal() }
+            }}
+          </h2>
 
-          <p>{{ reviewsToday() }} / {{ dailyStudyGoal() }} completed</p>
+          <p>
+            {{ 'home.goal.completed' | translate : { completed: reviewsToday(),
+            goal: dailyStudyGoal() } }}
+          </p>
 
           <div class="goal-progress-track">
             <div
@@ -66,7 +80,8 @@
       @if (isLoading()) {
       <section class="dashboard-loading">
         <div class="dashboard-spinner"></div>
-        <p>Dashboard wird geladen …</p>
+
+        <p>{{ 'home.loading.dashboard' | translate }}</p>
       </section>
       } @else if (loadError()) {
       <section class="dashboard-error">
@@ -74,11 +89,12 @@
           <ion-icon name="book-outline"></ion-icon>
         </div>
 
-        <h2>Laden fehlgeschlagen</h2>
+        <h2>{{ 'home.error.title' | translate }}</h2>
+
         <p>{{ loadError() }}</p>
 
         <button type="button" (click)="reloadDashboard()">
-          Erneut versuchen
+          {{ 'common.retry' | translate }}
         </button>
       </section>
       } @else {
@@ -90,7 +106,8 @@
 
           <div>
             <strong>{{ currentStreak() }}</strong>
-            <span>Day Streak</span>
+
+            <span> {{ 'home.stats.dayStreak' | translate }} </span>
           </div>
         </article>
 
@@ -101,7 +118,8 @@
 
           <div>
             <strong>{{ todayAccuracy() }}%</strong>
-            <span>Accuracy Today</span>
+
+            <span> {{ 'home.stats.accuracyToday' | translate }} </span>
           </div>
         </article>
 
@@ -111,8 +129,9 @@
           </div>
 
           <div>
-            <strong>{{ weeklyStudyTimeLabel }}</strong>
-            <span>This Week</span>
+            <strong> {{ weeklyStudyTimeLabel }} </strong>
+
+            <span> {{ 'home.stats.thisWeek' | translate }} </span>
           </div>
         </article>
       </section>
@@ -123,7 +142,8 @@
         </div>
 
         <div>
-          <span>KEEP GOING</span>
+          <span> {{ 'home.motivation.eyebrow' | translate }} </span>
+
           <p>{{ motivationMessage() }}</p>
         </div>
       </section>
@@ -131,13 +151,15 @@
       <section class="dashboard-section">
         <div class="section-heading">
           <div>
-            <span class="section-eyebrow"> YOUR SETS </span>
+            <span class="section-eyebrow">
+              {{ 'home.sets.eyebrow' | translate }}
+            </span>
 
-            <h2>Continue Studying</h2>
+            <h2>{{ 'home.sets.title' | translate }}</h2>
           </div>
 
           <button type="button" (click)="openSets()">
-            View all
+            {{ 'common.viewAll' | translate }}
 
             <ion-icon name="chevron-forward-outline"></ion-icon>
           </button>
@@ -157,25 +179,30 @@
               <div class="continue-heading">
                 <div>
                   <h3>{{ set.title }}</h3>
+
                   <span> {{ getCardLabel(set) }} </span>
                 </div>
 
                 <button
                   class="continue-play"
                   type="button"
-                  aria-label="Lernen starten"
+                  [attr.aria-label]="
+                    'home.sets.startStudying'
+                      | translate
+                  "
                   (click)="
-                          $event.stopPropagation();
-                          openSet(set)
-                        "
+                    $event.stopPropagation();
+                    openSet(set)
+                  "
                 >
                   <ion-icon name="play-outline"></ion-icon>
                 </button>
               </div>
 
               <div class="continue-progress-heading">
-                <span>Progress</span>
-                <strong>{{ set.progress }}%</strong>
+                <span> {{ 'home.sets.progress' | translate }} </span>
+
+                <strong> {{ set.progress }}% </strong>
               </div>
 
               <div class="continue-progress-track">
@@ -194,13 +221,14 @@
             <ion-icon name="book-outline"></ion-icon>
           </div>
 
-          <h3>Noch keine Lernsets</h3>
+          <h3>{{ 'home.sets.emptyTitle' | translate }}</h3>
 
-          <p>Erstelle dein erstes Lernset und beginne direkt mit dem Lernen.</p>
+          <p>{{ 'home.sets.emptyDescription' | translate }}</p>
 
           <button type="button" (click)="openCreateSet()">
             <ion-icon name="add-outline"></ion-icon>
-            New Set
+
+            {{ 'home.actions.newSet' | translate }}
           </button>
         </section>
         }
@@ -209,9 +237,11 @@
       <section class="dashboard-section">
         <div class="section-heading">
           <div>
-            <span class="section-eyebrow"> SHORTCUTS </span>
+            <span class="section-eyebrow">
+              {{ 'home.quickActions.eyebrow' | translate }}
+            </span>
 
-            <h2>Quick Actions</h2>
+            <h2>{{ 'home.quickActions.title' | translate }}</h2>
           </div>
         </div>
 
@@ -221,7 +251,7 @@
               <ion-icon name="add-outline"></ion-icon>
             </div>
 
-            <span>New Set</span>
+            <span> {{ 'home.actions.newSet' | translate }} </span>
           </button>
 
           <button type="button" (click)="openSets()">
@@ -229,7 +259,7 @@
               <ion-icon name="book-outline"></ion-icon>
             </div>
 
-            <span>My Sets</span>
+            <span> {{ 'home.actions.mySets' | translate }} </span>
           </button>
 
           <button type="button" (click)="openStatistics()">
@@ -237,7 +267,7 @@
               <ion-icon name="bar-chart-outline"></ion-icon>
             </div>
 
-            <span>Statistics</span>
+            <span> {{ 'home.actions.statistics' | translate }} </span>
           </button>
         </div>
       </section>
@@ -245,13 +275,15 @@
       <section class="dashboard-section">
         <div class="section-heading">
           <div>
-            <span class="section-eyebrow"> RECENT </span>
+            <span class="section-eyebrow">
+              {{ 'home.achievements.eyebrow' | translate }}
+            </span>
 
-            <h2>Achievements</h2>
+            <h2>{{ 'home.achievements.title' | translate }}</h2>
           </div>
 
           <button type="button" (click)="openStatistics()">
-            View all
+            {{ 'common.viewAll' | translate }}
 
             <ion-icon name="chevron-forward-outline"></ion-icon>
           </button>
@@ -264,10 +296,8 @@
             <div class="recent-achievement-icon">
               <ion-icon
                 [name]="
-                        getAchievementIcon(
-                          achievement
-                        )
-                      "
+                  getAchievementIcon(achievement)
+                "
               ></ion-icon>
             </div>
 
@@ -285,7 +315,7 @@
             <ion-icon name="trophy-outline"></ion-icon>
           </div>
 
-          <p>Deine freigeschalteten Achievements erscheinen hier.</p>
+          <p>{{ 'home.achievements.empty' | translate }}</p>
         </section>
         }
       </section>

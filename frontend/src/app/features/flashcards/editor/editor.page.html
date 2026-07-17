@@ -4,7 +4,7 @@
       <button
         class="header-button"
         type="button"
-        aria-label="Zurück"
+        [attr.aria-label]="'flashcardEditor.actions.back' | translate"
         (click)="goBack()"
       >
         <ion-icon name="arrow-back-outline"></ion-icon>
@@ -13,14 +13,18 @@
       <div class="header-title">
         <h1>{{ setTitle }}</h1>
 
-        <p>{{ cards.length }} {{ cards.length === 1 ? 'card' : 'cards' }}</p>
+        <p>
+          {{ cards.length === 1 ? ('flashcardEditor.cards.single' | translate: {
+          count: cards.length }) : ('flashcardEditor.cards.multiple' |
+          translate: { count: cards.length }) }}
+        </p>
       </div>
 
       <div class="editor-options">
         <button
           class="header-button"
           type="button"
-          aria-label="Weitere Optionen"
+          [attr.aria-label]="'flashcardEditor.actions.moreOptions' | translate"
           [attr.aria-expanded]="menuOpen"
           (click)="toggleMenu()"
         >
@@ -31,7 +35,8 @@
         <div class="editor-options-menu">
           <button type="button" (click)="editSet(); closeMenu()">
             <ion-icon name="create-outline"></ion-icon>
-            Set bearbeiten
+
+            {{ 'flashcardEditor.actions.editSet' | translate }}
           </button>
 
           <button
@@ -40,7 +45,8 @@
             (click)="deleteSet(); closeMenu()"
           >
             <ion-icon name="trash-outline"></ion-icon>
-            Set löschen
+
+            {{ 'flashcardEditor.actions.deleteSet' | translate }}
           </button>
         </div>
         }
@@ -51,62 +57,69 @@
       @if (isLoading) {
       <section class="editor-loading">
         <div class="editor-spinner"></div>
-        <p>Editor wird geladen …</p>
+
+        <p>{{ 'flashcardEditor.loading' | translate }}</p>
       </section>
       } @else if (loadError) {
       <section class="editor-empty-state">
-        <h2>Laden fehlgeschlagen</h2>
+        <h2>{{ 'flashcardEditor.error.title' | translate }}</h2>
+
         <p>{{ loadError }}</p>
 
         <button class="retry-button" type="button" (click)="loadEditorData()">
-          Erneut versuchen
+          {{ 'common.retry' | translate }}
         </button>
       </section>
       } @else {
       <div class="cards-list">
-        @for ( card of cards; track card.id; let index = $index ) {
+        @for (card of cards; track card.id; let index = $index) {
         <article
           class="flashcard-editor"
           [id]="'card-' + card.id"
-          [class.editing]="
-                editingCardId === card.id
-              "
+          [class.editing]="editingCardId === card.id"
         >
           <header class="card-header">
-            <span> Card {{ index + 1 }} </span>
+            <span>
+              {{ 'flashcardEditor.cardNumber' | translate: { number: index + 1 }
+              }}
+            </span>
 
             <button
               class="delete-button"
               type="button"
-              aria-label="Lernkarte löschen"
+              [attr.aria-label]="'flashcardEditor.actions.deleteCard' | translate"
               (click)="deleteCard(card.id)"
             >
               <ion-icon name="trash-outline"></ion-icon>
             </button>
           </header>
 
-          @if ( editingCardId === card.id ) {
+          @if (editingCardId === card.id) {
           <div class="card-fields">
             <label>
-              <span>Front</span>
+              <span>
+                {{ 'flashcardEditor.fields.front.label' | translate }}
+              </span>
 
               <textarea
-                [(ngModel)]="
-                        card.draftFront
-                      "
-                placeholder="Enter term or question..."
+                [(ngModel)]="card.draftFront"
+                [placeholder]="
+                  'flashcardEditor.fields.front.placeholder' | translate
+                "
                 rows="3"
               ></textarea>
             </label>
 
             <label>
-              <span>Back</span>
+              <span>
+                {{ 'flashcardEditor.fields.back.label' | translate }}
+              </span>
 
               <textarea
-                [(ngModel)]="
-                        card.draftBack
-                      "
-                placeholder="Enter definition or answer..."
+                [(ngModel)]="card.draftBack"
+                [placeholder]="
+                  'flashcardEditor.fields.back.placeholder' | translate
+                "
                 rows="3"
               ></textarea>
             </label>
@@ -118,7 +131,7 @@
                 [disabled]="card.isSaving"
                 (click)="cancelEdit(card.id)"
               >
-                Abbrechen
+                {{ 'common.cancel' | translate }}
               </button>
 
               <button
@@ -127,7 +140,8 @@
                 [disabled]="card.isSaving"
                 (click)="saveCard(card)"
               >
-                {{ card.isSaving ? 'Speichert …' : 'Speichern' }}
+                {{ card.isSaving ? ('flashcardEditor.actions.saving' |
+                translate) : ('common.save' | translate) }}
               </button>
             </div>
           </div>
@@ -138,15 +152,19 @@
             (click)="toggleEdit(card.id)"
           >
             <div>
-              <span>Front</span>
+              <span>
+                {{ 'flashcardEditor.fields.front.label' | translate }}
+              </span>
 
-              <strong> {{ card.front }} </strong>
+              <strong>{{ card.front }}</strong>
             </div>
 
             <div>
-              <span>Back</span>
+              <span>
+                {{ 'flashcardEditor.fields.back.label' | translate }}
+              </span>
 
-              <strong> {{ card.back }} </strong>
+              <strong>{{ card.back }}</strong>
             </div>
           </button>
           }
@@ -165,10 +183,11 @@
         </span>
 
         <strong>
-          {{ isAddingCard ? 'Karte wird erstellt …' : 'Add New Card' }}
+          {{ isAddingCard ? ('flashcardEditor.actions.addingCard' | translate) :
+          ('flashcardEditor.actions.addCard' | translate) }}
         </strong>
 
-        <small> Tap to add a term &amp; definition </small>
+        <small> {{ 'flashcardEditor.addCardHint' | translate }} </small>
       </button>
 
       <button
@@ -177,13 +196,14 @@
         [disabled]="!cardsComplete"
         (click)="startStudying()"
       >
-        Start Studying
+        {{ 'flashcardEditor.actions.startStudying' | translate }}
+
         <span aria-hidden="true">→</span>
       </button>
 
       @if (!cardsComplete && cards.length > 0) {
       <p class="form-hint">
-        Bitte fülle bei jeder Lernkarte Vorder- und Rückseite aus.
+        {{ 'flashcardEditor.validation.incompleteCards' | translate }}
       </p>
       } }
     </section>

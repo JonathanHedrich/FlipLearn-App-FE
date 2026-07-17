@@ -2,7 +2,9 @@ import { CommonModule, Location } from '@angular/common';
 import { Component, computed, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { IonContent, IonIcon } from '@ionic/angular/standalone';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
+
 import {
   albumsOutline,
   arrowBackOutline,
@@ -34,15 +36,22 @@ import {
   trophyOutline,
 } from 'ionicons/icons';
 
-import { StatisticsStore } from '../../../core/stores/statistics.store';
-import { FlBottomNavComponent } from '../../../shared/components/fl-bottom-nav/fl-bottom-nav.component';
 import { AchievementResponse } from '../../../core/models/statistics-api.model';
 import { AppNotificationService } from '../../../core/services/app-notification.service';
+import { StatisticsStore } from '../../../core/stores/statistics.store';
+
+import { FlBottomNavComponent } from '../../../shared/components/fl-bottom-nav/fl-bottom-nav.component';
 
 @Component({
   selector: 'app-statistics',
   standalone: true,
-  imports: [CommonModule, IonContent, IonIcon, FlBottomNavComponent],
+  imports: [
+    CommonModule,
+    IonContent,
+    IonIcon,
+    FlBottomNavComponent,
+    TranslatePipe,
+  ],
   templateUrl: './statistics.page.html',
   styleUrls: ['./statistics.page.scss'],
 })
@@ -220,6 +229,7 @@ export class StatisticsPage {
     private readonly location: Location,
     private readonly router: Router,
     readonly appNotificationService: AppNotificationService,
+    private readonly translate: TranslateService,
   ) {
     addIcons({
       albumsOutline,
@@ -265,14 +275,32 @@ export class StatisticsPage {
     const minutes = totalMinutes % 60;
 
     if (hours === 0) {
-      return `${minutes}m`;
+      return this.translate.instant('statistics.time.minutes', {
+        minutes,
+      });
     }
 
     if (minutes === 0) {
-      return `${hours}h`;
+      return this.translate.instant('statistics.time.hours', {
+        hours,
+      });
     }
 
-    return `${hours}h ${minutes}m`;
+    return this.translate.instant('statistics.time.hoursAndMinutes', {
+      hours,
+      minutes,
+    });
+  }
+
+  get streakLabel(): string {
+    const streak = this.currentStreak();
+
+    return this.translate.instant(
+      streak === 1 ? 'statistics.streak.single' : 'statistics.streak.plural',
+      {
+        count: streak,
+      },
+    );
   }
 
   goBack(): void {
@@ -294,7 +322,10 @@ export class StatisticsPage {
 
       this.appNotificationService.rebuildNotifications();
     } catch {
-      // Der Fehler liegt bereits im Store.
+      /*
+       * Der Fehler wird bereits im
+       * StatisticsStore gespeichert.
+       */
     }
   }
 
@@ -302,25 +333,57 @@ export class StatisticsPage {
     try {
       await this.statisticsStore.loadOverview(true);
     } catch {
-      // Der Fehler liegt bereits im Store.
+      /*
+       * Der Fehler wird bereits im
+       * StatisticsStore gespeichert.
+       */
     }
   }
 
   getDayLabel(dateValue: string): string {
-    const date = new Date(`${dateValue}T00:00:00`);
+    const date = this.createLocalDate(dateValue);
 
-    return new Intl.DateTimeFormat('en-US', {
+    return new Intl.DateTimeFormat(this.currentLocale, {
       weekday: 'short',
     }).format(date);
   }
 
   getDateLabel(dateValue: string): string {
-    const date = new Date(`${dateValue}T00:00:00`);
+    const date = this.createLocalDate(dateValue);
 
-    return new Intl.DateTimeFormat('de-DE', {
+    return new Intl.DateTimeFormat(this.currentLocale, {
       day: '2-digit',
       month: '2-digit',
     }).format(date);
+  }
+
+  getFullDayLabel(dateValue: string): string {
+    const date = this.createLocalDate(dateValue);
+
+    return new Intl.DateTimeFormat(this.currentLocale, {
+      weekday: 'long',
+    }).format(date);
+  }
+
+  getLongDateLabel(dateValue: string): string {
+    const date = this.createLocalDate(dateValue);
+
+    return new Intl.DateTimeFormat(this.currentLocale, {
+      day: '2-digit',
+      month: 'short',
+    }).format(date);
+  }
+
+  getChartPointAriaLabel(dateValue: string, reviews: number): string {
+    return this.translate.instant(
+      reviews === 1
+        ? 'statistics.chart.pointAriaSingle'
+        : 'statistics.chart.pointAriaPlural',
+      {
+        day: this.getFullDayLabel(dateValue),
+        count: reviews,
+      },
+    );
   }
 
   getSetColorClass(color: string): string {
@@ -366,7 +429,7 @@ export class StatisticsPage {
 
   getAchievementProgressLabel(achievement: AchievementResponse): string {
     if (achievement.earned) {
-      return 'Freigeschaltet';
+      return this.translate.instant('statistics.achievements.unlocked');
     }
 
     return `${achievement.currentValue}` + ` / ${achievement.targetValue}`;
@@ -431,6 +494,26 @@ export class StatisticsPage {
     this.selectedChartIndex.set(index);
   }
 
+  getTooltipLeftPercent(pointX: number): number {
+    const rawPercent = (pointX / this.chartWidth) * 100;
+
+    /*
+     * Der Tooltip bleibt vollständig innerhalb
+     * des Chart-Bereichs.
+     */
+    return Math.min(76, Math.max(24, rawPercent));
+  }
+
+  private get currentLocale(): string {
+    const language = this.translate.currentLang() ?? 'de';
+
+    return language === 'en' ? 'en-US' : 'de-DE';
+  }
+
+  private createLocalDate(dateValue: string): Date {
+    return new Date(`${dateValue}T00:00:00`);
+  }
+
   private updateChartSelection(
     event: PointerEvent,
     element: HTMLElement,
@@ -471,32 +554,5 @@ export class StatisticsPage {
     );
 
     this.selectedChartIndex.set(index);
-  }
-
-  getFullDayLabel(dateValue: string): string {
-    const date = new Date(`${dateValue}T00:00:00`);
-
-    return new Intl.DateTimeFormat('de-DE', {
-      weekday: 'long',
-    }).format(date);
-  }
-
-  getLongDateLabel(dateValue: string): string {
-    const date = new Date(`${dateValue}T00:00:00`);
-
-    return new Intl.DateTimeFormat('de-DE', {
-      day: '2-digit',
-      month: 'short',
-    }).format(date);
-  }
-
-  getTooltipLeftPercent(pointX: number): number {
-    const rawPercent = (pointX / this.chartWidth) * 100;
-
-    /*
-     * Der Tooltip bleibt vollständig innerhalb
-     * des Chart-Bereichs.
-     */
-    return Math.min(76, Math.max(24, rawPercent));
   }
 }

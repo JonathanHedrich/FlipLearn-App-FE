@@ -3,9 +3,9 @@
     <section class="register-hero">
       <fl-logo size="medium" [showText]="true"></fl-logo>
 
-      <h1>Konto erstellen</h1>
+      <h1>{{ 'register.title' | translate }}</h1>
 
-      <p>Erstelle dein Konto und beginne mit deinem persönlichen Lernplan.</p>
+      <p>{{ 'register.subtitle' | translate }}</p>
     </section>
 
     <section class="register-panel">
@@ -16,60 +16,63 @@
         novalidate
       >
         <fl-input
-          label="Name"
+          [label]="'register.name' | translate"
           type="text"
           icon="person-outline"
-          placeholder="Dein Name"
+          [placeholder]="'register.namePlaceholder' | translate"
           autocomplete="name"
           [value]="registerForm.controls.name.value"
           [invalid]="nameInvalid"
-          errorMessage="Bitte gib mindestens zwei Zeichen ein."
+          [errorMessage]="'register.invalidName' | translate"
           (valueChange)="registerForm.controls.name.setValue($event)"
         ></fl-input>
 
         <fl-input
-          label="E-Mail-Adresse"
+          [label]="'register.email' | translate"
           type="email"
           icon="mail-outline"
-          placeholder="name@beispiel.de"
+          [placeholder]="'register.emailPlaceholder' | translate"
           autocomplete="email"
           [value]="registerForm.controls.email.value"
           [invalid]="emailInvalid"
-          errorMessage="Bitte gib eine gültige E-Mail-Adresse ein."
+          [errorMessage]="'register.invalidEmail' | translate"
           (valueChange)="registerForm.controls.email.setValue($event)"
         ></fl-input>
 
         <fl-input
-          label="Passwort"
+          [label]="'register.password' | translate"
           type="password"
           icon="lock-closed-outline"
-          placeholder="Mindestens 8 Zeichen"
+          [placeholder]="'register.passwordPlaceholder' | translate"
           autocomplete="new-password"
           [value]="registerForm.controls.password.value"
           [invalid]="passwordInvalid"
-          errorMessage="Das Passwort muss mindestens 8 Zeichen enthalten."
+          [errorMessage]="'register.invalidPassword' | translate"
           (valueChange)="registerForm.controls.password.setValue($event)"
         ></fl-input>
 
         <fl-input
-          label="Passwort bestätigen"
+          [label]="'register.confirmPassword' | translate"
           type="password"
           icon="lock-closed-outline"
-          placeholder="Passwort wiederholen"
+          [placeholder]="'register.confirmPasswordPlaceholder' | translate"
           autocomplete="new-password"
           [value]="registerForm.controls.confirmPassword.value"
           [invalid]="confirmPasswordInvalid"
-          errorMessage="Die Passwörter stimmen nicht überein."
+          [errorMessage]="'register.passwordsDoNotMatch' | translate"
           (valueChange)="
             registerForm.controls.confirmPassword.setValue($event)
           "
         ></fl-input>
 
         <p class="terms">
-          Mit der Registrierung akzeptierst du unsere
-          <a href="#">Nutzungsbedingungen</a>
-          und
-          <a href="#">Datenschutzerklärung</a>.
+          {{ 'register.acceptTerms' | translate }}
+
+          <a href="#"> {{ 'register.termsOfService' | translate }} </a>
+
+          {{ 'register.and' | translate }}
+
+          <a href="#"> {{ 'register.privacyPolicy' | translate }} </a>.
         </p>
 
         @if (registerError) {
@@ -78,7 +81,7 @@
 
         <div class="register-button-wrapper">
           <fl-button
-            text="Konto erstellen"
+            [text]="'register.createAccount' | translate"
             [loading]="isSubmitting"
             [disabled]="isSubmitting"
             (clicked)="submitRegistration()"
@@ -87,20 +90,22 @@
 
         <div class="divider" aria-hidden="true">
           <span></span>
-          <p>oder</p>
+
+          <p>{{ 'register.or' | translate }}</p>
+
           <span></span>
         </div>
 
         <fl-social-button
           provider="google"
-          text="Mit Google registrieren"
+          [text]="'register.registerWithGoogle' | translate"
           (clicked)="registerWithGoogle()"
         ></fl-social-button>
 
         <p class="login-link">
-          Du hast bereits ein Konto?
+          {{ 'register.alreadyHaveAccount' | translate }}
 
-          <a routerLink="/login"> Anmelden </a>
+          <a routerLink="/login"> {{ 'register.login' | translate }} </a>
         </p>
       </form>
     </section>

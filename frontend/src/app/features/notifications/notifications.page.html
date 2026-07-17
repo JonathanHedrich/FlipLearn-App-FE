@@ -4,18 +4,18 @@
       <button
         class="header-button"
         type="button"
-        aria-label="Zurück"
+        [attr.aria-label]="'common.back' | translate"
         (click)="goBack()"
       >
         <ion-icon name="arrow-back-outline"></ion-icon>
       </button>
 
       <div>
-        <h1>Notifications</h1>
+        <h1>{{ 'notifications.title' | translate }}</h1>
 
         <p>
-          {{ unreadCount() }} {{ unreadCount() === 1 ? 'ungelesene Meldung' :
-          'ungelesene Meldungen' }}
+          {{ 'notifications.unreadCount' | translate: { count: unreadCount() }
+          }}
         </p>
       </div>
 
@@ -26,14 +26,16 @@
           [disabled]="unreadCount() === 0"
           (click)="markAllAsRead()"
         >
-          Read all
+          {{ 'notifications.actions.readAll' | translate }}
         </button>
 
         <button
           class="delete-all-button"
           type="button"
           [disabled]="notifications().length === 0"
-          aria-label="Alle Benachrichtigungen löschen"
+          [attr.aria-label]="
+            'notifications.actions.deleteAll' | translate
+          "
           (click)="deleteAllNotifications()"
         >
           <ion-icon name="trash-outline"></ion-icon>
@@ -44,7 +46,7 @@
     <section class="notifications-content">
       @if (notifications().length > 0) {
       <div class="notifications-list">
-        @for ( notification of notifications(); track notification.id ) {
+        @for (notification of notifications(); track notification.id) {
         <article
           class="notification-card"
           tabindex="0"
@@ -52,16 +54,10 @@
           [class.unread]="!notification.read"
           [class.goal]="notification.type === 'goal'"
           [class.streak]="notification.type === 'streak'"
-          [class.achievement]="
-    notification.type === 'achievement'
-  "
-          [class.warning]="
-    notification.type === 'warning'
-  "
+          [class.achievement]="notification.type === 'achievement'"
+          [class.warning]="notification.type === 'warning'"
           (click)="openNotification(notification)"
-          (keydown.enter)="
-    openNotification(notification)
-  "
+          (keydown.enter)="openNotification(notification)"
         >
           <div class="notification-icon">
             <ion-icon [name]="notification.icon"></ion-icon>
@@ -69,9 +65,9 @@
 
           <div class="notification-information">
             <div class="notification-heading">
-              <strong> {{ notification.title }} </strong>
+              <strong>{{ notification.title }}</strong>
 
-              <span> {{ getTimeLabel( notification.createdAt ) }} </span>
+              <span> {{ getTimeLabel(notification.createdAt) }} </span>
             </div>
 
             <p>{{ notification.message }}</p>
@@ -80,19 +76,21 @@
           <button
             class="notification-delete"
             type="button"
-            aria-label="Benachrichtigung löschen"
-            (click)="
-      deleteNotification(
-        notification,
-        $event
-      )
-    "
+            [attr.aria-label]="
+                  'notifications.actions.delete' | translate
+                "
+            (click)="deleteNotification(notification, $event)"
           >
             <ion-icon name="trash-outline"></ion-icon>
           </button>
 
           @if (!notification.read) {
-          <span class="unread-dot" aria-label="Ungelesen"></span>
+          <span
+            class="unread-dot"
+            [attr.aria-label]="
+                    'notifications.unread' | translate
+                  "
+          ></span>
           }
         </article>
         }
@@ -103,9 +101,9 @@
           <ion-icon name="checkmark-circle-outline"></ion-icon>
         </div>
 
-        <h2>Alles erledigt</h2>
+        <h2>{{ 'notifications.empty.title' | translate }}</h2>
 
-        <p>Im Moment gibt es keine neuen Benachrichtigungen.</p>
+        <p>{{ 'notifications.empty.message' | translate }}</p>
       </section>
       }
     </section>

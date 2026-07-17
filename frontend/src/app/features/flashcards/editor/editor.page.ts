@@ -4,10 +4,8 @@ import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { IonContent, IonIcon } from '@ionic/angular/standalone';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
-
-import { FlashcardStore } from '../../../core/stores/flashcard.store';
-import { AppNotificationService } from '../../../core/services/app-notification.service';
 
 import {
   addOutline,
@@ -23,6 +21,9 @@ import {
   FlashcardSetResponse,
 } from '../../../core/models/flashcard-api.model';
 
+import { AppNotificationService } from '../../../core/services/app-notification.service';
+import { FlashcardStore } from '../../../core/stores/flashcard.store';
+
 interface EditableFlashcard extends FlashcardResponse {
   draftFront: string;
   draftBack: string;
@@ -32,7 +33,7 @@ interface EditableFlashcard extends FlashcardResponse {
 @Component({
   selector: 'app-editor',
   standalone: true,
-  imports: [FormsModule, IonContent, IonIcon],
+  imports: [FormsModule, IonContent, IonIcon, TranslatePipe],
   templateUrl: './editor.page.html',
   styleUrls: ['./editor.page.scss'],
 })
@@ -55,6 +56,7 @@ export class EditorPage {
     private readonly location: Location,
     private readonly flashcardStore: FlashcardStore,
     private readonly appNotificationService: AppNotificationService,
+    private readonly translate: TranslateService,
   ) {
     this.setId = Number(this.route.snapshot.paramMap.get('setId')) || 0;
 
@@ -68,20 +70,15 @@ export class EditorPage {
     });
   }
 
-  toggleMenu(): void {
-    this.menuOpen = !this.menuOpen;
-  }
-
-  closeMenu(): void {
-    this.menuOpen = false;
-  }
-
   ionViewWillEnter(): void {
     void this.loadEditorData();
   }
 
   get setTitle(): string {
-    return this.currentSet?.title ?? 'Lernset';
+    return (
+      this.currentSet?.title ??
+      this.translate.instant('flashcardEditor.defaultSetTitle')
+    );
   }
 
   get cardsComplete(): boolean {
@@ -93,9 +90,19 @@ export class EditorPage {
     );
   }
 
+  toggleMenu(): void {
+    this.menuOpen = !this.menuOpen;
+  }
+
+  closeMenu(): void {
+    this.menuOpen = false;
+  }
+
   async loadEditorData(): Promise<void> {
     if (!this.setId) {
-      this.loadError = 'Die Lernset-ID ist ungültig.';
+      this.loadError = this.translate.instant(
+        'flashcardEditor.errors.invalidSetId',
+      );
       this.isLoading = false;
       return;
     }
@@ -165,12 +172,14 @@ export class EditorPage {
     try {
       /*
        * Das Backend akzeptiert aktuell keine vollständig
-       * leeren Karten. Deshalb erstellen wir einen kleinen
-       * Platzhalter und öffnen sie sofort zum Bearbeiten.
+       * leeren Karten. Die Platzhalter werden nicht sichtbar,
+       * weil die Entwurfsfelder direkt geleert werden.
        */
       const createdCard = await this.flashcardStore.createCard(this.setId, {
-        front: 'Neue Vorderseite',
-        back: 'Neue Rückseite',
+        front: this.translate.instant(
+          'flashcardEditor.newCard.placeholderFront',
+        ),
+        back: this.translate.instant('flashcardEditor.newCard.placeholderBack'),
       });
 
       const editableCard = this.toEditableCard(createdCard);
@@ -193,7 +202,9 @@ export class EditorPage {
         });
       });
     } catch {
-      window.alert('Die Lernkarte konnte nicht erstellt werden.');
+      window.alert(
+        this.translate.instant('flashcardEditor.errors.createCardFailed'),
+      );
     } finally {
       this.isAddingCard = false;
     }
@@ -204,7 +215,9 @@ export class EditorPage {
     const back = card.draftBack.trim();
 
     if (!front || !back) {
-      window.alert('Vorder- und Rückseite dürfen nicht leer sein.');
+      window.alert(
+        this.translate.instant('flashcardEditor.errors.cardSidesRequired'),
+      );
       return;
     }
 
@@ -229,7 +242,9 @@ export class EditorPage {
 
       this.editingCardId = null;
     } catch {
-      window.alert('Die Änderungen konnten nicht gespeichert werden.');
+      window.alert(
+        this.translate.instant('flashcardEditor.errors.saveCardFailed'),
+      );
     } finally {
       const currentCard = this.cards.find((item) => item.id === card.id);
 
@@ -241,7 +256,7 @@ export class EditorPage {
 
   async deleteCard(cardId: number): Promise<void> {
     const confirmed = window.confirm(
-      'Möchtest du diese Lernkarte wirklich löschen?',
+      this.translate.instant('flashcardEditor.confirmations.deleteCard'),
     );
 
     if (!confirmed) {
@@ -261,17 +276,49 @@ export class EditorPage {
         this.editingCardId = null;
       }
     } catch {
-      window.alert('Die Lernkarte konnte nicht gelöscht werden.');
+      window.alert(
+        this.translate.instant('flashcardEditor.errors.deleteCardFailed'),
+      );
     }
   }
 
   startStudying(): void {
     if (!this.cardsComplete) {
-      window.alert('Fülle zuerst alle Karten vollständig aus.');
+      window.alert(
+        this.translate.instant('flashcardEditor.errors.incompleteCards'),
+      );
       return;
     }
 
     void this.router.navigate(['/study', this.setId]);
+  }
+
+  async deleteSet(): Promise<void> {
+    const confirmed = window.confirm(
+      this.translate.instant('flashcardEditor.confirmations.deleteSet', {
+        title: this.setTitle,
+      }),
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    try {
+      await this.flashcardStore.deleteSet(this.setId);
+
+      await this.router.navigateByUrl('/sets', {
+        replaceUrl: true,
+      });
+    } catch {
+      window.alert(
+        this.translate.instant('flashcardEditor.errors.deleteSetFailed'),
+      );
+    }
+  }
+
+  editSet(): void {
+    void this.router.navigate(['/sets', this.setId, 'settings']);
   }
 
   private replaceCard(updatedCard: EditableFlashcard): void {
@@ -291,41 +338,32 @@ export class EditorPage {
 
   private resolveLoadError(error: unknown): string {
     if (!(error instanceof HttpErrorResponse)) {
-      return 'Die Daten konnten nicht geladen werden.';
+      return this.translate.instant('flashcardEditor.errors.loadDataFailed');
     }
 
     if (error.status === 0) {
-      return 'Das Backend ist nicht erreichbar.';
+      return this.translate.instant(
+        'flashcardEditor.errors.backendUnavailable',
+      );
+    }
+
+    if (error.status === 401) {
+      return this.translate.instant('flashcardEditor.errors.sessionExpired');
     }
 
     if (error.status === 404) {
-      return 'Das Lernset wurde nicht gefunden.';
+      return this.translate.instant('flashcardEditor.errors.setNotFound');
     }
 
-    return error.error?.message ?? 'Der Editor konnte nicht geladen werden.';
-  }
-
-  async deleteSet(): Promise<void> {
-    const confirmed = window.confirm(
-      `Möchtest du das Lernset „${this.setTitle}“ wirklich löschen? Alle Karten werden ebenfalls gelöscht.`,
-    );
-
-    if (!confirmed) {
-      return;
+    if (
+      typeof error.error === 'object' &&
+      error.error !== null &&
+      'message' in error.error &&
+      typeof error.error.message === 'string'
+    ) {
+      return error.error.message;
     }
 
-    try {
-      await this.flashcardStore.deleteSet(this.setId);
-
-      await this.router.navigateByUrl('/sets', {
-        replaceUrl: true,
-      });
-    } catch {
-      window.alert('Das Lernset konnte nicht gelöscht werden.');
-    }
-  }
-
-  editSet(): void {
-    void this.router.navigate(['/sets', this.setId, 'settings']);
+    return this.translate.instant('flashcardEditor.errors.editorLoadFailed');
   }
 }

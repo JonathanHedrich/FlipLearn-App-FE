@@ -14,6 +14,8 @@ import { FlButtonComponent } from '../../../shared/components/fl-button/fl-butto
 import { FlInputComponent } from '../../../shared/components/fl-input/fl-input.component';
 import { FlLogoComponent } from '../../../shared/components/fl-logo/fl-logo.component';
 
+import { TranslatePipe } from '@ngx-translate/core';
+
 @Component({
   selector: 'app-forgot-password',
   templateUrl: './forgot-password.page.html',
@@ -28,6 +30,7 @@ import { FlLogoComponent } from '../../../shared/components/fl-logo/fl-logo.comp
     FlButtonComponent,
     FlInputComponent,
     FlLogoComponent,
+    TranslatePipe,
   ],
 })
 export class ForgotPasswordPage {

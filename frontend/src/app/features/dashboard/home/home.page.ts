@@ -28,12 +28,20 @@ import { StatisticsStore } from '../../../core/stores/statistics.store';
 import { FlBottomNavComponent } from '../../../shared/components/fl-bottom-nav/fl-bottom-nav.component';
 import { AppNotificationService } from '../../../core/services/app-notification.service';
 
+import { TranslateService, TranslatePipe } from '@ngx-translate/core';
+
 const STUDY_GOAL_STORAGE_KEY = 'fliplearn.studyGoal';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, IonContent, IonIcon, FlBottomNavComponent],
+  imports: [
+    CommonModule,
+    IonContent,
+    IonIcon,
+    FlBottomNavComponent,
+    TranslatePipe,
+  ],
   templateUrl: './home.page.html',
   styleUrls: ['./home.page.scss'],
 })
@@ -113,18 +121,20 @@ export class HomePage {
     const remaining = this.remainingGoalCards();
 
     if (remaining === 0) {
-      return 'Tagesziel erreicht – großartige Arbeit!';
+      return this.translate.instant('home.motivation.goalReached');
     }
 
     if (this.reviewsToday() === 0) {
-      return 'Starte mit einer Karte. Der Rest kommt von allein.';
+      return this.translate.instant('home.motivation.firstCard');
     }
 
     if (remaining <= 5) {
-      return `Nur noch ${remaining} Karten bis zu deinem Tagesziel.`;
+      return this.translate.instant('home.motivation.remaining', {
+        remaining,
+      });
     }
 
-    return 'Jede Wiederholung bringt dich deinem Ziel näher.';
+    return this.translate.instant('home.motivation.keepGoing');
   });
 
   readonly unreadNotifications = this.appNotificationService.unreadCount;
@@ -135,6 +145,7 @@ export class HomePage {
     readonly statisticsStore: StatisticsStore,
     private readonly router: Router,
     readonly appNotificationService: AppNotificationService,
+    private readonly translate: TranslateService,
   ) {
     addIcons({
       addOutline,
@@ -158,29 +169,36 @@ export class HomePage {
   }
 
   get displayName(): string {
-    return this.authStore.displayName() || 'FlipLearn User';
+    return (
+      this.authStore.displayName() || this.translate.instant('home.defaultUser')
+    );
   }
 
   get userName(): string {
-    return this.authStore.username() || 'FlipLearn User';
+    return (
+      this.authStore.username() || this.translate.instant('home.defaultUser')
+    );
   }
 
   get firstName(): string {
-    return this.userName.trim().split(/\s+/)[0] || 'Learner';
+    return (
+      this.userName.trim().split(/\s+/)[0] ||
+      this.translate.instant('home.defaultLearner')
+    );
   }
 
   get greeting(): string {
     const hour = new Date().getHours();
 
     if (hour < 12) {
-      return 'Good morning';
+      return this.translate.instant('home.greeting.morning');
     }
 
     if (hour < 18) {
-      return 'Good afternoon';
+      return this.translate.instant('home.greeting.afternoon');
     }
 
-    return 'Good evening';
+    return this.translate.instant('home.greeting.evening');
   }
 
   private loadDailyStudyGoal(): number {
@@ -270,7 +288,12 @@ export class HomePage {
   }
 
   getCardLabel(set: FlashcardSetResponse): string {
-    return set.cardCount === 1 ? '1 card' : `${set.cardCount} cards`;
+    return this.translate.instant(
+      set.cardCount === 1 ? 'home.cards.single' : 'home.cards.multiple',
+      {
+        count: set.cardCount,
+      },
+    );
   }
 
   getAchievementIcon(achievement: AchievementResponse): string {

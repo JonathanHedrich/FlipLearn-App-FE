@@ -1,0 +1,789 @@
+{
+  "common": {
+    "back": "Back",
+    "save": "Save",
+    "cancel": "Cancel",
+    "close": "Close",
+    "delete": "Delete",
+    "edit": "Edit",
+    "loading": "Loading …",
+    "retry": "Try again",
+    "viewAll": "View all",
+    "common": {
+      "showPassword": "Show password",
+      "hidePassword": "Hide password"
+    }
+  },
+  "study": {
+    "again": "Again",
+    "hard": "Hard",
+    "good": "Good",
+    "easy": "Easy",
+    "correct": "Correct",
+    "sessionComplete": "Session complete"
+  },
+  "forgot": {
+    "title": "Forgot your password?",
+    "description": "No problem. We'll send you a link to reset your password.",
+    "resetTitle": "Reset password",
+    "enterEmail": "Enter the email address of your account.",
+    "email": "Email address",
+    "emailPlaceholder": "name@example.com",
+    "invalidEmail": "Please enter a valid email address.",
+    "sendLink": "Send link",
+    "rememberedPassword": "Remember your password?",
+    "backToLogin": "Back to login",
+    "emailSent": "Email sent",
+    "emailSentDescription": "We have sent a password reset link to",
+    "emailSentSuffix": ".",
+    "directLogin": "Go to login"
+  },
+  "login": {
+    "title": "Welcome back!",
+    "subtitle": "Sign in to continue learning.",
+    "emailLabel": "EMAIL ADDRESS",
+    "emailPlaceholder": "alex@example.com",
+    "invalidEmail": "Please enter a valid email address.",
+    "passwordLabel": "PASSWORD",
+    "forgotPassword": "Forgot password?",
+    "invalidPassword": "The password must contain at least 8 characters.",
+    "signIn": "Sign in",
+    "orContinueWith": "or continue with",
+    "signInWithGoogle": "Sign in with Google",
+    "noAccount": "Don't have an account?",
+    "signUp": "Sign up",
+    "messages": {
+      "googleNotImplemented": "Google sign-in will be implemented later."
+    },
+    "errors": {
+      "unknown": "An unknown error occurred while signing in.",
+      "backendUnavailable": "The backend is unavailable. Please make sure Spring Boot is running on port 8080.",
+      "invalidCredentials": "The email address or password is incorrect.",
+      "loginFailed": "Sign-in failed. Please try again."
+    }
+  },
+  "register": {
+    "title": "Create Account",
+    "subtitle": "Create your account and start your personal learning journey.",
+    "name": "Name",
+    "namePlaceholder": "Your name",
+    "invalidName": "Please enter at least two characters.",
+    "email": "Email address",
+    "emailPlaceholder": "name@example.com",
+    "invalidEmail": "Please enter a valid email address.",
+    "password": "Password",
+    "passwordPlaceholder": "At least 8 characters",
+    "invalidPassword": "The password must contain at least 8 characters.",
+    "confirmPassword": "Confirm password",
+    "confirmPasswordPlaceholder": "Repeat password",
+    "passwordsDoNotMatch": "The passwords do not match.",
+    "acceptTerms": "By registering you accept our",
+    "termsOfService": "Terms of Service",
+    "and": "and",
+    "privacyPolicy": "Privacy Policy",
+    "createAccount": "Create Account",
+    "or": "or",
+    "registerWithGoogle": "Sign up with Google",
+    "alreadyHaveAccount": "Already have an account?",
+    "login": "Sign in",
+    "messages": {
+      "googleNotImplemented": "Google registration will be implemented later."
+    },
+    "errors": {
+      "unknown": "An unknown error occurred during registration.",
+      "backendUnavailable": "The backend is unavailable. Please make sure the Spring Boot server is running.",
+      "emailExists": "An account already exists for this email address.",
+      "invalidData": "The entered data is invalid.",
+      "registrationFailed": "Registration failed."
+    }
+  },
+  "splash": {
+    "subtitle": "Smart flashcard learning"
+  },
+  "home": {
+    "defaultUser": "FlipLearn User",
+    "defaultLearner": "Learner",
+
+    "header": {
+      "readyToLearn": "Ready for today’s learning?"
+    },
+    "actions": {
+      "notifications": "Notifications",
+      "settings": "Settings",
+      "newSet": "New Set",
+      "mySets": "My Sets",
+      "statistics": "Statistics"
+    },
+    "goal": {
+      "eyebrow": "TODAY'S GOAL",
+      "studyCards": "Study {{count}} cards",
+      "completed": "{{completed}} of {{goal}} completed"
+    },
+    "loading": {
+      "dashboard": "Loading dashboard …"
+    },
+    "error": {
+      "title": "Loading failed"
+    },
+    "stats": {
+      "dayStreak": "Day Streak",
+      "accuracyToday": "Accuracy Today",
+      "thisWeek": "This Week"
+    },
+    "sets": {
+      "eyebrow": "YOUR SETS",
+      "title": "Continue Studying",
+      "startStudying": "Start studying",
+      "progress": "Progress",
+      "emptyTitle": "No sets yet",
+      "emptyDescription": "Create your first set and start learning right away."
+    },
+    "quickActions": {
+      "eyebrow": "SHORTCUTS",
+      "title": "Quick Actions"
+    },
+    "achievements": {
+      "eyebrow": "RECENT",
+      "title": "Achievements",
+      "empty": "Your unlocked achievements will appear here."
+    },
+    "cards": {
+      "single": "{{count}} card",
+      "multiple": "{{count}} cards"
+    },
+    "greeting": {
+      "morning": "Good morning",
+      "afternoon": "Good afternoon",
+      "evening": "Good evening"
+    },
+    "motivation": {
+      "eyebrow": "KEEP GOING",
+      "goalReached": "Daily goal reached – great job!",
+      "firstCard": "Start with one card. The rest will follow.",
+      "remaining": "Only {{remaining}} cards left until your daily goal.",
+      "keepGoing": "Every review brings you closer to your goal."
+    }
+  },
+  "createSet": {
+    "title": "Create New Set",
+    "backToSets": "Back to sets",
+    "fields": {
+      "title": {
+        "label": "Set Title",
+        "placeholder": "e.g. French Vocabulary, Math Formulas …",
+        "validation": "Please enter a title with at least two characters."
+      },
+      "description": {
+        "label": "Description",
+        "placeholder": "Brief description of this set …"
+      },
+      "color": {
+        "label": "Set Color",
+        "select": "Select {{color}}"
+      },
+      "category": {
+        "label": "Category",
+        "none": "No category",
+        "loading": "Loading categories …"
+      }
+    },
+    "preview": {
+      "label": "Preview",
+      "defaultTitle": "New study set",
+      "cardCount": "{{count}} cards"
+    },
+    "actions": {
+      "createAndAddCards": "Create new Set"
+    },
+    "colors": {
+      "blue": "Blue",
+      "purple": "Purple",
+      "green": "Green",
+      "orange": "Orange",
+      "red": "Red",
+      "cyan": "Cyan"
+    },
+    "errors": {
+      "unknown": "An unknown error occurred while creating the study set.",
+      "createFailed": "The study set could not be created.",
+      "categoriesLoadFailed": "The categories could not be loaded.",
+      "backendUnavailable": "The backend is unavailable.",
+      "sessionExpired": "Your session has expired. Please sign in again.",
+      "invalidData": "The entered data is invalid."
+    }
+  },
+  "editSet": {
+    "title": "Edit Set",
+    "back": "Back",
+    "loading": "Loading set …",
+    "fields": {
+      "title": {
+        "label": "Title",
+        "placeholder": "Set title",
+        "validation": "The title must be between 2 and 100 characters."
+      },
+      "description": {
+        "label": "Description",
+        "placeholder": "Description"
+      },
+      "category": {
+        "label": "Category",
+        "none": "No category",
+        "loading": "Loading categories …"
+      },
+      "color": {
+        "label": "Color",
+        "select": "Select {{color}}"
+      }
+    },
+    "actions": {
+      "save": "Save Changes",
+      "saving": "Saving …"
+    }
+  },
+  "flashcardEditor": {
+    "loading": "Loading editor …",
+    "cardNumber": "Card {{number}}",
+    "addCardHint": "Tap to add a term and definition.",
+    "cards": {
+      "single": "{{count}} card",
+      "multiple": "{{count}} cards"
+    },
+    "actions": {
+      "back": "Back",
+      "moreOptions": "More options",
+      "editSet": "Edit set",
+      "deleteSet": "Delete set",
+      "deleteCard": "Delete flashcard",
+      "saving": "Saving …",
+      "addingCard": "Creating card …",
+      "addCard": "Add New Card",
+      "startStudying": "Start Studying"
+    },
+    "fields": {
+      "front": {
+        "label": "Front",
+        "placeholder": "Enter a term or question …"
+      },
+      "back": {
+        "label": "Back",
+        "placeholder": "Enter a definition or answer …"
+      }
+    },
+    "error": {
+      "title": "Loading failed"
+    },
+    "validation": {
+      "incompleteCards": "Please fill in the front and back of every flashcard."
+    },
+    "defaultSetTitle": "Study set",
+    "newCard": {
+      "placeholderFront": "New front side",
+      "placeholderBack": "New back side"
+    },
+    "confirmations": {
+      "deleteCard": "Do you really want to delete this flashcard?",
+      "deleteSet": "Do you really want to delete the study set “{{title}}”? All of its cards will also be deleted."
+    },
+    "errors": {
+      "invalidSetId": "The study set ID is invalid.",
+      "loadDataFailed": "The data could not be loaded.",
+      "editorLoadFailed": "The editor could not be loaded.",
+      "backendUnavailable": "The backend is unavailable.",
+      "sessionExpired": "Your session has expired. Please sign in again.",
+      "setNotFound": "The study set could not be found.",
+      "createCardFailed": "The flashcard could not be created.",
+      "cardSidesRequired": "The front and back sides must not be empty.",
+      "saveCardFailed": "The changes could not be saved.",
+      "deleteCardFailed": "The flashcard could not be deleted.",
+      "incompleteCards": "Complete all flashcards before starting.",
+      "deleteSetFailed": "The study set could not be deleted."
+    }
+  },
+  "flashcardDetail": {
+    "title": "Flashcard"
+  },
+  "sets": {
+    "title": "My Sets",
+    "summary": "{{sets}} sets · {{cards}} cards",
+
+    "loading": "Loading sets…",
+
+    "progress": "Progress",
+
+    "cards": {
+      "single": "{{count}} card",
+      "multiple": "{{count}} cards"
+    },
+
+    "search": {
+      "placeholder": "Search sets…",
+      "aria": "Search sets"
+    },
+
+    "filters": {
+      "all": "All Sets",
+      "favorites": "Favorites",
+      "recent": "Recent"
+    },
+
+    "categories": {
+      "title": "Categories",
+      "all": "All",
+      "less": "Less",
+      "manage": "Manage categories"
+    },
+
+    "actions": {
+      "study": "Study",
+      "edit": "Edit Set",
+      "create": "Create New Set",
+      "newSet": "New Set",
+      "addFavorite": "Add to favorites",
+      "removeFavorite": "Remove from favorites"
+    },
+
+    "error": {
+      "title": "Loading failed"
+    },
+
+    "empty": {
+      "title": "No sets found",
+      "description": "Change your search or create a new set."
+    },
+
+    "categoryManager": {
+      "badge": "CATEGORIES",
+      "title": "Manage Categories",
+      "description": "Create, rename or delete your personal categories.",
+      "new": "New Category",
+      "rename": "Rename Category",
+      "placeholder": "e.g. Mathematics",
+      "renamePlaceholder": "New category name",
+      "saving": "Saving…",
+      "renameButton": "Rename",
+      "addButton": "Add",
+      "cancelRename": "Cancel rename",
+      "loading": "Loading categories…",
+      "empty": "You haven't created any categories yet.",
+      "delete": "Delete category",
+      "errors": {
+        "nameRequired": "Please enter a category name.",
+        "nameTooLong": "The category name may contain no more than {{max}} characters.",
+        "renameFailed": "The category could not be renamed.",
+        "createFailed": "The category could not be created.",
+        "deleteFailed": "The category could not be deleted.",
+        "alreadyExists": "A category with this name already exists."
+      }
+    },
+    "errors": {
+      "categoriesLoadFailed": "The categories could not be loaded.",
+      "favoriteSaveFailed": "The favorite status could not be saved.",
+      "noCards": "Add at least one flashcard first.",
+      "deleteSetFailed": "The study set could not be deleted.",
+      "backendUnavailable": "The backend is unavailable.",
+      "sessionExpired": "Your session has expired. Please sign in again."
+    },
+    "confirmations": {
+      "deleteSet": "Do you really want to delete “{{title}}” and all of its cards?",
+      "deleteCategory": "Do you really want to delete the category “{{name}}”? The study sets will remain and will be shown without a category."
+    }
+  },
+  "notifications": {
+    "title": "Notifications",
+    "unreadCount": "{{count}} unread notification",
+
+    "unread": {
+      "single": "{{count}} unread notification",
+      "multiple": "{{count}} unread notifications",
+      "label": "Unread"
+    },
+
+    "actions": {
+      "back": "Back",
+      "readAll": "Read all",
+      "delete": "Delete notification",
+      "deleteAll": "Delete all notifications"
+    },
+
+    "empty": {
+      "title": "All caught up",
+      "description": "There are no new notifications right now."
+    },
+
+    "deleteAllConfirm": {
+      "title": "Delete all notifications?",
+      "description": "This action cannot be undone.",
+      "cancel": "Cancel",
+      "delete": "Delete all"
+    }
+  },
+  "editProfile": {
+    "title": "Edit Profile",
+
+    "messages": {
+      "profileSaved": "Your profile has been saved.",
+      "emailChanged": "Your email address has been changed. Please sign in again using the new address.",
+      "passwordChanged": "Your password has been changed successfully."
+    },
+
+    "errors": {
+      "profileSaveFailed": "The profile could not be saved.",
+      "emailChangeFailed": "The email address could not be changed.",
+      "passwordChangeFailed": "The password could not be changed.",
+      "backendUnavailable": "The backend is unavailable.",
+      "sessionExpired": "Your session has expired. Please sign in again.",
+      "invalidPassword": "The current password is incorrect.",
+      "alreadyInUse": "The username or email address is already in use."
+    },
+
+    "profile": {
+      "title": "Profile",
+      "description": "Change your display name and username.",
+      "displayName": "Display Name",
+      "username": "Username",
+      "displayNameValidation": "Display name must be between 2 and 150 characters.",
+      "usernameValidation": "Username must be between 3 and 100 characters."
+    },
+
+    "email": {
+      "title": "Email",
+      "description": "Change the email address you use to sign in to FlipLearn.",
+      "currentEmail": "Current Email",
+      "newEmail": "New Email",
+      "currentPassword": "Current Password",
+      "placeholder": "new@example.com",
+      "validation": "Please enter a valid email address."
+    },
+
+    "password": {
+      "title": "Password",
+      "description": "Change your sign-in password.",
+      "currentPassword": "Current Password",
+      "newPassword": "New Password",
+      "confirmPassword": "Confirm New Password",
+      "passwordsDoNotMatch": "The new passwords do not match."
+    },
+
+    "actions": {
+      "back": "Back",
+      "saveProfile": "Save Profile",
+      "saving": "Saving…",
+      "changeEmail": "Change Email",
+      "changingEmail": "Changing…",
+      "changePassword": "Change Password",
+      "changingPassword": "Changing…"
+    }
+  },
+  "profile": {
+    "title": "Profile",
+    "memberSince": "Member since {{date}}",
+    "loading": "Loading profile …",
+    "memberSinceUnknown": "Unknown",
+    "error": {
+      "title": "Loading failed",
+      "generic": "The profile could not be loaded.",
+      "backendUnavailable": "The backend is unavailable.",
+      "sessionExpired": "Your session has expired. Please sign in again."
+    },
+    "actions": {
+      "openNotifications": "Open notifications",
+      "openSettings": "Open settings"
+    },
+    "stats": {
+      "sets": "Sets",
+      "cards": "Cards",
+      "sessions": "Sessions",
+      "accuracy": "Accuracy"
+    },
+    "summary": {
+      "correctReviews": "Correct Reviews",
+      "favoriteSets": "Favorite Sets",
+      "totalReviews": "Total Reviews"
+    },
+    "mySets": {
+      "title": "My Sets",
+      "cardCountSingle": "{{count}} card · {{progress}}% complete",
+      "cardCountMultiple": "{{count}} cards · {{progress}}% complete",
+      "empty": "You haven't created any sets yet."
+    }
+  },
+
+  "settings": {
+    "title": "Settings",
+    "general": "General",
+    "languageDescription": "Choose the language of the app.",
+    "german": "German",
+    "english": "English",
+
+    "profile": {
+      "edit": "Edit Profile",
+      "defaultUser": "FlipLearn User"
+    },
+
+    "appearance": {
+      "lightDescription": "Always use the light theme",
+      "darkDescription": "Always use the dark theme",
+      "systemDescription": "Follow your device settings",
+      "title": "Appearance",
+      "light": {
+        "title": "Light",
+        "description": "Always use the light theme"
+      },
+      "dark": {
+        "title": "Dark",
+        "description": "Always use the dark theme"
+      },
+      "system": {
+        "title": "System",
+        "description": "Use the device setting"
+      }
+    },
+    "language": {
+      "title": "Language",
+      "german": "German",
+      "germanDescription": "Use FlipLearn in German",
+      "english": "English",
+      "englishDescription": "Use FlipLearn in English"
+    },
+
+    "study": {
+      "goalDescription": "How many cards would you like to study each day?",
+      "goalValue": "{{count}} cards",
+      "customTitle": "Custom Goal",
+      "customDescription": "Choose how many cards you want to study every day.",
+      "customPlaceholder": "e.g. 75",
+      "title": "Study preferences",
+      "goalTitle": "Daily study goal",
+      "cardCount": "{{count}} cards",
+      "cardsPerDay": "cards per day",
+      "customValidation": "The study goal must be between {{min}} and {{max}}.",
+      "goalDialog": {
+        "title": "Daily study goal",
+        "description": "How many cards would you like to study each day?"
+      },
+      "customGoal": {
+        "title": "Custom goal",
+        "description": "Choose how many cards you want to study each day.",
+        "placeholder": "e.g. 75"
+      }
+    },
+
+    "notifications": {
+      "title": "Notifications",
+      "studyReminders": "Study Reminders",
+      "streakAlerts": "Streak Alerts",
+      "permissionDenied": "Notifications were not allowed by the browser.",
+      "testTitle": "FlipLearn",
+      "testBody": "It is time for your daily study session 📚"
+    },
+
+    "actions": {
+      "back": "Back",
+      "logout": "Log Out"
+    },
+
+    "footer": "FlipLearn v{{version}} · Privacy · Terms",
+
+    "confirmations": {
+      "logout": "Are you sure you want to log out?"
+    }
+  },
+  "statistics": {
+    "title": "Statistics",
+    "subtitle": "Your learning progress",
+    "notifications": "Notifications",
+    "thisWeek": "THIS WEEK",
+    "loading": "Loading statistics …",
+    "loadFailed": "Loading failed",
+    "retry": "Try again",
+    "cardsStudied": "Cards Studied",
+    "cardsStudiedLower": "cards studied",
+    "cards": "Cards",
+    "studyTime": "Study Time",
+    "averageAccuracy": "Avg. Accuracy",
+    "weeklyActivity": "Weekly Activity",
+    "accuracy": "Accuracy",
+    "correct": "Correct",
+    "noWeeklyActivity": "No learning activity this week yet.",
+    "accuracyBySet": "Accuracy by Set",
+    "lastSessionResults": "Last session results",
+    "noSetStatistics": "No set statistics available yet.",
+    "studyCalendar": "Study Calendar",
+    "studyCalendarSubtitle": "This week – keep the fire going!",
+    "progress": "Progress",
+    "streak": {
+      "single": "{{count}} day streak",
+      "plural": "{{count}} day streak"
+    },
+    "time": {
+      "minutes": "{{minutes}} min",
+      "hours": "{{hours}} h",
+      "hoursAndMinutes": "{{hours}} h {{minutes}} min"
+    },
+    "chart": {
+      "ariaLabel": "Weekly study activity",
+      "hint": "Move the mouse or slide your finger across the chart to view exact values.",
+      "pointAriaSingle": "{{day}}: {{count}} card studied",
+      "pointAriaPlural": "{{day}}: {{count}} cards studied"
+    },
+    "achievements": {
+      "title": "Achievements",
+      "earnedCount": "{{earned}} of {{total}} earned",
+      "showAll": "Show all achievements",
+      "showLess": "Show less",
+      "unlocked": "Unlocked",
+      "unlockedUpper": "ACHIEVEMENT UNLOCKED",
+      "inProgressUpper": "IN PROGRESS"
+    }
+  },
+  "studySession": {
+    "defaultSetTitle": "Study Set",
+    "loading": {
+      "title": "Preparing your study session",
+      "description": "Loading due flashcards …"
+    },
+    "errors": {
+      "unavailableTitle": "Studying is currently unavailable",
+      "invalidSetId": "The study set ID is invalid.",
+      "favoriteSaveFailed": "The favorite status could not be saved.",
+      "startFailed": "The study session could not be started.",
+      "backendUnavailable": "The backend cannot be reached.",
+      "sessionExpired": "Your session has expired. Please sign in again.",
+      "setNotFound": "The study set could not be found.",
+      "noCardsAvailable": "There are currently no matching cards available for this study set.",
+      "reviewSaveFailed": "The rating could not be saved."
+    },
+    "actions": {
+      "endSession": "End study session",
+      "studyAgain": "Study Again",
+      "backToHome": "Back to Home"
+    },
+    "progress": {
+      "cardCount": "Card {{current}} of {{total}}"
+    },
+    "marathon": {
+      "round": "Marathon · Round {{round}}",
+      "description": "Difficult cards are repeated until you answer all of them correctly.",
+      "preparingNextRound": "Preparing the next round …"
+    },
+    "exam": {
+      "title": "Exam Mode",
+      "answeredCount": "{{answered}} of {{total}} answered"
+    },
+    "status": {
+      "correct": "Correct",
+      "difficult": "Difficult",
+      "correctCount": "{{count}} correct",
+      "difficultCount": "{{count}} difficult"
+    },
+    "lightning": {
+      "title": "Lightning Mode",
+      "seconds": "{{seconds}}s"
+    },
+    "instructions": {
+      "exam": "Answer every card – you will see the result at the end.",
+      "reveal": "Tap the card to reveal the answer."
+    },
+    "card": {
+      "showFront": "Show the front of the card",
+      "showBack": "Show the back of the card",
+      "front": "Front",
+      "back": "Back",
+      "tapToFlip": "Tap to flip",
+      "selfAssessment": "How well did you know it?"
+    },
+    "favorite": {
+      "add": "Add to favorites",
+      "remove": "Remove from favorites"
+    },
+    "rating": {
+      "flipBeforeRating": "Flip the card before choosing an answer.",
+      "title": "Rate your answer",
+      "again": "Again",
+      "hard": "Hard",
+      "good": "Good",
+      "easy": "Easy"
+    },
+    "result": {
+      "marathonEyebrow": "Marathon complete",
+      "examEyebrow": "Exam complete",
+      "sessionEyebrow": "Session complete",
+      "marathonTitle": "Marathon completed!",
+      "examTitle": "Exam completed",
+      "sessionTitle": "Great job!",
+      "finishedSetPrefix": "You finished all cards in",
+      "finishedSetSuffix": ".",
+      "accuracy": "Accuracy",
+      "totalAttempts": "Total Attempts",
+      "totalCards": "Total Cards"
+    },
+    "modeMenu": {
+      "eyebrow": "STUDY MODE",
+      "title": "Choose your mode",
+      "description": "Choose how this study session should be structured."
+    },
+    "modes": {
+      "all": {
+        "title": "All Cards",
+        "description": "Study all cards in the study set."
+      },
+      "random": {
+        "title": "Random",
+        "description": "Study all cards in a random order."
+      },
+      "favorites": {
+        "title": "Favorites",
+        "description": "Study only cards marked as favorites."
+      },
+      "difficult": {
+        "title": "Difficult",
+        "description": "Study difficult cards first.",
+        "badge": "SMART"
+      },
+      "wrongOnly": {
+        "title": "Wrong Answers Only",
+        "description": "Study only cards that were answered incorrectly last time."
+      },
+      "newOnly": {
+        "title": "New Cards Only",
+        "description": "Study only cards that have never been answered."
+      },
+      "dueOnly": {
+        "title": "Due Cards Only",
+        "description": "Study only cards whose next review is currently due."
+      },
+      "favoritesDue": {
+        "title": "Favorites + Due",
+        "description": "Study only favorite cards whose review is currently due."
+      },
+      "marathon": {
+        "title": "Marathon Mode",
+        "description": "Study all available cards without a session limit.",
+        "badge": "Long Session"
+      },
+      "lightning": {
+        "title": "Lightning Mode",
+        "description": "You have only five seconds for each card.",
+        "badge": "5 sec"
+      },
+      "exam": {
+        "title": "Exam Mode",
+        "description": "No immediate feedback. Your result is shown at the end.",
+        "badge": "No hints"
+      }
+    }
+  },
+  "bottomNav": {
+    "navigation": "Main navigation",
+    "home": "Home",
+    "sets": "My Sets",
+    "statistics": "Statistics",
+    "profile": "Profile"
+  },
+  "auth": {
+    "continueWithGoogle": "Continue with Google",
+    "continueWithApple": "Continue with Apple",
+    "continueWithMicrosoft": "Continue with Microsoft"
+  }
+}

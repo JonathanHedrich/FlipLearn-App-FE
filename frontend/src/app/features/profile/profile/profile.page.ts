@@ -3,6 +3,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Component, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { IonContent, IonIcon } from '@ionic/angular/standalone';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { firstValueFrom } from 'rxjs';
 import { addIcons } from 'ionicons';
 import {
@@ -18,30 +19,37 @@ import { AuthApi } from '../../../core/services/auth-api';
 import { AuthStore } from '../../../core/stores/auth.store';
 import { FlashcardStore } from '../../../core/stores/flashcard.store';
 import { FlBottomNavComponent } from '../../../shared/components/fl-bottom-nav/fl-bottom-nav.component';
+import { AppNotificationService } from '../../../core/services/app-notification.service';
 
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [CommonModule, IonContent, IonIcon, FlBottomNavComponent],
+  imports: [
+    CommonModule,
+    IonContent,
+    IonIcon,
+    FlBottomNavComponent,
+    TranslatePipe,
+  ],
   templateUrl: './profile.page.html',
   styleUrls: ['./profile.page.scss'],
 })
 export class ProfilePage {
-  /*
-   * Profil und Lernsets kommen direkt aus den zentralen Stores.
-   * Dadurch speichern wir die Daten nicht noch einmal lokal.
-   */
   readonly profile = this.authStore.profile;
   readonly sets = this.flashcardStore.sets;
 
   readonly isLoading = signal(true);
   readonly loadError = signal('');
 
+  readonly unreadNotifications = this.appNotificationService.unreadCount;
+
   constructor(
     private readonly authApi: AuthApi,
     private readonly authStore: AuthStore,
     private readonly flashcardStore: FlashcardStore,
     private readonly router: Router,
+    private readonly translate: TranslateService,
+    private readonly appNotificationService: AppNotificationService,
   ) {
     addIcons({
       bookOutline,
@@ -75,16 +83,21 @@ export class ProfilePage {
     const value = this.profile()?.memberSince;
 
     if (!value) {
-      return 'Unbekannt';
+      return this.translate.instant('profile.memberSinceUnknown');
     }
 
     const date = new Date(value);
 
     if (Number.isNaN(date.getTime())) {
-      return 'Unbekannt';
+      return this.translate.instant('profile.memberSinceUnknown');
     }
 
-    return new Intl.DateTimeFormat('de-DE', {
+    const language =
+      this.translate.currentLang() ?? this.translate.getFallbackLang() ?? 'de';
+
+    const locale = language === 'en' ? 'en-US' : 'de-DE';
+
+    return new Intl.DateTimeFormat(locale, {
       month: 'short',
       year: 'numeric',
     }).format(date);
@@ -95,17 +108,14 @@ export class ProfilePage {
     this.loadError.set('');
 
     try {
-      /*
-       * Profil und Sets werden parallel geladen.
-       * loadSets() führt nur dann einen neuen Request aus,
-       * wenn die Sets noch nicht geladen wurden.
-       */
       const [profile] = await Promise.all([
         firstValueFrom(this.authApi.getProfile()),
         this.flashcardStore.loadSets(),
       ]);
 
       this.authStore.setProfile(profile);
+
+      this.appNotificationService.rebuildNotifications();
     } catch (error: unknown) {
       this.loadError.set(this.resolveLoadError(error));
     } finally {
@@ -124,6 +134,7 @@ export class ProfilePage {
       ]);
 
       this.authStore.setProfile(profile);
+      this.appNotificationService.rebuildNotifications();
     } catch (error: unknown) {
       this.loadError.set(this.resolveLoadError(error));
     } finally {
@@ -145,15 +156,15 @@ export class ProfilePage {
 
   private resolveLoadError(error: unknown): string {
     if (!(error instanceof HttpErrorResponse)) {
-      return 'Das Profil konnte nicht geladen werden.';
+      return this.translate.instant('profile.error.generic');
     }
 
     if (error.status === 0) {
-      return 'Das Backend ist nicht erreichbar.';
+      return this.translate.instant('profile.error.backendUnavailable');
     }
 
     if (error.status === 401) {
-      return 'Deine Anmeldung ist abgelaufen. Bitte melde dich erneut an.';
+      return this.translate.instant('profile.error.sessionExpired');
     }
 
     if (
@@ -165,6 +176,6 @@ export class ProfilePage {
       return error.error.message;
     }
 
-    return 'Das Profil konnte nicht geladen werden.';
+    return this.translate.instant('profile.error.generic');
   }
 }

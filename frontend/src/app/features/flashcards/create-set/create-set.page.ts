@@ -3,9 +3,8 @@ import { Component } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { IonContent, IonIcon } from '@ionic/angular/standalone';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
-import { firstValueFrom } from 'rxjs';
-
 import {
   arrowBackOutline,
   bookOutline,
@@ -13,6 +12,7 @@ import {
   chevronDownOutline,
   folderOutline,
 } from 'ionicons/icons';
+import { firstValueFrom } from 'rxjs';
 
 import {
   CreateFlashcardSetRequest,
@@ -28,13 +28,19 @@ import { FlButtonComponent } from '../../../shared/components/fl-button/fl-butto
 interface ColorOption {
   value: FlashcardSetColor;
   hex: string;
-  label: string;
+  labelKey: string;
 }
 
 @Component({
   selector: 'app-create-set',
   standalone: true,
-  imports: [ReactiveFormsModule, IonContent, IonIcon, FlButtonComponent],
+  imports: [
+    ReactiveFormsModule,
+    IonContent,
+    IonIcon,
+    FlButtonComponent,
+    TranslatePipe,
+  ],
   templateUrl: './create-set.page.html',
   styleUrls: ['./create-set.page.scss'],
 })
@@ -54,32 +60,32 @@ export class CreateSetPage {
     {
       value: 'blue',
       hex: '#2868f7',
-      label: 'Blau',
+      labelKey: 'createSet.colors.blue',
     },
     {
       value: 'purple',
       hex: '#8735ef',
-      label: 'Violett',
+      labelKey: 'createSet.colors.purple',
     },
     {
       value: 'green',
       hex: '#069f78',
-      label: 'Grün',
+      labelKey: 'createSet.colors.green',
     },
     {
       value: 'orange',
       hex: '#e88100',
-      label: 'Orange',
+      labelKey: 'createSet.colors.orange',
     },
     {
       value: 'red',
       hex: '#e92929',
-      label: 'Rot',
+      labelKey: 'createSet.colors.red',
     },
     {
       value: 'cyan',
       hex: '#1495b5',
-      label: 'Türkis',
+      labelKey: 'createSet.colors.cyan',
     },
   ];
 
@@ -102,6 +108,7 @@ export class CreateSetPage {
     private readonly router: Router,
     private readonly flashcardStore: FlashcardStore,
     private readonly categoryApi: CategoryApi,
+    private readonly translate: TranslateService,
   ) {
     addIcons({
       arrowBackOutline,
@@ -123,9 +130,10 @@ export class CreateSetPage {
   }
 
   get previewTitle(): string {
-    const title = this.createSetForm.controls.title.value.trim();
-
-    return title || 'Set Title';
+    return (
+      this.createSetForm.controls.title.value.trim() ||
+      this.translate.instant('createSet.preview.defaultTitle')
+    );
   }
 
   get selectedColorHex(): string {
@@ -146,7 +154,7 @@ export class CreateSetPage {
     try {
       this.categories = await firstValueFrom(this.categoryApi.getCategories());
     } catch (error: unknown) {
-      this.categoryError = this.resolveCreateError(error);
+      this.categoryError = this.resolveCategoryLoadError(error);
     } finally {
       this.isLoadingCategories = false;
     }
@@ -186,11 +194,8 @@ export class CreateSetPage {
 
       const request: CreateFlashcardSetRequest = {
         title: formValue.title.trim(),
-
         description: formValue.description.trim() || null,
-
         categoryId: formValue.categoryId,
-
         color: this.selectedColor,
       };
 
@@ -206,29 +211,83 @@ export class CreateSetPage {
     }
   }
 
-  private resolveCreateError(error: unknown): string {
+  private resolveCategoryLoadError(error: unknown): string {
     if (!(error instanceof HttpErrorResponse)) {
-      return 'Beim Erstellen des Lernsets ist ein unbekannter Fehler aufgetreten.';
+      return this.translate.instant('createSet.errors.categoriesLoadFailed');
     }
 
     if (error.status === 0) {
-      return 'Das Backend ist nicht erreichbar.';
+      return this.translate.instant('createSet.errors.backendUnavailable');
     }
 
     if (error.status === 401) {
-      return 'Deine Anmeldung ist abgelaufen. Bitte melde dich erneut an.';
+      return this.translate.instant('createSet.errors.sessionExpired');
+    }
+
+    if (
+      typeof error.error === 'object' &&
+      error.error !== null &&
+      'message' in error.error &&
+      typeof error.error.message === 'string'
+    ) {
+      return error.error.message;
+    }
+
+    return this.translate.instant('createSet.errors.categoriesLoadFailed');
+  }
+
+  private resolveCreateError(error: unknown): string {
+    if (!(error instanceof HttpErrorResponse)) {
+      return this.translate.instant('createSet.errors.unknown');
+    }
+
+    if (error.status === 0) {
+      return this.translate.instant('createSet.errors.backendUnavailable');
+    }
+
+    if (error.status === 401) {
+      return this.translate.instant('createSet.errors.sessionExpired');
     }
 
     if (error.status === 400) {
-      const validationErrors = error.error?.validationErrors as
-        | Record<string, string>
-        | undefined;
+      const validationErrors = this.extractValidationErrors(error.error);
 
-      return validationErrors
-        ? Object.values(validationErrors)[0]
-        : 'Die eingegebenen Daten sind ungültig.';
+      if (validationErrors.length > 0) {
+        return validationErrors[0];
+      }
+
+      return this.translate.instant('createSet.errors.invalidData');
     }
 
-    return error.error?.message ?? 'Das Lernset konnte nicht erstellt werden.';
+    if (
+      typeof error.error === 'object' &&
+      error.error !== null &&
+      'message' in error.error &&
+      typeof error.error.message === 'string'
+    ) {
+      return error.error.message;
+    }
+
+    return this.translate.instant('createSet.errors.createFailed');
+  }
+
+  private extractValidationErrors(responseBody: unknown): string[] {
+    if (
+      typeof responseBody !== 'object' ||
+      responseBody === null ||
+      !('validationErrors' in responseBody)
+    ) {
+      return [];
+    }
+
+    const validationErrors = responseBody.validationErrors;
+
+    if (typeof validationErrors !== 'object' || validationErrors === null) {
+      return [];
+    }
+
+    return Object.values(validationErrors).filter(
+      (message): message is string => typeof message === 'string',
+    );
   }
 }

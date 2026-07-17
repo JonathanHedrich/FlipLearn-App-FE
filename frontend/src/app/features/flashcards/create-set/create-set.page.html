@@ -4,13 +4,13 @@
       <button
         class="back-button"
         type="button"
-        aria-label="Zurück zu den Lernsets"
+        [attr.aria-label]="'createSet.backToSets' | translate"
         (click)="goBack()"
       >
         <ion-icon name="arrow-back-outline"></ion-icon>
       </button>
 
-      <h1>Create New Set</h1>
+      <h1>{{ 'createSet.title' | translate }}</h1>
     </header>
 
     <form
@@ -20,32 +20,39 @@
       novalidate
     >
       <div class="form-group">
-        <label for="set-title"> Set Title <span>*</span> </label>
+        <label for="set-title">
+          {{ 'createSet.fields.title.label' | translate }}
+          <span>*</span>
+        </label>
 
         <input
           id="set-title"
           type="text"
           formControlName="title"
           maxlength="60"
-          placeholder="e.g., French Vocabulary, Math Formulas..."
+          [placeholder]="'createSet.fields.title.placeholder' | translate"
           [class.invalid]="titleInvalid"
         />
 
         @if (titleInvalid) {
         <p class="validation-message">
-          Bitte gib einen Titel mit mindestens zwei Zeichen ein.
+          {{ 'createSet.fields.title.validation' | translate }}
         </p>
         }
       </div>
 
       <div class="form-group">
-        <label for="set-description"> Description </label>
+        <label for="set-description">
+          {{ 'createSet.fields.description.label' | translate }}
+        </label>
 
         <textarea
           id="set-description"
           formControlName="description"
           maxlength="250"
-          placeholder="Brief description of this set..."
+          [placeholder]="
+            'createSet.fields.description.placeholder' | translate
+          "
         ></textarea>
 
         <span class="character-count">
@@ -54,7 +61,7 @@
       </div>
 
       <fieldset class="color-section">
-        <legend>Set Color</legend>
+        <legend>{{ 'createSet.fields.color.label' | translate }}</legend>
 
         <div class="color-options">
           @for (option of colorOptions; track option.value) {
@@ -63,7 +70,10 @@
             type="button"
             [class.selected]="selectedColor === option.value"
             [style.--option-color]="option.hex"
-            [attr.aria-label]="option.label + ' auswählen'"
+            [attr.aria-label]="
+              ('createSet.fields.color.select'
+                | translate:{ color: (option.labelKey | translate) })
+            "
             [attr.aria-pressed]="selectedColor === option.value"
             (click)="selectColor(option.value)"
           >
@@ -76,15 +86,19 @@
       </fieldset>
 
       <div class="form-group">
-        <label for="categoryId"> Kategorie </label>
+        <label for="categoryId">
+          {{ 'createSet.fields.category.label' | translate }}
+        </label>
 
         <div class="select-wrapper">
           <ion-icon name="folder-outline"></ion-icon>
 
           <select id="categoryId" formControlName="categoryId">
-            <option [ngValue]="null">Keine Kategorie</option>
+            <option [ngValue]="null">
+              {{ 'createSet.fields.category.none' | translate }}
+            </option>
 
-            @for ( category of categories; track category.id ) {
+            @for (category of categories; track category.id) {
             <option [ngValue]="category.id">{{ category.name }}</option>
             }
           </select>
@@ -93,14 +107,18 @@
         </div>
 
         @if (isLoadingCategories) {
-        <p class="category-hint">Kategorien werden geladen …</p>
+        <p class="category-hint">
+          {{ 'createSet.fields.category.loading' | translate }}
+        </p>
         } @if (categoryError) {
         <p class="validation-message">{{ categoryError }}</p>
         }
       </div>
 
       <section class="preview-card" [style.--preview-color]="selectedColorHex">
-        <span class="preview-label"> Preview </span>
+        <span class="preview-label">
+          {{ 'createSet.preview.label' | translate }}
+        </span>
 
         <div class="preview-content">
           <div class="preview-icon">
@@ -109,7 +127,8 @@
 
           <div>
             <h2>{{ previewTitle }}</h2>
-            <p>0 cards</p>
+
+            <p>{{ 'createSet.preview.cardCount' | translate: { count: 0 } }}</p>
           </div>
         </div>
       </section>
@@ -119,7 +138,7 @@
       }
 
       <fl-button
-        text="Create Set & Add Cards"
+        [text]="'createSet.actions.createAndAddCards' | translate"
         [loading]="isSubmitting"
         [disabled]="createSetForm.invalid"
         (clicked)="createSet()"

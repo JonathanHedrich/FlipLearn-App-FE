@@ -3,9 +3,9 @@
     <section class="login-hero">
       <fl-logo size="medium"></fl-logo>
 
-      <h1>Welcome back!</h1>
+      <h1>{{ 'login.title' | translate }}</h1>
 
-      <p>Sign in to continue learning</p>
+      <p>{{ 'login.subtitle' | translate }}</p>
     </section>
 
     <section class="login-panel">
@@ -16,22 +16,24 @@
         novalidate
       >
         <fl-input
-          label="EMAIL ADDRESS"
+          [label]="'login.emailLabel' | translate"
           type="email"
           icon="mail-outline"
-          placeholder="alex@example.com"
+          [placeholder]="'login.emailPlaceholder' | translate"
           autocomplete="email"
           [value]="loginForm.controls.email.value"
           [invalid]="emailInvalid"
-          errorMessage="Bitte gib eine gültige E-Mail-Adresse ein."
+          [errorMessage]="'login.invalidEmail' | translate"
           (valueChange)="loginForm.controls.email.setValue($event)"
         >
         </fl-input>
 
         <div class="password-heading">
-          <span>PASSWORD</span>
+          <span> {{ 'login.passwordLabel' | translate }} </span>
 
-          <a routerLink="/forgot-password"> Forgot Password? </a>
+          <a routerLink="/forgot-password">
+            {{ 'login.forgotPassword' | translate }}
+          </a>
         </div>
 
         <fl-input
@@ -41,7 +43,7 @@
           autocomplete="current-password"
           [value]="loginForm.controls.password.value"
           [invalid]="passwordInvalid"
-          errorMessage="Das Passwort muss mindestens 8 Zeichen enthalten."
+          [errorMessage]="'login.invalidPassword' | translate"
           (valueChange)="loginForm.controls.password.setValue($event)"
         >
         </fl-input>
@@ -52,7 +54,7 @@
 
         <div class="login-button-wrapper">
           <fl-button
-            text="Sign In"
+            [text]="'login.signIn' | translate"
             [loading]="isSubmitting"
             (clicked)="submitLogin()"
           >
@@ -61,20 +63,22 @@
 
         <div class="divider">
           <span></span>
-          <p>or continue with</p>
+
+          <p>{{ 'login.orContinueWith' | translate }}</p>
+
           <span></span>
         </div>
 
         <fl-social-button
           provider="google"
-          text="Mit Google anmelden"
+          [text]="'login.signInWithGoogle' | translate"
           (clicked)="signInWithGoogle()"
         ></fl-social-button>
 
         <p class="register-link">
-          Don't have an account?
+          {{ 'login.noAccount' | translate }}
 
-          <a routerLink="/register"> Sign Up </a>
+          <a routerLink="/register"> {{ 'login.signUp' | translate }} </a>
         </p>
       </form>
     </section>

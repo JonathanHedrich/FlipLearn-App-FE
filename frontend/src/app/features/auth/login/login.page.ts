@@ -2,21 +2,22 @@ import { CommonModule } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { IonContent } from '@ionic/angular/standalone';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { firstValueFrom } from 'rxjs';
-import { ActivatedRoute } from '@angular/router';
 
 import {
   ApiErrorResponse,
   LoginRequest,
 } from '../../../core/models/auth.model';
 import { AuthApi } from '../../../core/services/auth-api';
+import { AuthStore } from '../../../core/stores/auth.store';
+
 import { FlButtonComponent } from '../../../shared/components/fl-button/fl-button.component';
 import { FlInputComponent } from '../../../shared/components/fl-input/fl-input.component';
 import { FlLogoComponent } from '../../../shared/components/fl-logo/fl-logo.component';
 import { FlSocialButtonComponent } from '../../../shared/components/fl-social-button/fl-social-button.component';
-import { AuthStore } from 'src/app/core/stores/auth.store';
 
 @Component({
   selector: 'app-login',
@@ -32,6 +33,7 @@ import { AuthStore } from 'src/app/core/stores/auth.store';
     FlButtonComponent,
     FlInputComponent,
     FlSocialButtonComponent,
+    TranslatePipe,
   ],
 })
 export class LoginPage {
@@ -50,6 +52,7 @@ export class LoginPage {
     private readonly authApi: AuthApi,
     private readonly route: ActivatedRoute,
     private readonly authStore: AuthStore,
+    private readonly translate: TranslateService,
   ) {}
 
   get emailInvalid(): boolean {
@@ -71,6 +74,7 @@ export class LoginPage {
 
     this.submitted = true;
     this.loginError = '';
+
     this.loginForm.markAllAsTouched();
 
     if (this.loginForm.invalid) {
@@ -107,27 +111,26 @@ export class LoginPage {
   }
 
   signInWithGoogle(): void {
-    console.log('Google-Anmeldung wird später implementiert.');
+    console.log(this.translate.instant('login.messages.googleNotImplemented'));
   }
 
   private resolveLoginError(error: unknown): string {
     if (!(error instanceof HttpErrorResponse)) {
-      return 'Beim Anmelden ist ein unbekannter Fehler aufgetreten.';
+      return this.translate.instant('login.errors.unknown');
     }
 
     if (error.status === 0) {
-      return 'Das Backend ist nicht erreichbar. Prüfe, ob Spring Boot auf Port 8080 läuft.';
+      return this.translate.instant('login.errors.backendUnavailable');
     }
 
     if (error.status === 401) {
-      return 'E-Mail-Adresse oder Passwort ist falsch.';
+      return this.translate.instant('login.errors.invalidCredentials');
     }
 
     const apiError = error.error as Partial<ApiErrorResponse> | null;
 
     return (
-      apiError?.message ??
-      'Die Anmeldung ist fehlgeschlagen. Bitte versuche es erneut.'
+      apiError?.message ?? this.translate.instant('login.errors.loginFailed')
     );
   }
 }

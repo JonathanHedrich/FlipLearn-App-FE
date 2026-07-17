@@ -9,10 +9,12 @@ import {
   personOutline,
 } from 'ionicons/icons';
 
+import { TranslatePipe } from '@ngx-translate/core';
+
 @Component({
   selector: 'fl-bottom-nav',
   standalone: true,
-  imports: [RouterLink, IonIcon],
+  imports: [RouterLink, IonIcon, TranslatePipe],
   templateUrl: './fl-bottom-nav.component.html',
   styleUrls: ['./fl-bottom-nav.component.scss'],
 })

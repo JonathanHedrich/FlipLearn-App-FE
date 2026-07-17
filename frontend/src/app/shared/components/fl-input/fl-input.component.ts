@@ -3,11 +3,12 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { IonIcon, IonInput } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { eyeOffOutline, eyeOutline } from 'ionicons/icons';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'fl-input',
   standalone: true,
-  imports: [CommonModule, IonIcon, IonInput],
+  imports: [CommonModule, IonIcon, IonInput, TranslatePipe],
   templateUrl: './fl-input.component.html',
   styleUrls: ['./fl-input.component.scss'],
 })

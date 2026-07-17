@@ -3,13 +3,9 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnDestroy, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { IonContent, IonIcon } from '@ionic/angular/standalone';
-import { firstValueFrom } from 'rxjs';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
-
-import { StatisticsStore } from '../../../core/stores/statistics.store';
-import { AppNotificationService } from '../../../core/services/app-notification.service';
-import { StudyModeOption } from '../../../core/models/study-mode-option.model';
-import { FitTextDirective } from '../../../shared/directives/fit-text.directive';
+import { firstValueFrom } from 'rxjs';
 
 import {
   albumsOutline,
@@ -32,20 +28,27 @@ import {
   trophyOutline,
 } from 'ionicons/icons';
 
+import { StudyModeOption } from '../../../core/models/study-mode-option.model';
 import {
   StudyCardResponse,
   StudyMode,
   StudyRating,
   StudySessionResponse,
 } from '../../../core/models/study-api.model';
+
+import { AppNotificationService } from '../../../core/services/app-notification.service';
 import { FlashcardApi } from '../../../core/services/flashcard-api';
 import { StudyApi } from '../../../core/services/study-api';
+
 import { FlashcardStore } from '../../../core/stores/flashcard.store';
+import { StatisticsStore } from '../../../core/stores/statistics.store';
+
+import { FitTextDirective } from '../../../shared/directives/fit-text.directive';
 
 @Component({
   selector: 'app-study-session',
   standalone: true,
-  imports: [IonContent, IonIcon, FitTextDirective],
+  imports: [IonContent, IonIcon, FitTextDirective, TranslatePipe],
   templateUrl: './study-session.page.html',
   styleUrls: ['./study-session.page.scss'],
 })
@@ -86,89 +89,92 @@ export class StudySessionPage implements OnDestroy {
   private lightningIntervalId: ReturnType<typeof window.setInterval> | null =
     null;
 
+  /*
+   * title, description und badge enthalten
+   * Übersetzungsschlüssel. Im Template werden
+   * sie mit dem TranslatePipe übersetzt.
+   */
   readonly studyModeOptions: StudyModeOption[] = [
     {
       value: 'ALL',
-      title: 'All Cards',
-      description: 'Alle Karten des Lernsets lernen.',
+      title: 'studySession.modes.all.title',
+      description: 'studySession.modes.all.description',
       icon: 'albums-outline',
       available: true,
     },
     {
       value: 'RANDOM',
-      title: 'Random',
-      description: 'Alle Karten in zufälliger Reihenfolge.',
+      title: 'studySession.modes.random.title',
+      description: 'studySession.modes.random.description',
       icon: 'shuffle-outline',
       available: true,
     },
     {
       value: 'FAVORITES',
-      title: 'Favorites',
-      description: 'Nur favorisierte Karten lernen.',
+      title: 'studySession.modes.favorites.title',
+      description: 'studySession.modes.favorites.description',
       icon: 'star-outline',
       available: true,
     },
     {
       value: 'DIFFICULT',
-      title: 'Difficult',
-      description: 'Schwierige Karten zuerst lernen.',
+      title: 'studySession.modes.difficult.title',
+      description: 'studySession.modes.difficult.description',
       icon: 'flame-outline',
-      badge: 'SMART',
+      badge: 'studySession.modes.difficult.badge',
       available: true,
     },
     {
       value: 'WRONG_ONLY',
-      title: 'Wrong Answers Only',
-      description: 'Nur Karten lernen, die zuletzt falsch beantwortet wurden.',
+      title: 'studySession.modes.wrongOnly.title',
+      description: 'studySession.modes.wrongOnly.description',
       icon: 'close-circle-outline',
       available: true,
     },
     {
       value: 'NEW_ONLY',
-      title: 'New Cards Only',
-      description: 'Nur Karten lernen, die noch nie beantwortet wurden.',
+      title: 'studySession.modes.newOnly.title',
+      description: 'studySession.modes.newOnly.description',
       icon: 'sparkles-outline',
       available: true,
     },
     {
       value: 'DUE_ONLY',
-      title: 'Due Cards Only',
-      description:
-        'Nur Karten lernen, deren nächste Wiederholung jetzt fällig ist.',
+      title: 'studySession.modes.dueOnly.title',
+      description: 'studySession.modes.dueOnly.description',
       icon: 'time-outline',
       available: true,
     },
     {
       value: 'FAVORITES_DUE',
-      title: 'Favorites + Due',
-      description:
-        'Nur favorisierte Karten lernen, deren Wiederholung aktuell fällig ist.',
+      title: 'studySession.modes.favoritesDue.title',
+      description: 'studySession.modes.favoritesDue.description',
       icon: 'heart-circle-outline',
       available: true,
     },
     {
       value: 'MARATHON',
-      title: 'Marathon Mode',
-      description: 'Alle verfügbaren Karten ohne Sitzungsbegrenzung.',
+      title: 'studySession.modes.marathon.title',
+      description: 'studySession.modes.marathon.description',
       icon: 'fitness-outline',
       available: true,
-      badge: 'Long Session',
+      badge: 'studySession.modes.marathon.badge',
     },
     {
       value: 'LIGHTNING',
-      title: 'Lightning Mode',
-      description: 'Nur fünf Sekunden pro Karte.',
+      title: 'studySession.modes.lightning.title',
+      description: 'studySession.modes.lightning.description',
       icon: 'flash-outline',
       available: true,
-      badge: '5 sec',
+      badge: 'studySession.modes.lightning.badge',
     },
     {
       value: 'EXAM',
-      title: 'Exam Mode',
-      description: 'Keine sofortige Auswertung. Ergebnis erst am Ende.',
+      title: 'studySession.modes.exam.title',
+      description: 'studySession.modes.exam.description',
       icon: 'school-outline',
       available: true,
-      badge: 'No hints',
+      badge: 'studySession.modes.exam.badge',
     },
   ];
 
@@ -181,6 +187,7 @@ export class StudySessionPage implements OnDestroy {
     private readonly flashcardStore: FlashcardStore,
     private readonly statisticsStore: StatisticsStore,
     private readonly appNotificationService: AppNotificationService,
+    private readonly translate: TranslateService,
   ) {
     this.setId = Number(this.route.snapshot.paramMap.get('setId')) || 0;
 
@@ -219,7 +226,10 @@ export class StudySessionPage implements OnDestroy {
   }
 
   get setTitle(): string {
-    return this.session?.setTitle ?? 'Lernset';
+    return (
+      this.session?.setTitle ??
+      this.translate.instant('studySession.defaultSetTitle')
+    );
   }
 
   get currentCard(): StudyCardResponse | null {
@@ -248,15 +258,75 @@ export class StudySessionPage implements OnDestroy {
     return Math.round((this.displayedCorrectAnswers / answered) * 100);
   }
 
+  get selectedStudyModeLabel(): string {
+    const translationKey =
+      this.studyModeOptions.find(
+        (option) => option.value === this.selectedStudyMode,
+      )?.title ?? 'studySession.modes.all.title';
+
+    return this.translate.instant(translationKey);
+  }
+
+  get isExamMode(): boolean {
+    return this.selectedStudyMode === 'EXAM';
+  }
+
+  get isMarathonMode(): boolean {
+    return this.selectedStudyMode === 'MARATHON';
+  }
+
+  get isLightningMode(): boolean {
+    return this.selectedStudyMode === 'LIGHTNING';
+  }
+
+  get activeStudyMode(): StudyMode {
+    return this.session?.mode ?? this.selectedStudyMode;
+  }
+
+  get displayedCorrectAnswers(): number {
+    if (this.isMarathonMode) {
+      return this.marathonCorrectAnswers;
+    }
+
+    return this.correctAnswers;
+  }
+
+  get displayedIncorrectAnswers(): number {
+    if (this.isMarathonMode) {
+      return this.marathonIncorrectAnswers;
+    }
+
+    return this.incorrectAnswers;
+  }
+
+  get totalAnsweredAttempts(): number {
+    return this.displayedCorrectAnswers + this.displayedIncorrectAnswers;
+  }
+
+  get examProgressCount(): number {
+    if (!this.isExamMode) {
+      return 0;
+    }
+
+    return Math.min(
+      this.currentIndex + (this.isFlipped ? 1 : 0),
+      this.cards.length,
+    );
+  }
+
   async startSession(): Promise<void> {
     if (!this.setId) {
-      this.loadError = 'Die Lernset-ID ist ungültig.';
+      this.loadError = this.translate.instant(
+        'studySession.errors.invalidSetId',
+      );
+
       this.isLoading = false;
       return;
     }
 
     this.isLoading = true;
     this.loadError = '';
+
     this.resetLocalSession();
 
     if (this.selectedStudyMode === 'MARATHON') {
@@ -280,6 +350,7 @@ export class StudySessionPage implements OnDestroy {
       this.correctAnswers = session.correctAnswers;
 
       this.incorrectAnswers = session.incorrectAnswers;
+
       this.startLightningTimer();
     } catch (error: unknown) {
       this.loadError = this.resolveSessionError(error);
@@ -339,7 +410,9 @@ export class StudySessionPage implements OnDestroy {
           : existingCard,
       );
     } catch {
-      window.alert('Der Favoritenstatus konnte nicht gespeichert werden.');
+      window.alert(
+        this.translate.instant('studySession.errors.favoriteSaveFailed'),
+      );
     }
   }
 
@@ -362,9 +435,10 @@ export class StudySessionPage implements OnDestroy {
     this.isSubmittingRating = true;
 
     /*
-     * Session und Karte werden für diesen Request
-     * festgehalten. Dadurch kann ein alter Request
-     * keine neue Marathon-Runde überschreiben.
+     * Session und Karte werden für diesen
+     * Request festgehalten. Dadurch kann ein
+     * alter Request keine neue Marathon-Runde
+     * überschreiben.
      */
     const submittedSessionId = session.sessionId;
 
@@ -379,8 +453,9 @@ export class StudySessionPage implements OnDestroy {
       );
 
       /*
-       * Wurde inzwischen eine neue Session gestartet,
-       * gehört diese Antwort noch zur alten Runde.
+       * Wurde inzwischen eine neue Session
+       * gestartet, gehört diese Antwort noch
+       * zur alten Runde.
        */
       if (this.session?.sessionId !== submittedSessionId) {
         return;
@@ -432,8 +507,9 @@ export class StudySessionPage implements OnDestroy {
     } catch (error: unknown) {
       /*
        * Falls inzwischen bereits eine andere
-       * Marathon-Runde aktiv ist, ignorieren wir
-       * den verspäteten Fehler der alten Runde.
+       * Marathon-Runde aktiv ist, ignorieren
+       * wir den verspäteten Fehler der alten
+       * Runde.
        */
       if (this.session?.sessionId !== submittedSessionId) {
         return;
@@ -459,59 +535,6 @@ export class StudySessionPage implements OnDestroy {
     void this.router.navigate(['/sets', this.setId, 'edit']);
   }
 
-  private resetLocalSession(): void {
-    this.stopLightningTimer();
-
-    this.session = null;
-    this.orderedCards = [];
-    this.currentIndex = 0;
-
-    this.isFlipped = false;
-    this.sessionComplete = false;
-    this.correctAnswers = 0;
-    this.incorrectAnswers = 0;
-
-    this.marathonRound = 1;
-    this.marathonCorrectAnswers = 0;
-    this.marathonIncorrectAnswers = 0;
-    this.isPreparingMarathonRound = false;
-
-    this.examAnsweredCards = 0;
-  }
-
-  private resolveSessionError(error: unknown): string {
-    if (!(error instanceof HttpErrorResponse)) {
-      return 'Die Lernsitzung konnte nicht gestartet werden.';
-    }
-
-    if (error.status === 0) {
-      return 'Das Backend ist nicht erreichbar.';
-    }
-
-    if (error.status === 404) {
-      return 'Das Lernset wurde nicht gefunden.';
-    }
-
-    if (error.status === 409) {
-      return (
-        error.error?.message ??
-        'Für dieses Lernset sind aktuell keine Karten fällig.'
-      );
-    }
-
-    return (
-      error.error?.message ?? 'Die Lernsitzung konnte nicht gestartet werden.'
-    );
-  }
-
-  private resolveReviewError(error: unknown): string {
-    if (error instanceof HttpErrorResponse && error.error?.message) {
-      return error.error.message as string;
-    }
-
-    return 'Die Bewertung konnte nicht gespeichert werden.';
-  }
-
   openStudyModeMenu(): void {
     this.studyModeMenuOpen = true;
   }
@@ -527,12 +550,91 @@ export class StudySessionPage implements OnDestroy {
     void this.startSession();
   }
 
-  get selectedStudyModeLabel(): string {
+  private resetLocalSession(): void {
+    this.stopLightningTimer();
+
+    this.session = null;
+    this.orderedCards = [];
+    this.currentIndex = 0;
+
+    this.isFlipped = false;
+    this.sessionComplete = false;
+
+    this.correctAnswers = 0;
+    this.incorrectAnswers = 0;
+
+    this.marathonRound = 1;
+    this.marathonCorrectAnswers = 0;
+    this.marathonIncorrectAnswers = 0;
+
+    this.isPreparingMarathonRound = false;
+
+    this.examAnsweredCards = 0;
+  }
+
+  private resolveSessionError(error: unknown): string {
+    if (!(error instanceof HttpErrorResponse)) {
+      return this.translate.instant('studySession.errors.startFailed');
+    }
+
+    if (error.status === 0) {
+      return this.translate.instant('studySession.errors.backendUnavailable');
+    }
+
+    if (error.status === 401) {
+      return this.translate.instant('studySession.errors.sessionExpired');
+    }
+
+    if (error.status === 404) {
+      return this.translate.instant('studySession.errors.setNotFound');
+    }
+
+    if (error.status === 409) {
+      return (
+        this.extractApiMessage(error) ??
+        this.translate.instant('studySession.errors.noCardsAvailable')
+      );
+    }
+
     return (
-      this.studyModeOptions.find(
-        (option) => option.value === this.selectedStudyMode,
-      )?.title ?? 'All Cards'
+      this.extractApiMessage(error) ??
+      this.translate.instant('studySession.errors.startFailed')
     );
+  }
+
+  private resolveReviewError(error: unknown): string {
+    if (error instanceof HttpErrorResponse) {
+      if (error.status === 0) {
+        return this.translate.instant('studySession.errors.backendUnavailable');
+      }
+
+      if (error.status === 401) {
+        return this.translate.instant('studySession.errors.sessionExpired');
+      }
+
+      const message = this.extractApiMessage(error);
+
+      if (message) {
+        return message;
+      }
+    }
+
+    return this.translate.instant('studySession.errors.reviewSaveFailed');
+  }
+
+  private extractApiMessage(error: HttpErrorResponse): string | null {
+    if (
+      typeof error.error !== 'object' ||
+      error.error === null ||
+      !('message' in error.error) ||
+      typeof error.error.message !== 'string'
+    ) {
+      return null;
+    }
+
+    const message = error.error.message.trim();
+
+    return message.length > 0 ? message : null;
   }
 
   private startLightningTimer(): void {
@@ -601,49 +703,15 @@ export class StudySessionPage implements OnDestroy {
     await this.rateCard('AGAIN');
   }
 
-  get isExamMode(): boolean {
-    return this.selectedStudyMode === 'EXAM';
-  }
-
-  get isMarathonMode(): boolean {
-    return this.selectedStudyMode === 'MARATHON';
-  }
-
-  get isLightningMode(): boolean {
-    return this.selectedStudyMode === 'LIGHTNING';
-  }
-
-  get activeStudyMode(): StudyMode {
-    return this.session?.mode ?? this.selectedStudyMode;
-  }
-
-  get displayedCorrectAnswers(): number {
-    if (this.isMarathonMode) {
-      return this.marathonCorrectAnswers;
-    }
-
-    return this.correctAnswers;
-  }
-
-  get displayedIncorrectAnswers(): number {
-    if (this.isMarathonMode) {
-      return this.marathonIncorrectAnswers;
-    }
-
-    return this.incorrectAnswers;
-  }
-
-  get totalAnsweredAttempts(): number {
-    return this.displayedCorrectAnswers + this.displayedIncorrectAnswers;
-  }
-
   private async startNextMarathonRound(): Promise<void> {
     if (this.isPreparingMarathonRound || !this.session) {
       return;
     }
 
     this.isPreparingMarathonRound = true;
+
     this.stopLightningTimer();
+
     this.loadError = '';
 
     /*
@@ -684,8 +752,9 @@ export class StudySessionPage implements OnDestroy {
     } catch (error: unknown) {
       if (error instanceof HttpErrorResponse && error.status === 409) {
         /*
-         * Keine falschen Karten mehr vorhanden:
-         * Marathon erfolgreich abgeschlossen.
+         * Keine falschen Karten mehr
+         * vorhanden: Marathon erfolgreich
+         * abgeschlossen.
          */
         this.sessionComplete = true;
         return;
@@ -695,16 +764,5 @@ export class StudySessionPage implements OnDestroy {
     } finally {
       this.isPreparingMarathonRound = false;
     }
-  }
-
-  get examProgressCount(): number {
-    if (!this.isExamMode) {
-      return 0;
-    }
-
-    return Math.min(
-      this.currentIndex + (this.isFlipped ? 1 : 0),
-      this.cards.length,
-    );
   }
 }

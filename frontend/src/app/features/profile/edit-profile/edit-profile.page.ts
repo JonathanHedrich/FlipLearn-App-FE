@@ -2,7 +2,9 @@ import { Location } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
 import { IonContent, IonIcon } from '@ionic/angular/standalone';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { firstValueFrom } from 'rxjs';
 import { addIcons } from 'ionicons';
 import {
@@ -12,29 +14,30 @@ import {
   personOutline,
   saveOutline,
 } from 'ionicons/icons';
-import { Router } from '@angular/router';
-
-import { FlashcardStore } from '../../../core/stores/flashcard.store';
-import { StatisticsStore } from '../../../core/stores/statistics.store';
 
 import { AuthApi } from '../../../core/services/auth-api';
 import { AuthStore } from '../../../core/stores/auth.store';
+import { FlashcardStore } from '../../../core/stores/flashcard.store';
+import { StatisticsStore } from '../../../core/stores/statistics.store';
 
 @Component({
   selector: 'app-edit-profile',
   standalone: true,
-  imports: [ReactiveFormsModule, IonContent, IonIcon],
+  imports: [ReactiveFormsModule, IonContent, IonIcon, TranslatePipe],
   templateUrl: './edit-profile.page.html',
   styleUrls: ['./edit-profile.page.scss'],
 })
 export class EditProfilePage {
   isSubmitting = false;
   submitted = false;
+
   saveError = '';
   saveSuccess = '';
+
   emailSubmitted = false;
   isChangingEmail = false;
   emailError = '';
+
   passwordSubmitted = false;
   isChangingPassword = false;
   passwordError = '';
@@ -49,6 +52,20 @@ export class EditProfilePage {
       '',
       [Validators.required, Validators.minLength(3), Validators.maxLength(100)],
     ],
+  });
+
+  readonly emailForm = this.formBuilder.nonNullable.group({
+    currentEmail: [
+      {
+        value: '',
+        disabled: true,
+      },
+    ],
+    newEmail: [
+      '',
+      [Validators.required, Validators.email, Validators.maxLength(255)],
+    ],
+    currentPassword: ['', [Validators.required]],
   });
 
   readonly passwordForm = this.formBuilder.nonNullable.group({
@@ -68,6 +85,7 @@ export class EditProfilePage {
     private readonly router: Router,
     private readonly flashcardStore: FlashcardStore,
     private readonly statisticsStore: StatisticsStore,
+    private readonly translate: TranslateService,
   ) {
     addIcons({
       arrowBackOutline,
@@ -92,6 +110,19 @@ export class EditProfilePage {
     const control = this.profileForm.controls.username;
 
     return control.invalid && (control.touched || this.submitted);
+  }
+
+  get newEmailInvalid(): boolean {
+    const control = this.emailForm.controls.newEmail;
+
+    return control.invalid && (control.touched || this.emailSubmitted);
+  }
+
+  get passwordsDoNotMatch(): boolean {
+    return (
+      this.passwordForm.controls.newPassword.value !==
+      this.passwordForm.controls.confirmPassword.value
+    );
   }
 
   goBack(): void {
@@ -126,55 +157,19 @@ export class EditProfilePage {
       );
 
       this.authApi.setCurrentUser(updatedUser);
-
       this.authStore.updateProfileData(updatedUser);
 
-      this.saveSuccess = 'Dein Profil wurde gespeichert.';
+      this.saveSuccess = this.translate.instant(
+        'editProfile.messages.profileSaved',
+      );
     } catch (error: unknown) {
       this.saveError = this.resolveRequestError(
         error,
-        'Das Profil konnte nicht gespeichert werden.',
+        'editProfile.errors.profileSaveFailed',
       );
     } finally {
       this.isSubmitting = false;
     }
-  }
-
-  private loadCurrentValues(): void {
-    const user = this.authStore.currentUser();
-
-    const profile = this.authStore.profile();
-
-    this.profileForm.patchValue({
-      displayName: user?.displayName ?? profile?.displayName ?? '',
-      username: user?.username ?? '',
-    });
-
-    this.emailForm.patchValue({
-      currentEmail: user?.email ?? profile?.email ?? '',
-      newEmail: '',
-      currentPassword: '',
-    });
-  }
-
-  readonly emailForm = this.formBuilder.nonNullable.group({
-    currentEmail: [
-      {
-        value: '',
-        disabled: true,
-      },
-    ],
-    newEmail: [
-      '',
-      [Validators.required, Validators.email, Validators.maxLength(255)],
-    ],
-    currentPassword: ['', [Validators.required]],
-  });
-
-  get newEmailInvalid(): boolean {
-    const control = this.emailForm.controls.newEmail;
-
-    return control.invalid && (control.touched || this.emailSubmitted);
   }
 
   async changeEmail(): Promise<void> {
@@ -204,18 +199,15 @@ export class EditProfilePage {
       );
 
       /*
-       * Das bisherige JWT enthält noch die alte
-       * E-Mail-Adresse. Deshalb ist nach der
-       * Änderung eine neue Anmeldung erforderlich.
+       * Das bestehende JWT enthält weiterhin die alte
+       * E-Mail-Adresse. Deshalb ist eine neue Anmeldung nötig.
        */
       this.authApi.logout();
       this.authStore.clear();
       this.flashcardStore.clear();
       this.statisticsStore.clear();
 
-      window.alert(
-        'Deine E-Mail-Adresse wurde geändert. Bitte melde dich mit der neuen Adresse erneut an.',
-      );
+      window.alert(this.translate.instant('editProfile.messages.emailChanged'));
 
       await this.router.navigateByUrl('/login', {
         replaceUrl: true,
@@ -223,39 +215,11 @@ export class EditProfilePage {
     } catch (error: unknown) {
       this.emailError = this.resolveRequestError(
         error,
-        'Die E-Mail-Adresse konnte nicht geändert werden.',
+        'editProfile.errors.emailChangeFailed',
       );
     } finally {
       this.isChangingEmail = false;
     }
-  }
-
-  private resolveRequestError(error: unknown, fallback: string): string {
-    if (!(error instanceof HttpErrorResponse)) {
-      return fallback;
-    }
-
-    if (error.status === 0) {
-      return 'Das Backend ist nicht erreichbar.';
-    }
-
-    if (
-      typeof error.error === 'object' &&
-      error.error !== null &&
-      'message' in error.error &&
-      typeof error.error.message === 'string'
-    ) {
-      return error.error.message;
-    }
-
-    return fallback;
-  }
-
-  get passwordsDoNotMatch(): boolean {
-    return (
-      this.passwordForm.controls.newPassword.value !==
-      this.passwordForm.controls.confirmPassword.value
-    );
   }
 
   async changePassword(): Promise<void> {
@@ -285,14 +249,16 @@ export class EditProfilePage {
         }),
       );
 
-      this.passwordSuccess = 'Dein Passwort wurde erfolgreich geändert.';
+      this.passwordSuccess = this.translate.instant(
+        'editProfile.messages.passwordChanged',
+      );
 
       this.passwordForm.reset();
       this.passwordSubmitted = false;
     } catch (error: unknown) {
       this.passwordError = this.resolveRequestError(
         error,
-        'Das Passwort konnte nicht geändert werden.',
+        'editProfile.errors.passwordChangeFailed',
       );
     } finally {
       this.isChangingPassword = false;
@@ -318,5 +284,54 @@ export class EditProfilePage {
     } catch {
       this.loadCurrentValues();
     }
+  }
+
+  private loadCurrentValues(): void {
+    const user = this.authStore.currentUser();
+    const profile = this.authStore.profile();
+
+    this.profileForm.patchValue({
+      displayName: user?.displayName ?? profile?.displayName ?? '',
+      username: user?.username ?? '',
+    });
+
+    this.emailForm.patchValue({
+      currentEmail: user?.email ?? profile?.email ?? '',
+      newEmail: '',
+      currentPassword: '',
+    });
+  }
+
+  private resolveRequestError(error: unknown, fallbackKey: string): string {
+    if (!(error instanceof HttpErrorResponse)) {
+      return this.translate.instant(fallbackKey);
+    }
+
+    if (error.status === 0) {
+      return this.translate.instant('editProfile.errors.backendUnavailable');
+    }
+
+    if (error.status === 401) {
+      return this.translate.instant('editProfile.errors.sessionExpired');
+    }
+
+    if (error.status === 403) {
+      return this.translate.instant('editProfile.errors.invalidPassword');
+    }
+
+    if (error.status === 409) {
+      return this.translate.instant('editProfile.errors.alreadyInUse');
+    }
+
+    if (
+      typeof error.error === 'object' &&
+      error.error !== null &&
+      'message' in error.error &&
+      typeof error.error.message === 'string'
+    ) {
+      return error.error.message;
+    }
+
+    return this.translate.instant(fallbackKey);
   }
 }

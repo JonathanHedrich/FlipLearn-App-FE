@@ -1,10 +1,12 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { IonSpinner } from '@ionic/angular/standalone';
 
+import { TranslatePipe } from '@ngx-translate/core';
+
 @Component({
   selector: 'fl-button',
   standalone: true,
-  imports: [IonSpinner],
+  imports: [IonSpinner, TranslatePipe],
   templateUrl: './fl-button.component.html',
   styleUrls: ['./fl-button.component.scss'],
 })

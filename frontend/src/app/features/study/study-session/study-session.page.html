@@ -4,37 +4,36 @@
     <section class="empty-study-state">
       <div class="study-loading-spinner"></div>
 
-      <h1>Lernsitzung wird vorbereitet</h1>
+      <h1>{{ 'studySession.loading.title' | translate }}</h1>
 
-      <p>Fällige Lernkarten werden geladen …</p>
+      <p>{{ 'studySession.loading.description' | translate }}</p>
     </section>
-
     } @else if (loadError) {
-
     <section class="empty-study-state">
       <div class="empty-study-icon">🃏</div>
 
-      <h1>Lernen momentan nicht möglich</h1>
+      <h1>{{ 'studySession.errors.unavailableTitle' | translate }}</h1>
 
       <p>{{ loadError }}</p>
 
       <button class="primary-action" type="button" (click)="startSession()">
-        Erneut versuchen
+        {{ 'common.retry' | translate }}
       </button>
 
       <button class="secondary-action" type="button" (click)="goBack()">
-        Zurück
+        {{ 'common.back' | translate }}
       </button>
     </section>
-
     } @else if (!sessionComplete && currentCard) {
-
     <header class="study-header">
       <div class="header-top">
         <button
           class="header-button"
           type="button"
-          aria-label="Lernsitzung beenden"
+          [attr.aria-label]="
+              'studySession.actions.endSession'
+                | translate
+            "
           (click)="goBack()"
         >
           <ion-icon name="arrow-back-outline"></ion-icon>
@@ -43,7 +42,10 @@
         <div class="header-title">
           <h1>{{ setTitle }}</h1>
 
-          <p>Card {{ currentCardNumber }} of {{ cards.length }}</p>
+          <p>
+            {{ 'studySession.progress.cardCount' | translate : { current:
+            currentCardNumber, total: cards.length } }}
+          </p>
         </div>
 
         <span class="progress-percentage"> {{ progress }}% </span>
@@ -66,32 +68,34 @@
       </button>
     </div>
 
-    @if ( isMarathonMode && !sessionComplete ) {
+    @if (isMarathonMode && !sessionComplete) {
     <section class="marathon-status">
       <div class="marathon-status-icon">
         <ion-icon name="fitness-outline"></ion-icon>
       </div>
 
       <div class="marathon-status-information">
-        <strong> Marathon · Runde {{ marathonRound }} </strong>
+        <strong>
+          {{ 'studySession.marathon.round' | translate : { round: marathonRound
+          } }}
+        </strong>
 
-        <span>
-          Schwierige Karten werden wiederholt, bis du alle richtig beantwortet
-          hast.
-        </span>
+        <span> {{ 'studySession.marathon.description' | translate }} </span>
       </div>
 
       <div class="marathon-status-score">
         <strong> {{ displayedCorrectAnswers }} </strong>
 
-        <span>correct</span>
+        <span> {{ 'studySession.status.correct' | translate }} </span>
       </div>
     </section>
     } @if (isPreparingMarathonRound) {
     <section class="marathon-round-loading">
       <div class="marathon-round-spinner"></div>
 
-      <span> Nächste Runde wird vorbereitet … </span>
+      <span>
+        {{ 'studySession.marathon.preparingNextRound' | translate }}
+      </span>
     </section>
     } @if (isExamMode) {
     <section class="exam-status">
@@ -100,10 +104,11 @@
       </div>
 
       <div>
-        <strong>Exam Mode</strong>
+        <strong> {{ 'studySession.exam.title' | translate }} </strong>
 
         <span>
-          {{ examAnsweredCards }} von {{ cards.length }} beantwortet
+          {{ 'studySession.exam.answeredCount' | translate : { answered:
+          examAnsweredCards, total: cards.length } }}
         </span>
       </div>
     </section>
@@ -112,13 +117,15 @@
       <div>
         <span class="status-dot incorrect"></span>
 
-        {{ displayedIncorrectAnswers }} difficult
+        {{ 'studySession.status.difficultCount' | translate : { count:
+        displayedIncorrectAnswers } }}
       </div>
 
       <div>
         <span class="status-dot correct"></span>
 
-        {{ displayedCorrectAnswers }} correct
+        {{ 'studySession.status.correctCount' | translate : { count:
+        displayedCorrectAnswers } }}
       </div>
     </section>
     }
@@ -130,19 +137,24 @@
           <div>
             <ion-icon name="flash-outline"></ion-icon>
 
-            <span>Lightning Mode</span>
+            <span> {{ 'studySession.lightning.title' | translate }} </span>
           </div>
 
-          <strong> {{ lightningSecondsLeft() }}s </strong>
+          <strong>
+            {{ 'studySession.lightning.seconds' | translate : { seconds:
+            lightningSecondsLeft() } }}
+          </strong>
         </div>
 
         <div class="lightning-timer-track">
           <div
             class="lightning-timer-value"
-            [style.width.%]="lightningProgress()"
+            [style.width.%]="
+                  lightningProgress()
+                "
             [class.warning]="
-          lightningSecondsLeft() <= 2
-        "
+                  lightningSecondsLeft() <= 2
+                "
           ></div>
         </div>
       </section>
@@ -151,8 +163,8 @@
 
     <section class="study-content">
       <p class="instruction">
-        {{ isExamMode ? 'Beantworte jede Karte – das Ergebnis siehst du erst am
-        Ende.' : 'Tap the card to reveal the answer' }}
+        {{ isExamMode ? ( 'studySession.instructions.exam' | translate ) : (
+        'studySession.instructions.reveal' | translate ) }}
       </p>
 
       <div
@@ -160,6 +172,17 @@
         [class.flipped]="isFlipped"
         role="button"
         tabindex="0"
+        [attr.aria-label]="
+            isFlipped
+              ? (
+                  'studySession.card.showFront'
+                    | translate
+                )
+              : (
+                  'studySession.card.showBack'
+                    | translate
+                )
+          "
         (click)="flipCard()"
         (keydown.enter)="flipCard()"
         (keydown.space)="flipCard()"
@@ -169,7 +192,17 @@
             <button
               class="favorite-button"
               type="button"
-              aria-label="Favorit umschalten"
+              [attr.aria-label]="
+                  currentCard.favorite
+                    ? (
+                        'studySession.favorite.remove'
+                          | translate
+                      )
+                    : (
+                        'studySession.favorite.add'
+                          | translate
+                      )
+                "
               (click)="toggleFavorite($event)"
             >
               <ion-icon
@@ -181,11 +214,15 @@
               ></ion-icon>
             </button>
 
-            <span class="card-side-label"> Front </span>
+            <span class="card-side-label">
+              {{ 'studySession.card.front' | translate }}
+            </span>
 
             <div class="card-text-box">
               <h2
-                [flFitText]="currentCard.front"
+                [flFitText]="
+                    currentCard.front
+                  "
                 [flFitTextMin]="12"
                 [flFitTextMax]="56"
               >
@@ -193,14 +230,24 @@
               </h2>
             </div>
 
-            <p>Tap to flip</p>
+            <p>{{ 'studySession.card.tapToFlip' | translate }}</p>
           </article>
 
           <article class="card-face card-back">
             <button
               class="favorite-button"
               type="button"
-              aria-label="Favorit umschalten"
+              [attr.aria-label]="
+                  currentCard.favorite
+                    ? (
+                        'studySession.favorite.remove'
+                          | translate
+                      )
+                    : (
+                        'studySession.favorite.add'
+                          | translate
+                      )
+                "
               (click)="toggleFavorite($event)"
             >
               <ion-icon
@@ -212,11 +259,15 @@
               ></ion-icon>
             </button>
 
-            <span class="card-side-label"> Back </span>
+            <span class="card-side-label">
+              {{ 'studySession.card.back' | translate }}
+            </span>
 
             <div class="card-text-box">
               <h2
-                [flFitText]="currentCard.back"
+                [flFitText]="
+                    currentCard.back
+                  "
                 [flFitTextMin]="12"
                 [flFitTextMax]="56"
               >
@@ -224,99 +275,106 @@
               </h2>
             </div>
 
-            <p>How well did you know it?</p>
+            <p>{{ 'studySession.card.selfAssessment' | translate }}</p>
           </article>
         </div>
       </div>
 
       @if (!isFlipped) {
-
       <section class="answer-placeholder">
-        <span> Flip the card before choosing an answer </span>
+        <span> {{ 'studySession.rating.flipBeforeRating' | translate }} </span>
       </section>
-
       } @else {
-
       <section class="rating-section">
-        <p>Rate your answer</p>
+        <p>{{ 'studySession.rating.title' | translate }}</p>
 
         <div class="rating-grid">
           <button
             class="rating-button again"
             type="button"
-            [disabled]="isSubmittingRating"
+            [disabled]="
+                  isSubmittingRating
+                "
             (click)="rateCard('AGAIN')"
           >
             <ion-icon name="refresh-outline"></ion-icon>
 
-            <strong>Again</strong>
+            <strong> {{ 'studySession.rating.again' | translate }} </strong>
           </button>
 
           <button
             class="rating-button hard"
             type="button"
-            [disabled]="isSubmittingRating"
+            [disabled]="
+                  isSubmittingRating
+                "
             (click)="rateCard('HARD')"
           >
             <ion-icon name="close-outline"></ion-icon>
 
-            <strong>Hard</strong>
+            <strong> {{ 'studySession.rating.hard' | translate }} </strong>
           </button>
 
           <button
             class="rating-button good"
             type="button"
-            [disabled]="isSubmittingRating"
+            [disabled]="
+                  isSubmittingRating
+                "
             (click)="rateCard('GOOD')"
           >
             <ion-icon name="checkmark-outline"></ion-icon>
 
-            <strong>Good</strong>
+            <strong> {{ 'studySession.rating.good' | translate }} </strong>
           </button>
 
           <button
             class="rating-button easy"
             type="button"
-            [disabled]="isSubmittingRating"
+            [disabled]="
+                  isSubmittingRating
+                "
             (click)="rateCard('EASY')"
           >
-            <span class="easy-symbol">⚡</span>
+            <span class="easy-symbol"> ⚡ </span>
 
-            <strong>Easy</strong>
+            <strong> {{ 'studySession.rating.easy' | translate }} </strong>
           </button>
         </div>
       </section>
-
       }
     </section>
-
     } @else {
-
     <section class="result-page">
       <div class="result-icon">
         <ion-icon name="trophy-outline"></ion-icon>
       </div>
 
       <span class="result-eyebrow">
-        {{ isMarathonMode ? 'Marathon complete' : isExamMode ? 'Exam complete' :
-        'Session complete' }}
+        {{ isMarathonMode ? ( 'studySession.result.marathonEyebrow' | translate
+        ) : isExamMode ? ( 'studySession.result.examEyebrow' | translate ) : (
+        'studySession.result.sessionEyebrow' | translate ) }}
       </span>
 
       <h1>
-        {{ isMarathonMode ? 'Marathon geschafft!' : isExamMode ? 'Prüfung
-        abgeschlossen' : 'Great job!' }}
+        {{ isMarathonMode ? ( 'studySession.result.marathonTitle' | translate )
+        : isExamMode ? ( 'studySession.result.examTitle' | translate ) : (
+        'studySession.result.sessionTitle' | translate ) }}
       </h1>
 
       <p>
-        You finished all cards in
-        <strong>{{ setTitle }}</strong>.
+        {{ 'studySession.result.finishedSetPrefix' | translate }}
+
+        <strong> {{ setTitle }} </strong>
+
+        {{ 'studySession.result.finishedSetSuffix' | translate }}
       </p>
 
       <div class="accuracy-ring" [style.--accuracy]="accuracy">
         <div class="accuracy-ring-inner">
-          <strong>{{ accuracy }}%</strong>
+          <strong> {{ accuracy }}% </strong>
 
-          <span>Accuracy</span>
+          <span> {{ 'studySession.result.accuracy' | translate }} </span>
         </div>
       </div>
 
@@ -326,9 +384,9 @@
             <ion-icon name="checkmark-outline"></ion-icon>
           </div>
 
-          <strong>{{ displayedCorrectAnswers }}</strong>
+          <strong> {{ displayedCorrectAnswers }} </strong>
 
-          <span>Correct</span>
+          <span> {{ 'studySession.status.correct' | translate }} </span>
         </article>
 
         <article>
@@ -336,9 +394,9 @@
             <ion-icon name="close-outline"></ion-icon>
           </div>
 
-          <strong>{{ displayedIncorrectAnswers }}</strong>
+          <strong> {{ displayedIncorrectAnswers }} </strong>
 
-          <span>Difficult</span>
+          <span> {{ 'studySession.status.difficult' | translate }} </span>
         </article>
 
         <article>
@@ -348,7 +406,10 @@
             {{ isMarathonMode ? totalAnsweredAttempts : cards.length }}
           </strong>
 
-          <span> {{ isMarathonMode ? 'Total Attempts' : 'Total Cards' }} </span>
+          <span>
+            {{ isMarathonMode ? ( 'studySession.result.totalAttempts' |
+            translate ) : ( 'studySession.result.totalCards' | translate ) }}
+          </span>
         </article>
       </section>
 
@@ -356,11 +417,11 @@
         <button class="primary-action" type="button" (click)="restartSession()">
           <ion-icon name="refresh-outline"></ion-icon>
 
-          Study Again
+          {{ 'studySession.actions.studyAgain' | translate }}
         </button>
 
         <button class="secondary-action" type="button" (click)="goHome()">
-          Back to Home
+          {{ 'studySession.actions.backToHome' | translate }}
         </button>
       </div>
     </section>
@@ -375,16 +436,21 @@
       >
         <div class="study-mode-modal-header">
           <div>
-            <span>STUDY MODE</span>
+            <span> {{ 'studySession.modeMenu.eyebrow' | translate }} </span>
 
-            <h2 id="study-mode-title">Choose your mode</h2>
+            <h2 id="study-mode-title">
+              {{ 'studySession.modeMenu.title' | translate }}
+            </h2>
 
-            <p>Wähle aus, wie diese Lernsitzung aufgebaut werden soll.</p>
+            <p>{{ 'studySession.modeMenu.description' | translate }}</p>
           </div>
 
           <button
             type="button"
-            aria-label="Schließen"
+            [attr.aria-label]="
+                'common.close'
+                  | translate
+              "
             (click)="closeStudyModeMenu()"
           >
             <ion-icon name="close-outline"></ion-icon>
@@ -397,10 +463,17 @@
             class="study-mode-option"
             type="button"
             [class.active]="
-              selectedStudyMode === option.value
-            "
-            [disabled]="!option.available"
-            (click)="selectStudyMode(option.value)"
+                  selectedStudyMode ===
+                  option.value
+                "
+            [disabled]="
+                  !option.available
+                "
+            (click)="
+                  selectStudyMode(
+                    option.value
+                  )
+                "
           >
             <div class="study-mode-option-icon">
               <ion-icon [name]="option.icon"></ion-icon>
@@ -408,14 +481,14 @@
 
             <div class="study-mode-option-content">
               <div class="study-mode-option-heading">
-                <strong>{{ option.title }}</strong>
+                <strong> {{ option.title | translate }} </strong>
 
                 @if (option.badge) {
-                <span>{{ option.badge }}</span>
+                <span> {{ option.badge | translate }} </span>
                 }
               </div>
 
-              <p>{{ option.description }}</p>
+              <p>{{ option.description | translate }}</p>
             </div>
 
             <div class="study-mode-radio"></div>

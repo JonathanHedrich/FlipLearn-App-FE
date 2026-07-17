@@ -1,41 +1,53 @@
-<nav class="bottom-nav" aria-label="Hauptnavigation">
+<nav class="bottom-nav" [attr.aria-label]="'bottomNav.navigation' | translate">
   <a
     class="nav-item"
     routerLink="/home"
     [class.active]="activePage === 'home'"
-    aria-label="Startseite"
+    [attr.aria-label]="'bottomNav.home' | translate"
   >
     <ion-icon name="home-outline"></ion-icon>
-    <span>Home</span>
+
+    <span>
+      {{ "bottomNav.home" | translate }}
+    </span>
   </a>
 
   <a
     class="nav-item"
     routerLink="/sets"
     [class.active]="activePage === 'sets'"
-    aria-label="Meine Lernsets"
+    [attr.aria-label]="'bottomNav.sets' | translate"
   >
     <ion-icon name="layers-outline"></ion-icon>
-    <span>My Sets</span>
+
+    <span>
+      {{ "bottomNav.sets" | translate }}
+    </span>
   </a>
 
   <a
     class="nav-item"
     routerLink="/statistics"
     [class.active]="activePage === 'statistics'"
-    aria-label="Statistiken"
+    [attr.aria-label]="'bottomNav.statistics' | translate"
   >
     <ion-icon name="bar-chart-outline"></ion-icon>
-    <span>Statistics</span>
+
+    <span>
+      {{ "bottomNav.statistics" | translate }}
+    </span>
   </a>
 
   <a
     class="nav-item"
     routerLink="/profile"
     [class.active]="activePage === 'profile'"
-    aria-label="Profil"
+    [attr.aria-label]="'bottomNav.profile' | translate"
   >
     <ion-icon name="person-outline"></ion-icon>
-    <span>Profile</span>
+
+    <span>
+      {{ "bottomNav.profile" | translate }}
+    </span>
   </a>
 </nav>

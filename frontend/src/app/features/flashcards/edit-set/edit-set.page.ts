@@ -24,6 +24,7 @@ import { CategoryResponse } from '../../../core/models/category.model';
 import { CategoryApi } from '../../../core/services/category-api';
 
 import { FlashcardStore } from '../../../core/stores/flashcard.store';
+import { TranslatePipe } from '@ngx-translate/core';
 
 interface ColorOption {
   value: FlashcardSetColor;
@@ -34,7 +35,7 @@ interface ColorOption {
 @Component({
   selector: 'app-edit-set',
   standalone: true,
-  imports: [ReactiveFormsModule, IonContent, IonIcon],
+  imports: [ReactiveFormsModule, IonContent, IonIcon, TranslatePipe],
   templateUrl: './edit-set.page.html',
   styleUrls: ['./edit-set.page.scss'],
 })

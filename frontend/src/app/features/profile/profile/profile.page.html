@@ -2,22 +2,27 @@
   <main class="profile-page">
     <header class="profile-header">
       <div class="header-top">
-        <h1>Profile</h1>
+        <h1>{{ 'profile.title' | translate }}</h1>
 
         <div class="header-actions">
           <button
             class="header-button"
             type="button"
-            aria-label="Benachrichtigungen öffnen"
+            [attr.aria-label]="'profile.actions.openNotifications' | translate"
             (click)="openNotifications()"
           >
             <ion-icon name="notifications-outline"></ion-icon>
+            @if (unreadNotifications() > 0) {
+            <span class="notification-badge">
+              {{ unreadNotifications() > 9 ? '9+' : unreadNotifications() }}
+            </span>
+            }
           </button>
 
           <button
             class="header-button"
             type="button"
-            aria-label="Einstellungen öffnen"
+            [attr.aria-label]="'profile.actions.openSettings' | translate"
             (click)="openSettings()"
           >
             <ion-icon name="settings-outline"></ion-icon>
@@ -36,7 +41,7 @@
         <div class="member-badge">
           <ion-icon name="star-outline"></ion-icon>
 
-          Member since {{ memberSince }}
+          {{ 'profile.memberSince' | translate : { date: memberSince } }}
         </div>
       </section>
       }
@@ -47,38 +52,38 @@
       <section class="profile-loading">
         <div class="profile-spinner"></div>
 
-        <p>Profil wird geladen …</p>
+        <p>{{ 'profile.loading' | translate }}</p>
       </section>
       } @else if (loadError()) {
       <section class="profile-error">
-        <h2>Laden fehlgeschlagen</h2>
+        <h2>{{ 'profile.error.title' | translate }}</h2>
 
         <p>{{ loadError() }}</p>
 
         <button type="button" (click)="reloadProfile()">
-          Erneut versuchen
+          {{ 'common.retry' | translate }}
         </button>
       </section>
       } @else if (profile()) {
       <section class="stats-grid">
         <article class="stat-card">
           <strong>{{ profile()!.totalSets }}</strong>
-          <span>Sets</span>
+          <span>{{ 'profile.stats.sets' | translate }}</span>
         </article>
 
         <article class="stat-card">
           <strong>{{ profile()!.totalCards }}</strong>
-          <span>Cards</span>
+          <span>{{ 'profile.stats.cards' | translate }}</span>
         </article>
 
         <article class="stat-card">
           <strong>{{ profile()!.completedSessions }}</strong>
-          <span>Sessions</span>
+          <span>{{ 'profile.stats.sessions' | translate }}</span>
         </article>
 
         <article class="stat-card">
           <strong>{{ profile()!.accuracy }}%</strong>
-          <span>Accuracy</span>
+          <span>{{ 'profile.stats.accuracy' | translate }}</span>
         </article>
       </section>
 
@@ -90,7 +95,7 @@
 
           <div>
             <strong>{{ profile()!.correctReviews }}</strong>
-            <span>Correct Reviews</span>
+            <span>{{ 'profile.summary.correctReviews' | translate }}</span>
           </div>
         </article>
 
@@ -101,7 +106,7 @@
 
           <div>
             <strong>{{ profile()!.favoriteSets }}</strong>
-            <span>Favorite Sets</span>
+            <span>{{ 'profile.summary.favoriteSets' | translate }}</span>
           </div>
         </article>
 
@@ -112,13 +117,13 @@
 
           <div>
             <strong>{{ profile()!.totalReviews }}</strong>
-            <span>Total Reviews</span>
+            <span>{{ 'profile.summary.totalReviews' | translate }}</span>
           </div>
         </article>
       </section>
 
       <section class="my-sets-section">
-        <h2>My Sets</h2>
+        <h2>{{ 'profile.mySets.title' | translate }}</h2>
 
         @if (sets().length > 0) {
         <div class="sets-list">
@@ -144,8 +149,10 @@
               <h3>{{ set.title }}</h3>
 
               <p>
-                {{ set.cardCount }} {{ set.cardCount === 1 ? 'card' : 'cards' }}
-                · {{ set.progress }}% complete
+                {{ set.cardCount === 1 ? ('profile.mySets.cardCountSingle' |
+                translate : { count: set.cardCount, progress: set.progress }) :
+                ('profile.mySets.cardCountMultiple' | translate : { count:
+                set.cardCount, progress: set.progress }) }}
               </p>
             </div>
 
@@ -157,7 +164,7 @@
           }
         </div>
         } @else {
-        <p class="empty-sets">Du hast noch keine Lernsets erstellt.</p>
+        <p class="empty-sets">{{ 'profile.mySets.empty' | translate }}</p>
         }
       </section>
       }

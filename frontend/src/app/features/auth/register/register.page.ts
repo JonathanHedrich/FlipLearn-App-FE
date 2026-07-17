@@ -4,6 +4,7 @@ import { Component } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { IonContent } from '@ionic/angular/standalone';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { firstValueFrom } from 'rxjs';
 
 import {
@@ -30,11 +31,13 @@ import { FlSocialButtonComponent } from '../../../shared/components/fl-social-bu
     FlInputComponent,
     FlLogoComponent,
     FlSocialButtonComponent,
+    TranslatePipe,
   ],
 })
 export class RegisterPage {
   submitted = false;
   isSubmitting = false;
+
   registerError = '';
 
   readonly registerForm = this.formBuilder.nonNullable.group({
@@ -57,6 +60,7 @@ export class RegisterPage {
     private readonly formBuilder: FormBuilder,
     private readonly router: Router,
     private readonly authApi: AuthApi,
+    private readonly translate: TranslateService,
   ) {}
 
   get nameInvalid(): boolean {
@@ -79,7 +83,6 @@ export class RegisterPage {
 
   get passwordsDoNotMatch(): boolean {
     const password = this.registerForm.controls.password.value;
-
     const confirmation = this.registerForm.controls.confirmPassword.value;
 
     return confirmation.length > 0 && password !== confirmation;
@@ -101,6 +104,7 @@ export class RegisterPage {
 
     this.submitted = true;
     this.registerError = '';
+
     this.registerForm.markAllAsTouched();
 
     if (this.registerForm.invalid || this.passwordsDoNotMatch) {
@@ -140,16 +144,18 @@ export class RegisterPage {
   }
 
   registerWithGoogle(): void {
-    console.log('Google-Registrierung wird später implementiert.');
+    console.log(
+      this.translate.instant('register.messages.googleNotImplemented'),
+    );
   }
 
   private resolveRegistrationError(error: unknown): string {
     if (!(error instanceof HttpErrorResponse)) {
-      return 'Bei der Registrierung ist ein unbekannter Fehler aufgetreten.';
+      return this.translate.instant('register.errors.unknown');
     }
 
     if (error.status === 0) {
-      return 'Das Backend ist nicht erreichbar. Prüfe, ob Spring Boot läuft.';
+      return this.translate.instant('register.errors.backendUnavailable');
     }
 
     const apiError = error.error as Partial<ApiErrorResponse> | null;
@@ -157,7 +163,7 @@ export class RegisterPage {
     if (error.status === 409) {
       return (
         apiError?.message ??
-        'Für diese E-Mail-Adresse existiert bereits ein Konto.'
+        this.translate.instant('register.errors.emailExists')
       );
     }
 
@@ -167,11 +173,16 @@ export class RegisterPage {
       if (validationErrors) {
         return (
           Object.values(validationErrors)[0] ??
-          'Die eingegebenen Daten sind ungültig.'
+          this.translate.instant('register.errors.invalidData')
         );
       }
+
+      return this.translate.instant('register.errors.invalidData');
     }
 
-    return apiError?.message ?? 'Die Registrierung ist fehlgeschlagen.';
+    return (
+      apiError?.message ??
+      this.translate.instant('register.errors.registrationFailed')
+    );
   }
 }

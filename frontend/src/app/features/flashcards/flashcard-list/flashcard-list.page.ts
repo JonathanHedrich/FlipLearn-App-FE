@@ -4,9 +4,8 @@ import { Component, computed, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { IonContent, IonIcon } from '@ionic/angular/standalone';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
-import { firstValueFrom } from 'rxjs';
-
 import {
   addOutline,
   closeOutline,
@@ -19,6 +18,7 @@ import {
   timeOutline,
   trashOutline,
 } from 'ionicons/icons';
+import { firstValueFrom } from 'rxjs';
 
 import {
   FlashcardSetColor,
@@ -44,6 +44,7 @@ type MainFilter = 'all' | 'favorites' | 'recent';
     IonContent,
     IonIcon,
     FlBottomNavComponent,
+    TranslatePipe,
   ],
   templateUrl: './flashcard-list.page.html',
   styleUrls: ['./flashcard-list.page.scss'],
@@ -72,8 +73,8 @@ export class FlashcardListPage {
   readonly activeFilter = signal<MainFilter>('all');
 
   /*
-   * Solange das Set-Modell noch set.folder verwendet,
-   * speichern wir hier den Kategorienamen.
+   * Intern wird weiterhin der technische Wert "all"
+   * verwendet. Nur die sichtbare Beschriftung wird übersetzt.
    */
   readonly activeCategory = signal<string>('all');
 
@@ -86,15 +87,15 @@ export class FlashcardListPage {
   readonly totalCards = this.flashcardStore.totalCards;
 
   readonly filteredSets = computed(() => {
-    const query = this.searchTerm.trim().toLowerCase();
+    const query = this.searchTerm.trim().toLocaleLowerCase();
 
     const filter = this.activeFilter();
     const category = this.activeCategory();
 
     let result = this.sets().filter((set) => {
-      const title = set.title.toLowerCase();
+      const title = set.title.toLocaleLowerCase();
 
-      const description = (set.description ?? '').toLowerCase();
+      const description = (set.description ?? '').toLocaleLowerCase();
 
       const matchesSearch =
         query.length === 0 ||
@@ -133,6 +134,7 @@ export class FlashcardListPage {
     private readonly router: Router,
     private readonly appNotificationService: AppNotificationService,
     private readonly categoryApi: CategoryApi,
+    private readonly translate: TranslateService,
   ) {
     addIcons({
       addOutline,
@@ -189,7 +191,7 @@ export class FlashcardListPage {
 
       /*
        * Falls eine ausgewählte Kategorie extern
-       * gelöscht wurde, springen wir auf "All".
+       * gelöscht wurde, springen wir auf "all".
        */
       const selectedCategory = this.activeCategory();
 
@@ -202,7 +204,7 @@ export class FlashcardListPage {
     } catch (error: unknown) {
       this.categoryError = this.resolveCategoryError(
         error,
-        'Die Kategorien konnten nicht geladen werden.',
+        'sets.errors.categoriesLoadFailed',
       );
     } finally {
       this.isLoadingCategories = false;
@@ -227,7 +229,7 @@ export class FlashcardListPage {
     try {
       await this.flashcardStore.toggleFavorite(set.id);
     } catch {
-      window.alert('Der Favoritenstatus konnte nicht gespeichert werden.');
+      window.alert(this.translate.instant('sets.errors.favoriteSaveFailed'));
     }
   }
 
@@ -245,7 +247,7 @@ export class FlashcardListPage {
     event.stopPropagation();
 
     if (set.cardCount === 0) {
-      window.alert('Füge zuerst mindestens eine Lernkarte hinzu.');
+      window.alert(this.translate.instant('sets.errors.noCards'));
 
       this.openEditor(set.id);
       return;
@@ -258,7 +260,9 @@ export class FlashcardListPage {
     event.stopPropagation();
 
     const confirmed = window.confirm(
-      `Möchtest du „${set.title}“ und alle enthaltenen Karten wirklich löschen?`,
+      this.translate.instant('sets.confirmations.deleteSet', {
+        title: set.title,
+      }),
     );
 
     if (!confirmed) {
@@ -270,7 +274,7 @@ export class FlashcardListPage {
 
       this.appNotificationService.rebuildNotifications();
     } catch {
-      window.alert('Das Lernset konnte nicht gelöscht werden.');
+      window.alert(this.translate.instant('sets.errors.deleteSetFailed'));
     }
   }
 
@@ -320,13 +324,21 @@ export class FlashcardListPage {
     this.categoryError = '';
 
     if (!name) {
-      this.categoryError = 'Bitte gib einen Kategorienamen ein.';
+      this.categoryError = this.translate.instant(
+        'sets.categoryManager.errors.nameRequired',
+      );
+
       return;
     }
 
     if (name.length > 80) {
-      this.categoryError =
-        'Der Kategoriename darf höchstens 80 Zeichen lang sein.';
+      this.categoryError = this.translate.instant(
+        'sets.categoryManager.errors.nameTooLong',
+        {
+          max: 80,
+        },
+      );
+
       return;
     }
 
@@ -346,7 +358,9 @@ export class FlashcardListPage {
           .map((category) =>
             category.id === updatedCategory.id ? updatedCategory : category,
           )
-          .sort((first, second) => first.name.localeCompare(second.name, 'de'));
+          .sort((first, second) =>
+            this.compareCategoryNames(first.name, second.name),
+          );
 
         if (this.activeCategory() === previousName) {
           this.activeCategory.set(updatedCategory.name);
@@ -359,7 +373,7 @@ export class FlashcardListPage {
         );
 
         this.categories = [...this.categories, createdCategory].sort(
-          (first, second) => first.name.localeCompare(second.name, 'de'),
+          (first, second) => this.compareCategoryNames(first.name, second.name),
         );
       }
 
@@ -369,8 +383,8 @@ export class FlashcardListPage {
       this.categoryError = this.resolveCategoryError(
         error,
         this.editingCategory
-          ? 'Die Kategorie konnte nicht umbenannt werden.'
-          : 'Die Kategorie konnte nicht erstellt werden.',
+          ? 'sets.categoryManager.errors.renameFailed'
+          : 'sets.categoryManager.errors.createFailed',
       );
     } finally {
       this.isSavingCategory = false;
@@ -383,7 +397,9 @@ export class FlashcardListPage {
     }
 
     const confirmed = window.confirm(
-      `Möchtest du die Kategorie „${category.name}“ wirklich löschen? Die Lernsets bleiben erhalten und werden danach ohne Kategorie angezeigt.`,
+      this.translate.instant('sets.confirmations.deleteCategory', {
+        name: category.name,
+      }),
     );
 
     if (!confirmed) {
@@ -391,7 +407,6 @@ export class FlashcardListPage {
     }
 
     this.deletingCategoryId = category.id;
-
     this.categoryError = '';
 
     try {
@@ -417,7 +432,7 @@ export class FlashcardListPage {
     } catch (error: unknown) {
       this.categoryError = this.resolveCategoryError(
         error,
-        'Die Kategorie konnte nicht gelöscht werden.',
+        'sets.categoryManager.errors.deleteFailed',
       );
     } finally {
       this.deletingCategoryId = null;
@@ -428,13 +443,31 @@ export class FlashcardListPage {
     return category.id;
   }
 
-  private resolveCategoryError(error: unknown, fallback: string): string {
+  private compareCategoryNames(first: string, second: string): number {
+    const language = this.translate.currentLang() ?? 'de';
+
+    return first.localeCompare(second, language, {
+      sensitivity: 'base',
+    });
+  }
+
+  private resolveCategoryError(error: unknown, fallbackKey: string): string {
     if (!(error instanceof HttpErrorResponse)) {
-      return fallback;
+      return this.translate.instant(fallbackKey);
     }
 
     if (error.status === 0) {
-      return 'Das Backend ist nicht erreichbar.';
+      return this.translate.instant('sets.errors.backendUnavailable');
+    }
+
+    if (error.status === 401) {
+      return this.translate.instant('sets.errors.sessionExpired');
+    }
+
+    if (error.status === 409) {
+      return this.translate.instant(
+        'sets.categoryManager.errors.alreadyExists',
+      );
     }
 
     if (
@@ -446,6 +479,6 @@ export class FlashcardListPage {
       return error.error.message;
     }
 
-    return fallback;
+    return this.translate.instant(fallbackKey);
   }
 }

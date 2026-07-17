@@ -3,12 +3,14 @@ import { IonIcon, IonSpinner } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { logoApple, logoGoogle, logoMicrosoft } from 'ionicons/icons';
 
+import { TranslatePipe } from '@ngx-translate/core';
+
 type SocialProvider = 'google' | 'apple' | 'microsoft';
 
 @Component({
   selector: 'fl-social-button',
   standalone: true,
-  imports: [IonIcon, IonSpinner],
+  imports: [IonIcon, IonSpinner, TranslatePipe],
   templateUrl: './fl-social-button.component.html',
   styleUrls: ['./fl-social-button.component.scss'],
 })

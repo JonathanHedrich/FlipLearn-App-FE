@@ -5,21 +5,24 @@
         <button
           class="header-button"
           type="button"
-          aria-label="Zurück"
+          [attr.aria-label]="'common.back' | translate"
           (click)="goBack()"
         >
           <ion-icon name="arrow-back-outline"></ion-icon>
         </button>
 
         <div class="header-title">
-          <h1>Statistics</h1>
-          <p>Your learning progress</p>
+          <h1>{{ 'statistics.title' | translate }}</h1>
+
+          <p>{{ 'statistics.subtitle' | translate }}</p>
         </div>
 
         <button
           class="header-button notification-action"
           type="button"
-          aria-label="Benachrichtigungen"
+          [attr.aria-label]="
+            'statistics.notifications' | translate
+          "
           (click)="openNotifications()"
         >
           <ion-icon name="notifications-outline"></ion-icon>
@@ -34,10 +37,9 @@
 
       <div class="streak-row">
         <div class="streak-pill">
-          <span aria-hidden="true">🔥</span>
+          <span aria-hidden="true"> 🔥 </span>
 
-          {{ currentStreak() }} {{ currentStreak() === 1 ? 'day streak' : 'day
-          streak' }}
+          {{ streakLabel }}
         </div>
       </div>
     </header>
@@ -47,7 +49,7 @@
       <section class="statistics-loading">
         <div class="statistics-spinner"></div>
 
-        <p>Statistiken werden geladen …</p>
+        <p>{{ 'statistics.loading' | translate }}</p>
       </section>
       } @else if (loadError()) {
       <section class="statistics-error">
@@ -55,19 +57,21 @@
           <ion-icon name="bar-chart-outline"></ion-icon>
         </div>
 
-        <h2>Laden fehlgeschlagen</h2>
+        <h2>{{ 'statistics.loadFailed' | translate }}</h2>
 
         <p>{{ loadError() }}</p>
 
         <button type="button" (click)="reloadStatistics()">
           <ion-icon name="refresh-outline"></ion-icon>
 
-          Erneut versuchen
+          {{ 'statistics.retry' | translate }}
         </button>
       </section>
       } @else {
       <section class="weekly-summary-card">
-        <span class="section-eyebrow"> THIS WEEK </span>
+        <span class="section-eyebrow">
+          {{ 'statistics.thisWeek' | translate }}
+        </span>
 
         <div class="weekly-summary-grid">
           <article>
@@ -77,7 +81,7 @@
 
             <strong> {{ reviewsThisWeek() }} </strong>
 
-            <span>Cards Studied</span>
+            <span> {{ 'statistics.cardsStudied' | translate }} </span>
           </article>
 
           <article>
@@ -87,7 +91,7 @@
 
             <strong> {{ weeklyStudyTimeLabel }} </strong>
 
-            <span>Study Time</span>
+            <span> {{ 'statistics.studyTime' | translate }} </span>
           </article>
 
           <article>
@@ -97,7 +101,7 @@
 
             <strong> {{ weeklyAccuracy() }}% </strong>
 
-            <span>Avg. Accuracy</span>
+            <span> {{ 'statistics.averageAccuracy' | translate }} </span>
           </article>
         </div>
       </section>
@@ -105,22 +109,24 @@
       <section class="weekly-activity-card">
         <div class="weekly-activity-heading">
           <div>
-            <span class="section-eyebrow"> THIS WEEK </span>
+            <span class="section-eyebrow">
+              {{ 'statistics.thisWeek' | translate }}
+            </span>
 
-            <h2>Weekly Activity</h2>
+            <h2>{{ 'statistics.weeklyActivity' | translate }}</h2>
           </div>
 
           <div class="weekly-activity-summary">
             <div>
               <strong> {{ reviewsThisWeek() }} </strong>
 
-              <span>cards studied</span>
+              <span> {{ 'statistics.cardsStudiedLower' | translate }} </span>
             </div>
 
             <div>
               <strong> {{ weeklyAccuracy() }}% </strong>
 
-              <span>accuracy</span>
+              <span> {{ 'statistics.accuracy' | translate }} </span>
             </div>
           </div>
         </div>
@@ -138,7 +144,10 @@
             viewBox="0 0 300 150"
             preserveAspectRatio="none"
             role="img"
-            aria-label="Weekly study activity"
+            [attr.aria-label]="
+                  'statistics.chart.ariaLabel'
+                    | translate
+                "
           >
             <defs>
               <linearGradient
@@ -162,7 +171,6 @@
               </linearGradient>
             </defs>
 
-            <!-- Y-Achsen-Skala und horizontale Linien -->
             @for ( tick of chartYAxisTicks(); track tick.value ) {
             <line
               class="weekly-chart-grid-line"
@@ -177,19 +185,16 @@
             </text>
             }
 
-            <!-- Flächenfüllung -->
             <polyline
               class="weekly-chart-area"
               [attr.points]="chartAreaPoints()"
             ></polyline>
 
-            <!-- Linie -->
             <polyline
               class="weekly-chart-line"
               [attr.points]="chartPoints()"
             ></polyline>
 
-            <!-- Normale Datenpunkte -->
             @for ( point of chartData(); track point.date ) {
             <circle
               class="weekly-chart-point-hitbox"
@@ -199,34 +204,35 @@
               tabindex="0"
               role="button"
               [attr.aria-label]="
-            getFullDayLabel(point.date) +
-            ': ' +
-            point.reviews +
-            ' Karten'
-          "
-              (focus)="selectChartPoint(point.index)"
-              (mouseenter)="selectChartPoint(point.index)"
+                      getChartPointAriaLabel(
+                        point.date,
+                        point.reviews
+                      )
+                    "
+              (focus)="
+                      selectChartPoint(point.index)
+                    "
+              (mouseenter)="
+                      selectChartPoint(point.index)
+                    "
             ></circle>
 
             <circle
               class="weekly-chart-point"
               [class.active]="
-            selectedChartIndex() ===
-            point.index
-          "
+                      selectedChartIndex() ===
+                      point.index
+                    "
               [attr.cx]="point.x"
               [attr.cy]="point.y"
               [attr.r]="
-            selectedChartIndex() ===
-            point.index
-              ? 5
-              : 3.5
-          "
+                      selectedChartIndex() ===
+                      point.index
+                        ? 5
+                        : 3.5
+                    "
             ></circle>
-            }
-
-            <!-- Aktive Scan-Linie -->
-            @if (selectedChartPoint(); as point) {
+            } @if (selectedChartPoint(); as point) {
             <line
               class="weekly-chart-scanner"
               [attr.x1]="point.x"
@@ -251,36 +257,35 @@
             }
           </svg>
 
-          <!-- Tooltip bleibt immer oben innerhalb des Charts -->
           @if (selectedChartPoint(); as point) {
           <section
             class="weekly-chart-tooltip"
             [style.left.%]="
-          getTooltipLeftPercent(point.x)
-        "
+                    getTooltipLeftPercent(point.x)
+                  "
           >
             <div class="tooltip-heading">
               <strong> {{ getDayLabel(point.date) }} </strong>
 
-              <span> {{ getLongDateLabel(point.date) }} </span>
+              <span> {{ getLongDateLabel( point.date ) }} </span>
             </div>
 
             <div class="tooltip-stat primary">
               <span class="tooltip-dot"></span>
 
-              <span>cards</span>
+              <span> {{ 'statistics.cards' | translate }} </span>
 
               <strong> {{ point.reviews }} </strong>
             </div>
 
             <div class="tooltip-stat">
-              <span>correct</span>
+              <span> {{ 'statistics.correct' | translate }} </span>
 
               <strong> {{ point.correctReviews }} </strong>
             </div>
 
             <div class="tooltip-stat">
-              <span>accuracy</span>
+              <span> {{ 'statistics.accuracy' | translate }} </span>
 
               <strong> {{ point.accuracy }}% </strong>
             </div>
@@ -289,20 +294,20 @@
         </div>
 
         <p class="weekly-chart-hint">
-          Bewege die Maus oder fahre mit dem Finger über den Chart, um genaue
-          Werte zu sehen.
+          {{ 'statistics.chart.hint' | translate }}
         </p>
         } @else {
         <p class="weekly-activity-empty">
-          Noch keine Lernaktivität in dieser Woche.
+          {{ 'statistics.noWeeklyActivity' | translate }}
         </p>
         }
       </section>
 
       <section class="accuracy-card">
         <div class="chart-heading">
-          <h2>Accuracy by Set</h2>
-          <p>Last session results</p>
+          <h2>{{ 'statistics.accuracyBySet' | translate }}</h2>
+
+          <p>{{ 'statistics.lastSessionResults' | translate }}</p>
         </div>
 
         @if (setAccuracies().length > 0) {
@@ -310,12 +315,14 @@
           @for ( set of setAccuracies(); track set.setId ) {
           <article class="accuracy-row">
             <div class="accuracy-row-heading">
-              <span>{{ set.title }}</span>
+              <span> {{ set.title }} </span>
 
               <strong
                 [ngClass]="
-                getSetColorClass(set.color)
-              "
+                        getSetColorClass(
+                          set.color
+                        )
+                      "
               >
                 {{ set.accuracy }}%
               </strong>
@@ -325,33 +332,45 @@
               <div
                 class="accuracy-value"
                 [ngClass]="
-                getSetColorClass(set.color)
-              "
-                [style.width.%]="set.accuracy"
+                        getSetColorClass(
+                          set.color
+                        )
+                      "
+                [style.width.%]="
+                        set.accuracy
+                      "
               ></div>
             </div>
           </article>
           }
         </div>
         } @else {
-        <p class="empty-section-text">Noch keine Set-Statistiken vorhanden.</p>
+        <p class="empty-section-text">
+          {{ 'statistics.noSetStatistics' | translate }}
+        </p>
         }
       </section>
 
       <section class="calendar-card">
         <div class="chart-heading">
-          <h2>Study Calendar</h2>
-          <p>This week – keep the fire going!</p>
+          <h2>{{ 'statistics.studyCalendar' | translate }}</h2>
+
+          <p>{{ 'statistics.studyCalendarSubtitle' | translate }}</p>
         </div>
 
         <div class="study-calendar-grid">
           @for ( activity of studyCalendar(); track activity.date ) {
           <article class="calendar-day">
-            <span> {{ getDayLabel(activity.date).charAt(0) }} </span>
+            <span> {{ getDayLabel( activity.date ).charAt(0) }} </span>
 
-            <div class="calendar-circle" [class.active]="activity.reviews > 0">
+            <div
+              class="calendar-circle"
+              [class.active]="
+                    activity.reviews > 0
+                  "
+            >
               @if (activity.reviews > 0) {
-              <span aria-hidden="true">🔥</span>
+              <span aria-hidden="true"> 🔥 </span>
               }
             </div>
 
@@ -363,10 +382,11 @@
 
       <section class="achievements-card">
         <div class="achievements-heading">
-          <h2>Achievements</h2>
+          <h2>{{ 'statistics.achievements.title' | translate }}</h2>
 
           <strong>
-            {{ earnedAchievements() }} / {{ achievements().length }} earned
+            {{ 'statistics.achievements.earnedCount' | translate : { earned:
+            earnedAchievements(), total: achievements().length } }}
           </strong>
         </div>
 
@@ -376,20 +396,34 @@
           <button
             class="achievement-item"
             type="button"
-            [class.earned]="achievement.earned"
-            (click)="openAchievement(achievement)"
+            [class.earned]="
+                  achievement.earned
+                "
+            (click)="
+                  openAchievement(
+                    achievement
+                  )
+                "
           >
             <div class="achievement-icon">
               <ion-icon
-                [name]="getAchievementIcon(achievement.icon)"
+                [name]="
+                      getAchievementIcon(
+                        achievement.icon
+                      )
+                    "
               ></ion-icon>
             </div>
 
-            <span>{{ achievement.title }}</span>
+            <span> {{ achievement.title }} </span>
 
             @if (!achievement.earned) {
             <div class="achievement-mini-progress">
-              <div [style.width.%]="achievement.progress"></div>
+              <div
+                [style.width.%]="
+                        achievement.progress
+                      "
+              ></div>
             </div>
             }
           </button>
@@ -402,8 +436,8 @@
           type="button"
           (click)="toggleAchievements()"
         >
-          {{ showAllAchievements() ? 'Weniger anzeigen' : 'Alle Achievements
-          anzeigen' }}
+          {{ showAllAchievements() ? ( 'statistics.achievements.showLess' |
+          translate ) : ( 'statistics.achievements.showAll' | translate ) }}
 
           <span> {{ achievements().length }} </span>
         </button>
@@ -419,7 +453,9 @@
             <button
               class="achievement-modal-close"
               type="button"
-              aria-label="Schließen"
+              [attr.aria-label]="
+                    'common.close' | translate
+                  "
               (click)="closeAchievement()"
             >
               ×
@@ -427,20 +463,23 @@
 
             <div
               class="achievement-modal-icon"
-              [class.earned]="selectedAchievement.earned"
+              [class.earned]="
+                    selectedAchievement.earned
+                  "
             >
               <ion-icon
                 [name]="
-            getAchievementIcon(
-              selectedAchievement.icon
-            )
-          "
+                      getAchievementIcon(
+                        selectedAchievement.icon
+                      )
+                    "
               ></ion-icon>
             </div>
 
             <span class="achievement-modal-status">
-              {{ selectedAchievement.earned ? 'ACHIEVEMENT UNLOCKED' : 'IN
-              PROGRESS' }}
+              {{ selectedAchievement.earned ? (
+              'statistics.achievements.unlockedUpper' | translate ) : (
+              'statistics.achievements.inProgressUpper' | translate ) }}
             </span>
 
             <h2 id="achievement-dialog-title">
@@ -451,7 +490,7 @@
 
             <div class="achievement-detail-progress">
               <div class="achievement-detail-heading">
-                <span>Fortschritt</span>
+                <span> {{ 'statistics.progress' | translate }} </span>
 
                 <strong>
                   {{ getAchievementProgressLabel( selectedAchievement ) }}
@@ -461,8 +500,8 @@
               <div class="achievement-detail-track">
                 <div
                   [style.width.%]="
-              selectedAchievement.progress
-            "
+                        selectedAchievement.progress
+                      "
                 ></div>
               </div>
 

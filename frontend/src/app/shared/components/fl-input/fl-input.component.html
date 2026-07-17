@@ -1,7 +1,7 @@
 <div class="field">
   @if (label) {
     <label class="field-label">
-      {{ label }}
+      {{ label | translate }}
     </label>
   }
 
@@ -13,7 +13,7 @@
     <ion-input
       [type]="currentType"
       [value]="value"
-      [placeholder]="placeholder"
+      [placeholder]="placeholder | translate"
       [autocomplete]="autocomplete"
       (ionInput)="onInput($event)"
     ></ion-input>
@@ -24,7 +24,9 @@
         class="password-toggle"
         (click)="togglePassword()"
         [attr.aria-label]="
-          passwordVisible ? 'Passwort ausblenden' : 'Passwort anzeigen'
+          passwordVisible
+            ? ('common.hidePassword' | translate)
+            : ('common.showPassword' | translate)
         "
       >
         <ion-icon
@@ -36,7 +38,7 @@
 
   @if (invalid && errorMessage) {
     <p class="error-message">
-      {{ errorMessage }}
+      {{ errorMessage | translate }}
     </p>
   }
 </div>

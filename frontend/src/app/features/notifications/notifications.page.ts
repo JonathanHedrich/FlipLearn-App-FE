@@ -16,10 +16,12 @@ import {
 import { AppNotification } from '../../core/models/app-notification.model';
 import { AppNotificationService } from '../../core/services/app-notification.service';
 
+import { TranslateService, TranslatePipe } from '@ngx-translate/core';
+
 @Component({
   selector: 'app-notifications',
   standalone: true,
-  imports: [CommonModule, IonContent, IonIcon],
+  imports: [CommonModule, IonContent, IonIcon, TranslatePipe],
   templateUrl: './notifications.page.html',
   styleUrls: ['./notifications.page.scss'],
 })
@@ -32,6 +34,7 @@ export class NotificationsPage {
     private readonly location: Location,
     private readonly router: Router,
     private readonly notificationService: AppNotificationService,
+    private readonly translate: TranslateService,
   ) {
     addIcons({
       alertCircleOutline,
@@ -86,7 +89,7 @@ export class NotificationsPage {
 
   deleteAllNotifications(): void {
     const confirmed = window.confirm(
-      'Möchtest du alle Benachrichtigungen löschen?',
+      this.translate.instant('notifications.deleteAllConfirm'),
     );
 
     if (!confirmed) {

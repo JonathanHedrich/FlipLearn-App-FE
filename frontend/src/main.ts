@@ -1,8 +1,5 @@
-import { bootstrapApplication } from '@angular/platform-browser';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
-
-import { authInterceptor } from './app/core/interceptors/auth.interceptor';
-
+import { bootstrapApplication } from '@angular/platform-browser';
 import {
   PreloadAllModules,
   provideRouter,
@@ -13,9 +10,12 @@ import {
   IonicRouteStrategy,
   provideIonicAngular,
 } from '@ionic/angular/standalone';
+import { provideTranslateService } from '@ngx-translate/core';
+import { provideTranslateHttpLoader } from '@ngx-translate/http-loader';
 
 import { AppComponent } from './app/app.component';
 import { routes } from './app/app.routes';
+import { authInterceptor } from './app/core/interceptors/auth.interceptor';
 
 bootstrapApplication(AppComponent, {
   providers: [
@@ -23,9 +23,22 @@ bootstrapApplication(AppComponent, {
       provide: RouteReuseStrategy,
       useClass: IonicRouteStrategy,
     },
+
     provideIonicAngular(),
+
     provideRouter(routes, withPreloading(PreloadAllModules)),
+
     provideHttpClient(withInterceptors([authInterceptor])),
+
+    provideTranslateService({
+      loader: provideTranslateHttpLoader({
+        prefix: '/i18n/',
+        suffix: '.json',
+        failOnError: true,
+      }),
+      fallbackLang: 'de',
+      lang: 'de',
+    }),
   ],
 }).catch((error: unknown) => {
   console.error('FlipLearn konnte nicht gestartet werden:', error);

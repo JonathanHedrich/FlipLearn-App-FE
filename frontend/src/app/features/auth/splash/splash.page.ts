@@ -2,12 +2,14 @@ import { Component, OnInit } from '@angular/core';
 import { IonContent, IonIcon } from '@ionic/angular/standalone';
 import { Router } from '@angular/router';
 
+import { TranslatePipe } from '@ngx-translate/core';
+
 @Component({
   selector: 'app-splash',
   templateUrl: './splash.page.html',
   styleUrls: ['./splash.page.scss'],
   standalone: true,
-  imports: [IonContent, IonIcon],
+  imports: [IonContent, IonIcon, TranslatePipe],
 })
 export class SplashPage implements OnInit {
   constructor(private router: Router) {}
