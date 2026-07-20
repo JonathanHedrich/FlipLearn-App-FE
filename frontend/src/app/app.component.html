@@ -1,3 +1,9 @@
 <ion-app>
   <ion-router-outlet></ion-router-outlet>
+
+  @if (showAnimatedSplash()) {
+    <fl-animated-splash
+      (animationFinished)="finishSplashAnimation()"
+    ></fl-animated-splash>
+  }
 </ion-app>
