@@ -810,5 +810,221 @@
     "continueWithGoogle": "Mit Google fortfahren",
     "continueWithApple": "Mit Apple fortfahren",
     "continueWithMicrosoft": "Mit Microsoft fortfahren"
+  },
+  "achievements": {
+    "FIRST_SET": {
+      "title": "Erstes Lernset",
+      "description": "Erstelle dein erstes Lernset."
+    },
+    "SET_COLLECTOR_5": {
+      "title": "Set-Sammler",
+      "description": "Erstelle fünf Lernsets."
+    },
+    "SET_COLLECTOR_10": {
+      "title": "Organisierter Lerner",
+      "description": "Erstelle zehn Lernsets."
+    },
+    "SET_COLLECTOR_25": {
+      "title": "Wissensbibliothek",
+      "description": "Erstelle 25 Lernsets."
+    },
+    "SET_COLLECTOR_50": {
+      "title": "Meisterbibliothekar",
+      "description": "Erstelle 50 Lernsets."
+    },
+
+    "FIRST_CARD": {
+      "title": "Erste Lernkarte",
+      "description": "Erstelle deine erste Lernkarte."
+    },
+    "TEN_CARDS": {
+      "title": "Erste Schritte",
+      "description": "Erstelle zehn Lernkarten."
+    },
+    "TWENTY_FIVE_CARDS": {
+      "title": "Kartenbauer",
+      "description": "Erstelle 25 Lernkarten."
+    },
+    "FIFTY_CARDS": {
+      "title": "Deck-Architekt",
+      "description": "Erstelle 50 Lernkarten."
+    },
+    "HUNDRED_CARDS": {
+      "title": "100 Lernkarten",
+      "description": "Erstelle insgesamt 100 Lernkarten."
+    },
+    "TWO_HUNDRED_FIFTY_CARDS": {
+      "title": "Wissensschmied",
+      "description": "Erstelle 250 Lernkarten."
+    },
+    "FIVE_HUNDRED_CARDS": {
+      "title": "Kartenfabrik",
+      "description": "Erstelle 500 Lernkarten."
+    },
+    "THOUSAND_CARDS": {
+      "title": "Enzyklopädie",
+      "description": "Erstelle 1.000 Lernkarten."
+    },
+
+    "FIRST_SESSION": {
+      "title": "Erste Lernsitzung",
+      "description": "Schließe deine erste Lernsitzung ab."
+    },
+    "FIVE_SESSIONS": {
+      "title": "Lerngewohnheit",
+      "description": "Schließe fünf Lernsitzungen ab."
+    },
+    "TEN_SESSIONS": {
+      "title": "Engagierter Lerner",
+      "description": "Schließe zehn Lernsitzungen ab."
+    },
+    "TWENTY_FIVE_SESSIONS": {
+      "title": "Top-Lerner",
+      "description": "Schließe 25 Lernsitzungen ab."
+    },
+    "FIFTY_SESSIONS": {
+      "title": "Lernveteran",
+      "description": "Schließe 50 Lernsitzungen ab."
+    },
+    "HUNDRED_SESSIONS": {
+      "title": "Sitzungsmeister",
+      "description": "Schließe 100 Lernsitzungen ab."
+    },
+    "TWO_HUNDRED_FIFTY_SESSIONS": {
+      "title": "Lernmaschine",
+      "description": "Schließe 250 Lernsitzungen ab."
+    },
+    "FIVE_HUNDRED_SESSIONS": {
+      "title": "Unaufhaltsam",
+      "description": "Schließe 500 Lernsitzungen ab."
+    },
+
+    "FIRST_REVIEW": {
+      "title": "Erste Antwort",
+      "description": "Bewerte deine erste Lernkarte."
+    },
+    "TEN_REVIEWS": {
+      "title": "Warm-up",
+      "description": "Bearbeite zehn Lernkarten."
+    },
+    "FIFTY_REVIEWS": {
+      "title": "Schneller Lerner",
+      "description": "Bearbeite 50 Lernkarten."
+    },
+    "HUNDRED_REVIEWS": {
+      "title": "Jahrhundert",
+      "description": "Bearbeite 100 Lernkarten."
+    },
+    "TWO_HUNDRED_FIFTY_REVIEWS": {
+      "title": "Fokussierter Geist",
+      "description": "Bearbeite 250 Lernkarten."
+    },
+    "FIVE_HUNDRED_REVIEWS": {
+      "title": "Engagement",
+      "description": "Bearbeite insgesamt 500 Lernkarten."
+    },
+    "THOUSAND_REVIEWS": {
+      "title": "Review-Meister",
+      "description": "Bearbeite 1.000 Lernkarten."
+    },
+    "TWO_THOUSAND_FIVE_HUNDRED_REVIEWS": {
+      "title": "Wissenssucher",
+      "description": "Bearbeite 2.500 Lernkarten."
+    },
+    "FIVE_THOUSAND_REVIEWS": {
+      "title": "Gedächtnisathlet",
+      "description": "Bearbeite 5.000 Lernkarten."
+    },
+    "TEN_THOUSAND_REVIEWS": {
+      "title": "Legendärer Lerner",
+      "description": "Bearbeite 10.000 Lernkarten."
+    },
+
+    "STREAK_2": {
+      "title": "Zurück im Flow",
+      "description": "Lerne an zwei Tagen hintereinander."
+    },
+    "STREAK_3": {
+      "title": "Drei-Tage-Serie",
+      "description": "Lerne an drei Tagen hintereinander."
+    },
+    "WEEK_STREAK": {
+      "title": "Wochenserie",
+      "description": "Lerne an sieben Tagen hintereinander."
+    },
+    "STREAK_14": {
+      "title": "Zwei-Wochen-Serie",
+      "description": "Lerne an 14 Tagen hintereinander."
+    },
+    "STREAK_30": {
+      "title": "Monatlicher Schwung",
+      "description": "Lerne an 30 Tagen hintereinander."
+    },
+    "STREAK_60": {
+      "title": "Gewohnheit etabliert",
+      "description": "Lerne an 60 Tagen hintereinander."
+    },
+    "STREAK_100": {
+      "title": "100-Tage-Serie",
+      "description": "Lerne an 100 Tagen hintereinander."
+    },
+    "STREAK_180": {
+      "title": "Halbes Jahr",
+      "description": "Lerne an 180 Tagen hintereinander."
+    },
+    "STREAK_365": {
+      "title": "Ein Jahr Lernen",
+      "description": "Lerne ein ganzes Jahr ohne Unterbrechung."
+    },
+
+    "ACCURACY_60": {
+      "title": "Auf dem richtigen Weg",
+      "description": "Erreiche mindestens 60 % Genauigkeit."
+    },
+    "ACCURACY_70": {
+      "title": "Sicheres Ziel",
+      "description": "Erreiche mindestens 70 % Genauigkeit."
+    },
+    "ACCURACY_80": {
+      "title": "Präziser Lerner",
+      "description": "Erreiche mindestens 80 % Genauigkeit."
+    },
+    "ACCURACY_90": {
+      "title": "Scharfschütze",
+      "description": "Erreiche mindestens 90 % Genauigkeit."
+    },
+    "ACCURACY_95": {
+      "title": "Präzisionsmeister",
+      "description": "Erreiche mindestens 95 % Genauigkeit."
+    },
+    "PERFECT": {
+      "title": "Perfekt",
+      "description": "Erreiche 100 % Genauigkeit."
+    },
+
+    "STUDY_TIME_15": {
+      "title": "Viertelstunde",
+      "description": "Lerne mindestens 15 Minuten in einer Woche."
+    },
+    "STUDY_TIME_30": {
+      "title": "Konzentrierte halbe Stunde",
+      "description": "Lerne mindestens 30 Minuten in einer Woche."
+    },
+    "SPEED_RUN": {
+      "title": "Speedrun",
+      "description": "Sammle mindestens 60 Lernminuten in einer Woche."
+    },
+    "STUDY_TIME_120": {
+      "title": "Tiefer Fokus",
+      "description": "Lerne mindestens zwei Stunden in einer Woche."
+    },
+    "STUDY_TIME_300": {
+      "title": "Fünf-Stunden-Woche",
+      "description": "Lerne mindestens fünf Stunden in einer Woche."
+    },
+    "STUDY_TIME_600": {
+      "title": "Lernmarathon",
+      "description": "Lerne mindestens zehn Stunden in einer Woche."
+    }
   }
 }

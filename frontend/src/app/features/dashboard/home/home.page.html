@@ -302,9 +302,15 @@
             </div>
 
             <div>
-              <strong> {{ achievement.title }} </strong>
+              <strong>
+                {{ ('achievements.' + achievement.code + '.title') | translate:
+                achievement.params }}
+              </strong>
 
-              <span> {{ achievement.description }} </span>
+              <span>
+                {{ ('achievements.' + achievement.code + '.description') |
+                translate: achievement.params }}
+              </span>
             </div>
           </article>
           }

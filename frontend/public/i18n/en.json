@@ -785,5 +785,222 @@
     "continueWithGoogle": "Continue with Google",
     "continueWithApple": "Continue with Apple",
     "continueWithMicrosoft": "Continue with Microsoft"
+  },
+
+  "achievements": {
+    "FIRST_SET": {
+      "title": "First Set",
+      "description": "Create your first study set."
+    },
+    "SET_COLLECTOR_5": {
+      "title": "Set Collector",
+      "description": "Create five study sets."
+    },
+    "SET_COLLECTOR_10": {
+      "title": "Organized Learner",
+      "description": "Create ten study sets."
+    },
+    "SET_COLLECTOR_25": {
+      "title": "Knowledge Library",
+      "description": "Create 25 study sets."
+    },
+    "SET_COLLECTOR_50": {
+      "title": "Master Librarian",
+      "description": "Create 50 study sets."
+    },
+
+    "FIRST_CARD": {
+      "title": "First Card",
+      "description": "Create your first flashcard."
+    },
+    "TEN_CARDS": {
+      "title": "Getting Started",
+      "description": "Create ten flashcards."
+    },
+    "TWENTY_FIVE_CARDS": {
+      "title": "Card Builder",
+      "description": "Create 25 flashcards."
+    },
+    "FIFTY_CARDS": {
+      "title": "Deck Architect",
+      "description": "Create 50 flashcards."
+    },
+    "HUNDRED_CARDS": {
+      "title": "100 Cards",
+      "description": "Create a total of 100 flashcards."
+    },
+    "TWO_HUNDRED_FIFTY_CARDS": {
+      "title": "Knowledge Crafter",
+      "description": "Create 250 flashcards."
+    },
+    "FIVE_HUNDRED_CARDS": {
+      "title": "Card Factory",
+      "description": "Create 500 flashcards."
+    },
+    "THOUSAND_CARDS": {
+      "title": "Encyclopedia",
+      "description": "Create 1,000 flashcards."
+    },
+
+    "FIRST_SESSION": {
+      "title": "First Session",
+      "description": "Complete your first study session."
+    },
+    "FIVE_SESSIONS": {
+      "title": "Study Habit",
+      "description": "Complete five study sessions."
+    },
+    "TEN_SESSIONS": {
+      "title": "Dedicated Student",
+      "description": "Complete ten study sessions."
+    },
+    "TWENTY_FIVE_SESSIONS": {
+      "title": "Top Learner",
+      "description": "Complete 25 study sessions."
+    },
+    "FIFTY_SESSIONS": {
+      "title": "Study Veteran",
+      "description": "Complete 50 study sessions."
+    },
+    "HUNDRED_SESSIONS": {
+      "title": "Session Master",
+      "description": "Complete 100 study sessions."
+    },
+    "TWO_HUNDRED_FIFTY_SESSIONS": {
+      "title": "Learning Machine",
+      "description": "Complete 250 study sessions."
+    },
+    "FIVE_HUNDRED_SESSIONS": {
+      "title": "Unstoppable",
+      "description": "Complete 500 study sessions."
+    },
+
+    "FIRST_REVIEW": {
+      "title": "First Answer",
+      "description": "Review your first flashcard."
+    },
+    "TEN_REVIEWS": {
+      "title": "Warm Up",
+      "description": "Review ten flashcards."
+    },
+    "FIFTY_REVIEWS": {
+      "title": "Quick Learner",
+      "description": "Review 50 flashcards."
+    },
+    "HUNDRED_REVIEWS": {
+      "title": "Century",
+      "description": "Review 100 flashcards."
+    },
+    "TWO_HUNDRED_FIFTY_REVIEWS": {
+      "title": "Focused Mind",
+      "description": "Review 250 flashcards."
+    },
+    "FIVE_HUNDRED_REVIEWS": {
+      "title": "Committed",
+      "description": "Review a total of 500 flashcards."
+    },
+    "THOUSAND_REVIEWS": {
+      "title": "Review Master",
+      "description": "Review 1,000 flashcards."
+    },
+    "TWO_THOUSAND_FIVE_HUNDRED_REVIEWS": {
+      "title": "Knowledge Seeker",
+      "description": "Review 2,500 flashcards."
+    },
+    "FIVE_THOUSAND_REVIEWS": {
+      "title": "Memory Athlete",
+      "description": "Review 5,000 flashcards."
+    },
+    "TEN_THOUSAND_REVIEWS": {
+      "title": "Legendary Learner",
+      "description": "Review 10,000 flashcards."
+    },
+
+    "STREAK_2": {
+      "title": "Back Again",
+      "description": "Study on two consecutive days."
+    },
+    "STREAK_3": {
+      "title": "Three-Day Spark",
+      "description": "Study on three consecutive days."
+    },
+    "WEEK_STREAK": {
+      "title": "Week Streak",
+      "description": "Study on seven consecutive days."
+    },
+    "STREAK_14": {
+      "title": "Two-Week Streak",
+      "description": "Study on 14 consecutive days."
+    },
+    "STREAK_30": {
+      "title": "Monthly Momentum",
+      "description": "Study on 30 consecutive days."
+    },
+    "STREAK_60": {
+      "title": "Habit Formed",
+      "description": "Study on 60 consecutive days."
+    },
+    "STREAK_100": {
+      "title": "Century Streak",
+      "description": "Study on 100 consecutive days."
+    },
+    "STREAK_180": {
+      "title": "Half-Year Hero",
+      "description": "Study on 180 consecutive days."
+    },
+    "STREAK_365": {
+      "title": "Year of Learning",
+      "description": "Study for an entire year without interruption."
+    },
+
+    "ACCURACY_60": {
+      "title": "On the Right Track",
+      "description": "Reach at least 60% accuracy."
+    },
+    "ACCURACY_70": {
+      "title": "Steady Aim",
+      "description": "Reach at least 70% accuracy."
+    },
+    "ACCURACY_80": {
+      "title": "Accurate Learner",
+      "description": "Reach at least 80% accuracy."
+    },
+    "ACCURACY_90": {
+      "title": "Sharpshooter",
+      "description": "Reach at least 90% accuracy."
+    },
+    "ACCURACY_95": {
+      "title": "Precision Expert",
+      "description": "Reach at least 95% accuracy."
+    },
+    "PERFECT": {
+      "title": "Perfect",
+      "description": "Reach 100% accuracy."
+    },
+
+    "STUDY_TIME_15": {
+      "title": "Quarter Hour",
+      "description": "Study at least 15 minutes in one week."
+    },
+    "STUDY_TIME_30": {
+      "title": "Focused Half Hour",
+      "description": "Study at least 30 minutes in one week."
+    },
+    "SPEED_RUN": {
+      "title": "Speed Run",
+      "description": "Accumulate at least 60 study minutes in one week."
+    },
+    "STUDY_TIME_120": {
+      "title": "Deep Focus",
+      "description": "Study at least two hours in one week."
+    },
+    "STUDY_TIME_300": {
+      "title": "Five-Hour Week",
+      "description": "Study at least five hours in one week."
+    },
+    "STUDY_TIME_600": {
+      "title": "Study Marathon",
+      "description": "Study at least ten hours in one week."
+    }
   }
 }

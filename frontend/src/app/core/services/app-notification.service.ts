@@ -3,6 +3,7 @@ import { Injectable, computed, signal } from '@angular/core';
 import { AppNotification } from '../models/app-notification.model';
 import { FlashcardStore } from '../stores/flashcard.store';
 import { StatisticsStore } from '../stores/statistics.store';
+import { TranslateService } from '@ngx-translate/core';
 
 const STUDY_GOAL_STORAGE_KEY = 'fliplearn.studyGoal';
 
@@ -35,6 +36,7 @@ export class AppNotificationService {
   constructor(
     private readonly flashcardStore: FlashcardStore,
     private readonly statisticsStore: StatisticsStore,
+    private readonly translate: TranslateService,
   ) {}
 
   rebuildNotifications(): void {
@@ -112,8 +114,14 @@ export class AppNotificationService {
       this.addNotification(notifications, {
         id: notificationId,
         type: 'achievement',
-        title: achievement.title,
-        message: achievement.description,
+        title: this.translate.instant(
+          `achievements.${achievement.code}.title`,
+          achievement.params,
+        ),
+        message: this.translate.instant(
+          `achievements.${achievement.code}.description`,
+          achievement.params,
+        ),
         icon: 'trophy-outline',
         createdAt: now,
         route: '/statistics',

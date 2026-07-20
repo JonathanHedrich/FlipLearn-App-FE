@@ -415,7 +415,10 @@
               ></ion-icon>
             </div>
 
-            <span> {{ achievement.title }} </span>
+            <span>
+              {{ ('achievements.' + achievement.code + '.title') | translate:
+              achievement.params }}
+            </span>
 
             @if (!achievement.earned) {
             <div class="achievement-mini-progress">
@@ -483,10 +486,14 @@
             </span>
 
             <h2 id="achievement-dialog-title">
-              {{ selectedAchievement.title }}
+              {{ ('achievements.' + selectedAchievement.code + '.title') |
+              translate: selectedAchievement.params }}
             </h2>
 
-            <p>{{ selectedAchievement.description }}</p>
+            <p>
+              {{ ('achievements.' + selectedAchievement.code + '.description') |
+              translate: selectedAchievement.params }}
+            </p>
 
             <div class="achievement-detail-progress">
               <div class="achievement-detail-heading">
