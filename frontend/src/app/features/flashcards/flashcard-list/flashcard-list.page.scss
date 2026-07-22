@@ -1,10 +1,20 @@
 :host {
   display: flex;
   flex-direction: column;
+  inset: 0;
+
+  display: block;
+
+  width: 100%;
   height: 100%;
+  min-width: 0;
+  min-height: 0;
 }
 
 ion-content {
+  width: 100%;
+  height: 100%;
+
   --background: var(--fl-background);
 }
 
@@ -104,7 +114,8 @@ ion-content {
 /* Inhalt */
 
 .sets-content {
-  padding: 16px 20px calc(28px + env(safe-area-inset-bottom));
+  padding: 16px 20px
+    calc(var(--fl-bottom-nav-height, 80px) + 24px + env(safe-area-inset-bottom));
 }
 
 .main-filters {
@@ -200,6 +211,16 @@ ion-content {
 .theme-orange {
   --card-color: var(--fl-set-orange);
   --card-soft-color: #fff0dc;
+}
+
+.theme-red {
+  --card-color: var(--fl-set-red);
+  --card-soft-color: #ffe8e8;
+}
+
+.theme-cyan {
+  --card-color: var(--fl-set-cyan);
+  --card-soft-color: #e4f6fa;
 }
 
 .set-card-header {
@@ -435,9 +456,11 @@ ion-content {
 }
 
 fl-bottom-nav {
-  position: relative;
-  z-index: 20;
-  flex: 0 0 auto;
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 100;
 }
 
 @media (max-width: 350px) {
@@ -456,16 +479,6 @@ fl-bottom-nav {
 
     border-radius: 34px;
     box-shadow: var(--fl-shadow-lg);
-  }
-
-  .theme-red {
-    --card-color: var(--fl-set-red);
-    --card-soft-color: #ffe8e8;
-  }
-
-  .theme-cyan {
-    --card-color: var(--fl-set-cyan);
-    --card-soft-color: #e4f6fa;
   }
 
   .loading-state {

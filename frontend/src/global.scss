@@ -151,12 +151,12 @@ ion-label {
   padding: var(--fl-content-padding);
 }
 
-@media (min-width: 600px) {
-  .fl-page {
-    max-width: var(--fl-max-mobile-width);
-    box-shadow: var(--fl-shadow-lg);
-  }
-}
+// @media (min-width: 600px) {
+//   .fl-page {
+//     max-width: var(--fl-max-mobile-width);
+//     box-shadow: var(--fl-shadow-lg);
+//   }
+// }
 
 /* --------------------------------------------------
  * Typografie
@@ -451,6 +451,7 @@ ion-textarea.fl-ion-input {
  * -------------------------------------------------- */
 
 .fl-bottom-nav {
+  position: absolute;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   width: 100%;

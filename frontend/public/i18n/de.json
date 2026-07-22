@@ -71,7 +71,7 @@
     },
     "errors": {
       "unknown": "Beim Anmelden ist ein unbekannter Fehler aufgetreten.",
-      "backendUnavailable": "Das Backend ist nicht erreichbar. Prüfe, ob Spring Boot auf Port 8080 läuft.",
+      "backendUnavailable": "Das Backend ist nicht erreichbar.",
       "invalidCredentials": "E-Mail-Adresse oder Passwort ist falsch.",
       "loginFailed": "Die Anmeldung ist fehlgeschlagen. Bitte versuche es erneut."
     }
@@ -105,7 +105,7 @@
     },
     "errors": {
       "unknown": "Bei der Registrierung ist ein unbekannter Fehler aufgetreten.",
-      "backendUnavailable": "Das Backend ist nicht erreichbar. Prüfe, ob Spring Boot läuft.",
+      "backendUnavailable": "Das Backend ist nicht erreichbar.",
       "emailExists": "Für diese E-Mail-Adresse existiert bereits ein Konto.",
       "invalidData": "Die eingegebenen Daten sind ungültig.",
       "registrationFailed": "Die Registrierung ist fehlgeschlagen."

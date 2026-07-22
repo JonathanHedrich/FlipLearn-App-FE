@@ -57,7 +57,7 @@
     },
     "errors": {
       "unknown": "An unknown error occurred while signing in.",
-      "backendUnavailable": "The backend is unavailable. Please make sure Spring Boot is running on port 8080.",
+      "backendUnavailable": "The backend is unavailable.",
       "invalidCredentials": "The email address or password is incorrect.",
       "loginFailed": "Sign-in failed. Please try again."
     }
@@ -91,7 +91,7 @@
     },
     "errors": {
       "unknown": "An unknown error occurred during registration.",
-      "backendUnavailable": "The backend is unavailable. Please make sure the Spring Boot server is running.",
+      "backendUnavailable": "The backend is unavailable.",
       "emailExists": "An account already exists for this email address.",
       "invalidData": "The entered data is invalid.",
       "registrationFailed": "Registration failed."

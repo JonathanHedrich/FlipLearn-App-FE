@@ -5,6 +5,10 @@ const config: CapacitorConfig = {
   appName: 'FlipLearn',
   webDir: 'www',
 
+  server: {
+    androidScheme: 'http',
+  },
+
   plugins: {
     SplashScreen: {
       launchAutoHide: false,
