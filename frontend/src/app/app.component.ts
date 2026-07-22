@@ -1,10 +1,11 @@
 import { Component, OnInit, signal } from '@angular/core';
-import { IonApp, IonRouterOutlet } from '@ionic/angular/standalone';
 import { SplashScreen } from '@capacitor/splash-screen';
+import { IonApp, IonRouterOutlet } from '@ionic/angular/standalone';
 
-import { ThemeService } from './core/services/theme.service';
-import { StreakAlertService } from './core/services/streak-alert.service';
+import { GoogleAuthService } from './core/services/google-auth.service';
 import { LanguageService } from './core/services/language.service';
+import { StreakAlertService } from './core/services/streak-alert.service';
+import { ThemeService } from './core/services/theme.service';
 
 import { AnimatedSplashComponent } from './shared/components/animated-splash/animated-splash.component';
 
@@ -21,6 +22,7 @@ export class AppComponent implements OnInit {
     private readonly themeService: ThemeService,
     private readonly streakAlertService: StreakAlertService,
     private readonly languageService: LanguageService,
+    private readonly googleAuthService: GoogleAuthService,
   ) {
     void this.themeService;
     void this.streakAlertService.checkAndNotify();
@@ -29,9 +31,18 @@ export class AppComponent implements OnInit {
 
   async ngOnInit(): Promise<void> {
     try {
+      await this.googleAuthService.initialize();
+    } catch (error: unknown) {
+      console.error(
+        'Google-Anmeldung konnte nicht initialisiert werden.',
+        error,
+      );
+    }
+
+    try {
       await SplashScreen.hide();
     } catch {
-      // Browser
+      // Der native SplashScreen ist im Browser möglicherweise nicht verfügbar.
     }
   }
 

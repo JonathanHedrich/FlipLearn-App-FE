@@ -12,6 +12,11 @@ import {
   LoginRequest,
 } from '../../../core/models/auth.model';
 import { AuthApi } from '../../../core/services/auth-api';
+import {
+  GoogleAuthService,
+  GoogleIdTokenMissingError,
+  GoogleLoginCancelledError,
+} from '../../../core/services/google-auth.service';
 import { AuthStore } from '../../../core/stores/auth.store';
 
 import { FlButtonComponent } from '../../../shared/components/fl-button/fl-button.component';
@@ -52,6 +57,7 @@ export class LoginPage {
     private readonly authApi: AuthApi,
     private readonly route: ActivatedRoute,
     private readonly authStore: AuthStore,
+    private readonly googleAuthService: GoogleAuthService,
     private readonly translate: TranslateService,
   ) {}
 
@@ -95,14 +101,11 @@ export class LoginPage {
 
       this.authStore.setCurrentUser(response);
 
-      await firstValueFrom(this.authApi.loadCurrentUser());
+      const currentUser = await firstValueFrom(this.authApi.loadCurrentUser());
 
-      const returnUrl =
-        this.route.snapshot.queryParamMap.get('returnUrl') ?? '/home';
+      this.authStore.setCurrentUser(currentUser);
 
-      await this.router.navigateByUrl(returnUrl, {
-        replaceUrl: true,
-      });
+      await this.navigateAfterLogin();
     } catch (error: unknown) {
       this.loginError = this.resolveLoginError(error);
     } finally {
@@ -110,8 +113,43 @@ export class LoginPage {
     }
   }
 
-  signInWithGoogle(): void {
-    console.log(this.translate.instant('login.messages.googleNotImplemented'));
+  async signInWithGoogle(): Promise<void> {
+    if (this.isSubmitting) {
+      return;
+    }
+
+    this.loginError = '';
+    this.isSubmitting = true;
+
+    try {
+      await this.googleAuthService.login();
+      await this.navigateAfterLogin();
+    } catch (error: unknown) {
+      this.loginError = this.resolveGoogleLoginError(error);
+    } finally {
+      this.isSubmitting = false;
+    }
+  }
+
+  private async navigateAfterLogin(): Promise<void> {
+    const returnUrl =
+      this.route.snapshot.queryParamMap.get('returnUrl') ?? '/home';
+
+    await this.router.navigateByUrl(returnUrl, {
+      replaceUrl: true,
+    });
+  }
+
+  private resolveGoogleLoginError(error: unknown): string {
+    if (error instanceof GoogleLoginCancelledError) {
+      return '';
+    }
+
+    if (error instanceof GoogleIdTokenMissingError) {
+      return this.translate.instant('login.errors.googleTokenMissing');
+    }
+
+    return this.resolveLoginError(error);
   }
 
   private resolveLoginError(error: unknown): string {

@@ -12,6 +12,13 @@ import {
   RegisterRequest,
 } from '../../../core/models/auth.model';
 import { AuthApi } from '../../../core/services/auth-api';
+import {
+  GoogleAuthService,
+  GoogleIdTokenMissingError,
+  GoogleLoginCancelledError,
+} from '../../../core/services/google-auth.service';
+import { AuthStore } from '../../../core/stores/auth.store';
+
 import { FlButtonComponent } from '../../../shared/components/fl-button/fl-button.component';
 import { FlInputComponent } from '../../../shared/components/fl-input/fl-input.component';
 import { FlLogoComponent } from '../../../shared/components/fl-logo/fl-logo.component';
@@ -37,7 +44,6 @@ import { FlSocialButtonComponent } from '../../../shared/components/fl-social-bu
 export class RegisterPage {
   submitted = false;
   isSubmitting = false;
-
   registerError = '';
 
   readonly registerForm = this.formBuilder.nonNullable.group({
@@ -60,6 +66,8 @@ export class RegisterPage {
     private readonly formBuilder: FormBuilder,
     private readonly router: Router,
     private readonly authApi: AuthApi,
+    private readonly authStore: AuthStore,
+    private readonly googleAuthService: GoogleAuthService,
     private readonly translate: TranslateService,
   ) {}
 
@@ -124,18 +132,20 @@ export class RegisterPage {
 
       await firstValueFrom(this.authApi.register(request));
 
-      await firstValueFrom(
+      const loginResponse = await firstValueFrom(
         this.authApi.login({
           email: request.email,
           password: request.password,
         }),
       );
 
-      await firstValueFrom(this.authApi.loadCurrentUser());
+      this.authStore.setCurrentUser(loginResponse);
 
-      await this.router.navigateByUrl('/home', {
-        replaceUrl: true,
-      });
+      const currentUser = await firstValueFrom(this.authApi.loadCurrentUser());
+
+      this.authStore.setCurrentUser(currentUser);
+
+      await this.navigateToHome();
     } catch (error: unknown) {
       this.registerError = this.resolveRegistrationError(error);
     } finally {
@@ -143,10 +153,40 @@ export class RegisterPage {
     }
   }
 
-  registerWithGoogle(): void {
-    console.log(
-      this.translate.instant('register.messages.googleNotImplemented'),
-    );
+  async registerWithGoogle(): Promise<void> {
+    if (this.isSubmitting) {
+      return;
+    }
+
+    this.registerError = '';
+    this.isSubmitting = true;
+
+    try {
+      await this.googleAuthService.login();
+      await this.navigateToHome();
+    } catch (error: unknown) {
+      this.registerError = this.resolveGoogleRegistrationError(error);
+    } finally {
+      this.isSubmitting = false;
+    }
+  }
+
+  private async navigateToHome(): Promise<void> {
+    await this.router.navigateByUrl('/home', {
+      replaceUrl: true,
+    });
+  }
+
+  private resolveGoogleRegistrationError(error: unknown): string {
+    if (error instanceof GoogleLoginCancelledError) {
+      return '';
+    }
+
+    if (error instanceof GoogleIdTokenMissingError) {
+      return this.translate.instant('register.errors.googleTokenMissing');
+    }
+
+    return this.resolveRegistrationError(error);
   }
 
   private resolveRegistrationError(error: unknown): string {
@@ -159,6 +199,13 @@ export class RegisterPage {
     }
 
     const apiError = error.error as Partial<ApiErrorResponse> | null;
+
+    if (error.status === 401) {
+      return (
+        apiError?.message ??
+        this.translate.instant('register.errors.googleLoginFailed')
+      );
+    }
 
     if (error.status === 409) {
       return (
@@ -177,7 +224,10 @@ export class RegisterPage {
         );
       }
 
-      return this.translate.instant('register.errors.invalidData');
+      return (
+        apiError?.message ??
+        this.translate.instant('register.errors.invalidData')
+      );
     }
 
     return (

@@ -5,19 +5,19 @@ import { Observable, tap } from 'rxjs';
 import { API_BASE_URL } from '../config/api.config';
 
 import {
+  ChangeEmailRequest,
   ChangePasswordRequest,
   CurrentUserResponse,
-  UpdateProfileRequest,
-  ChangeEmailRequest,
+  GoogleLoginRequest,
   LoginRequest,
   LoginResponse,
   RegisterRequest,
   RegisterResponse,
+  UpdateProfileRequest,
   UserProfileResponse,
 } from '../models/auth.model';
 
 const TOKEN_STORAGE_KEY = 'fliplearn.accessToken';
-
 const USER_STORAGE_KEY = 'fliplearn.currentUser';
 
 @Injectable({
@@ -33,9 +33,7 @@ export class AuthApi {
   );
 
   readonly accessToken = this.tokenState.asReadonly();
-
   readonly currentUser = this.userState.asReadonly();
-
   readonly isAuthenticated = computed(() => Boolean(this.tokenState()));
 
   constructor(private readonly http: HttpClient) {}
@@ -57,11 +55,20 @@ export class AuthApi {
       );
   }
 
+  googleLogin(request: GoogleLoginRequest): Observable<LoginResponse> {
+    return this.http
+      .post<LoginResponse>(`${API_BASE_URL}/auth/google`, request)
+      .pipe(
+        tap((response) => {
+          this.storeLogin(response);
+        }),
+      );
+  }
+
   loadCurrentUser(): Observable<CurrentUserResponse> {
     return this.http.get<CurrentUserResponse>(`${API_BASE_URL}/users/me`).pipe(
       tap((user) => {
         this.userState.set(user);
-
         localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(user));
       }),
     );
@@ -69,47 +76,10 @@ export class AuthApi {
 
   logout(): void {
     localStorage.removeItem(TOKEN_STORAGE_KEY);
-
     localStorage.removeItem(USER_STORAGE_KEY);
 
     this.tokenState.set(null);
     this.userState.set(null);
-  }
-
-  private storeLogin(response: LoginResponse): void {
-    localStorage.setItem(TOKEN_STORAGE_KEY, response.accessToken);
-
-    this.tokenState.set(response.accessToken);
-
-    const user: CurrentUserResponse = {
-      id: response.userId,
-      displayName: response.displayName,
-      username: response.username,
-      email: response.email,
-      role: response.role,
-      enabled: true,
-      createdAt: '',
-    };
-
-    this.userState.set(user);
-
-    localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(user));
-  }
-
-  private loadStoredUser(): CurrentUserResponse | null {
-    const storedUser = localStorage.getItem(USER_STORAGE_KEY);
-
-    if (!storedUser) {
-      return null;
-    }
-
-    try {
-      return JSON.parse(storedUser) as CurrentUserResponse;
-    } catch {
-      localStorage.removeItem(USER_STORAGE_KEY);
-
-      return null;
-    }
   }
 
   getProfile(): Observable<UserProfileResponse> {
@@ -135,7 +105,40 @@ export class AuthApi {
 
   setCurrentUser(user: CurrentUserResponse): void {
     this.userState.set(user);
-
     localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(user));
+  }
+
+  private storeLogin(response: LoginResponse): void {
+    localStorage.setItem(TOKEN_STORAGE_KEY, response.accessToken);
+    this.tokenState.set(response.accessToken);
+
+    const user: CurrentUserResponse = {
+      id: response.userId,
+      displayName: response.displayName,
+      username: response.username,
+      email: response.email,
+      role: response.role,
+      enabled: true,
+      createdAt: '',
+    };
+
+    this.userState.set(user);
+    localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(user));
+  }
+
+  private loadStoredUser(): CurrentUserResponse | null {
+    const storedUser = localStorage.getItem(USER_STORAGE_KEY);
+
+    if (!storedUser) {
+      return null;
+    }
+
+    try {
+      return JSON.parse(storedUser) as CurrentUserResponse;
+    } catch {
+      localStorage.removeItem(USER_STORAGE_KEY);
+
+      return null;
+    }
   }
 }
